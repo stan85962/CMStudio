@@ -2794,3 +2794,41 @@ body.theme-intelixa .veille-badge {
 @media (max-width: 520px) {
   .veille-label-desc { display: none; }
 }
+
+/* ===== TEMPLATES VEILLE ===== */
+.veille-chip {
+  border-color: rgba(59,130,246,.4) !important;
+  color: #3b82f6 !important;
+  background: rgba(59,130,246,.06) !important;
+}
+.veille-chip:hover {
+  border-color: #3b82f6 !important;
+  background: rgba(59,130,246,.14) !important;
+  color: #2563eb !important;
+}
+body.theme-intelixa .veille-chip {
+  border-color: rgba(96,165,250,.4) !important;
+  color: #60a5fa !important;
+  background: rgba(96,165,250,.07) !important;
+}
+body.theme-intelixa .veille-chip:hover {
+  border-color: #60a5fa !important;
+  background: rgba(96,165,250,.15) !important;
+}
+
+/* Loading tendances */
+.template-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #3b82f6;
+  padding: 6px 0;
+}
+.template-spin {
+  animation: tplSpin .8s linear infinite;
+}
+@keyframes tplSpin {
+  to { transform: rotate(360deg); }
+}

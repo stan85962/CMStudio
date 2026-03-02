@@ -18,6 +18,7 @@ async function initVeille() {
 function toggleVeille(enabled) {
   _veilleEnabled = enabled;
   window.storage.set('veille-enabled', String(enabled));
+  if(typeof renderTemplates === 'function') renderTemplates();
 }
 
 function getVeillePrompt(brandKey) {

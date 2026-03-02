@@ -91,7 +91,7 @@ function setABMode(mode, el) {
 }
 
 // ===== TEMPLATES =====
-function renderTemplates() {
+function _renderTemplatesStatic() {
   const row = document.getElementById('templatesRow');
   if(!row || !selectedBrand) return;
   const byPlatform = TEMPLATES[selectedBrand] || {};
@@ -99,8 +99,64 @@ function renderTemplates() {
     ? byPlatform[selectedPlatform]
     : byPlatform[Object.keys(byPlatform)[0]] || [];
   row.innerHTML = list.map(t =>
-    `<button class="template-chip" onclick="document.getElementById('theme').value='${t.replace(/'/g,"\\'")}'">${t}</button>`
+    `<button class="template-chip" onclick="document.getElementById('theme').value='${t.replace(/'/g,"\'")}'">${t}</button>`
   ).join('');
+}
+
+async function _renderVeilleTemplates() {
+  const row = document.getElementById('templatesRow');
+  if(!row || !selectedBrand || !selectedPlatform) return;
+
+  row.innerHTML = '<span class="template-loading"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="template-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Tendances en cours…</span>';
+
+  const token = getGithubToken();
+  if(!token) { _renderTemplatesStatic(); return; }
+
+  const brand = BRAND_CONTEXT[selectedBrand];
+  const veilleContext = getVeillePrompt(selectedBrand);
+
+  try {
+    const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        max_tokens: 200,
+        messages: [
+          {
+            role: 'system',
+            content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc}${veilleContext}`
+          },
+          {
+            role: 'user',
+            content: `Génère exactement 4 idées de posts tendance pour ${brand.label} sur ${selectedPlatform}. Retourne UNIQUEMENT un tableau JSON de 4 courtes chaînes (max 55 caractères chacune). Format strict : ["idée 1","idée 2","idée 3","idée 4"]. Rien d'autre.`
+          }
+        ]
+      })
+    });
+    const data = await resp.json();
+    if(!resp.ok || !data.choices) throw new Error('api');
+    const raw = data.choices[0].message.content.trim();
+    const match = raw.match(/\[[\s\S]*?\]/);
+    const ideas = match ? JSON.parse(match[0]) : [];
+    if(ideas.length > 0) {
+      row.innerHTML = ideas.map(t =>
+        `<button class="template-chip veille-chip" onclick="document.getElementById('theme').value='${t.replace(/'/g,"\'")}'">${t}</button>`
+      ).join('');
+    } else {
+      _renderTemplatesStatic();
+    }
+  } catch(e) {
+    _renderTemplatesStatic();
+  }
+}
+
+function renderTemplates() {
+  if(typeof _veilleEnabled !== 'undefined' && _veilleEnabled && selectedPlatform) {
+    _renderVeilleTemplates();
+  } else {
+    _renderTemplatesStatic();
+  }
 }
 
 // ===== COPY =====
