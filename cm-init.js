@@ -4,7 +4,12 @@ function checkConnectivity() {
   const generateBtn = document.getElementById('generateBtn');
   const ideaBtn     = document.getElementById('ideaBtn');
   const isOnline    = navigator.onLine;
-  const hasToken    = !!(localStorage.getItem('cm_github_token') || '').trim();
+  // Priorité : config.js → localStorage (fallback)
+  const hasToken    = !!(
+    (typeof CONFIG !== 'undefined' && CONFIG.GITHUB_TOKEN ? CONFIG.GITHUB_TOKEN : '') ||
+    localStorage.getItem('cm_github_token') ||
+    ''
+  ).trim();
 
   let msg = '', cls = '';
   if (!isOnline)      { msg = icon('wifiOff',14) + ' Hors-ligne — notes et calendrier disponibles'; cls = 'status-offline'; }
@@ -25,10 +30,6 @@ function checkConnectivity() {
 
 window.addEventListener('online',  checkConnectivity);
 window.addEventListener('offline', checkConnectivity);
-
-// Réécouter le champ token pour mise à jour immédiate du banner
-const _apiKeyEl = document.getElementById('apiKeyInput');
-if (_apiKeyEl) _apiKeyEl.addEventListener('input', checkConnectivity);
 
 // ===== PAGE SWITCH =====
 function switchPage(page, el) {

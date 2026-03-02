@@ -1,6 +1,15 @@
 // ===== API =====
 function getGithubToken() {
-  return (document.getElementById('apiKeyInput')?.value || localStorage.getItem('cm_github_token') || '').trim();
+  // Priorité : config.js → localStorage (fallback compatibilité)
+  return (
+    (typeof CONFIG !== 'undefined' && CONFIG.GITHUB_TOKEN ? CONFIG.GITHUB_TOKEN : '') ||
+    localStorage.getItem('cm_github_token') ||
+    ''
+  ).trim();
+}
+
+function getBraveToken() {
+  return (typeof CONFIG !== 'undefined' && CONFIG.BRAVE_TOKEN ? CONFIG.BRAVE_TOKEN : '').trim();
 }
 
 // ===== MODE VEILLE =====
