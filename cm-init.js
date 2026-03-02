@@ -52,6 +52,7 @@ setTimeout(renderPerfRecap, 700);
 renderGreeting();
 checkConnectivity();
 setTimeout(initAutopilot, 800);
+setTimeout(initVeille, 850);
 document.addEventListener('click', () => {
   if (openMoveId !== null) { openMoveId = null; getNotes().then(renderNotes); }
 });

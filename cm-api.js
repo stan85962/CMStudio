@@ -3,12 +3,44 @@ function getGithubToken() {
   return (document.getElementById('apiKeyInput')?.value || localStorage.getItem('cm_github_token') || '').trim();
 }
 
+// ===== MODE VEILLE =====
+let _veilleEnabled = false;
+
+async function initVeille() {
+  try {
+    const r = await window.storage.get('veille-enabled');
+    _veilleEnabled = r && r.value === 'true';
+    const toggle = document.getElementById('veilleToggle');
+    if (toggle) toggle.checked = _veilleEnabled;
+  } catch(e) {}
+}
+
+function toggleVeille(enabled) {
+  _veilleEnabled = enabled;
+  window.storage.set('veille-enabled', String(enabled));
+}
+
+function getVeillePrompt(brandKey) {
+  if (brandKey === 'intelixa') {
+    return ' Avant de générer, appuie-toi sur les tendances IA et bureautique les plus récentes que tu connais en 2025-2026. Ancre le contenu dans l\'actualité du secteur.';
+  }
+  return ' Avant de générer, appuie-toi sur les tendances actuelles de la petite enfance, les évolutions réglementaires et les sujets qui buzzent dans le secteur crèche en 2025-2026. Ancre le contenu dans l\'actualité du secteur.';
+}
+
+function _veilleHeaderBadge() {
+  if (!_veilleEnabled) return '';
+  return '<span class="veille-badge"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Veille active</span>';
+}
+
+// ===== CALL API CORE =====
 async function callClaude(brand, theme, variant) {
   const token = getGithubToken();
   if(!token) throw new Error("Token GitHub manquant — colle ton token dans le champ 🔑 en haut de la page.");
 
   const _customRes = await window.storage.get('prompt-' + selectedBrand + '-' + selectedPlatform);
   const _platformPrompt = (_customRes && _customRes.value) ? _customRes.value : PLATFORM_PROMPTS[selectedPlatform](brand);
+
+  const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
 
   const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
     method: 'POST',
@@ -22,7 +54,7 @@ async function callClaude(brand, theme, variant) {
       messages: [
         {
           role: 'system',
-          content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}`
+          content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}${veilleInject}`
         },
         {
           role: 'user',
@@ -59,7 +91,7 @@ async function generateIdea() {
   const meta    = PLATFORMS_META[selectedPlatform];
   const resultBox = document.getElementById('resultBox');
   resultBox.classList.add('visible');
-  document.getElementById('resultHeader').innerHTML = meta.icon + `<div class="result-platform">${meta.label}</div>`;
+  document.getElementById('resultHeader').innerHTML = meta.icon + `<div class="result-platform">${meta.label}</div>` + _veilleHeaderBadge();
   document.getElementById('resultSingle').style.display = 'block';
   document.getElementById('resultAB').style.display = 'none';
   document.getElementById('copyBtn').style.display = 'flex';
@@ -68,6 +100,8 @@ async function generateIdea() {
   try {
     const token = getGithubToken();
     if(!token) throw new Error("Token GitHub manquant — colle ton token dans le champ 🔑 en haut de la page.");
+
+    const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
 
     const ideaTheme = `Choisis toi-même l'idée la plus pertinente du moment pour ${brand.label} sur ${selectedPlatform}. Lance-toi directement dans le contenu, sans préciser le thème choisi au préalable.`;
 
@@ -83,7 +117,7 @@ async function generateIdea() {
         messages: [
           {
             role: 'system',
-            content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.`
+            content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.${veilleInject}`
           },
           { role: 'user', content: ideaTheme }
         ]
@@ -142,7 +176,7 @@ async function generate() {
   const resultBox = document.getElementById('resultBox');
   resultBox.classList.add('visible');
   const meta = PLATFORMS_META[selectedPlatform];
-  document.getElementById('resultHeader').innerHTML = meta.icon + `<div class="result-platform">${meta.label}</div>`;
+  document.getElementById('resultHeader').innerHTML = meta.icon + `<div class="result-platform">${meta.label}</div>` + _veilleHeaderBadge();
 
   if(abMode) {
     document.getElementById('resultSingle').style.display='none';
