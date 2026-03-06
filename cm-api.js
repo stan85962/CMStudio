@@ -42,6 +42,20 @@ function _veilleHeaderBadge() {
   return '<span class="veille-badge"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Veille active</span>';
 }
 
+// ===== SEO/AEO CONTRAINTES PROMPT =====
+const _IDEAL_LENGTHS = {
+  linkedin:[1500,3000], instagram:[800,2200], gmb:[250,1500],
+  facebook:[400,1200], tiktok:[100,500], pinterest:[200,500],
+  spotify:[200,800], brevo:[500,2000], youtube:[500,3000]
+};
+
+function buildSEOConstraints(brandKey, platform) {
+  const kw = (typeof SEO_KEYWORDS !== 'undefined' && SEO_KEYWORDS[brandKey])
+    ? SEO_KEYWORDS[brandKey].slice(0, 6).join(', ') : '';
+  const [min, max] = _IDEAL_LENGTHS[platform] || [200, 1500];
+  return `\nCONTRAINTES SEO/AEO :${kw ? ` mots-clés à intégrer : ${kw} |` : ''} longueur ${min}–${max} car. | inclure une question | phrases ≤20 mots.`;
+}
+
 // ===== CALL API CORE =====
 async function callClaude(brand, theme, variant) {
   const token = getGithubToken();
@@ -51,6 +65,7 @@ async function callClaude(brand, theme, variant) {
   const _platformPrompt = (_customRes && _customRes.value) ? _customRes.value : PLATFORM_PROMPTS[selectedPlatform](brand);
 
   const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
+  const seoInject = buildSEOConstraints(selectedBrand, selectedPlatform);
 
   const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
     method: 'POST',
@@ -64,7 +79,7 @@ async function callClaude(brand, theme, variant) {
       messages: [
         {
           role: 'system',
-          content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}${veilleInject}`
+          content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}${veilleInject}${seoInject}`
         },
         {
           role: 'user',
@@ -112,6 +127,7 @@ async function generateIdea() {
     if(!token) throw new Error("Token GitHub manquant — colle ton token dans le champ 🔑 en haut de la page.");
 
     const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
+    const seoInject = buildSEOConstraints(selectedBrand, selectedPlatform);
 
     const ideaTheme = `Choisis toi-même l'idée la plus pertinente du moment pour ${brand.label} sur ${selectedPlatform}. Lance-toi directement dans le contenu, sans préciser le thème choisi au préalable.`;
 
@@ -127,7 +143,7 @@ async function generateIdea() {
         messages: [
           {
             role: 'system',
-            content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.${veilleInject}`
+            content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.${veilleInject}${seoInject}`
           },
           { role: 'user', content: ideaTheme }
         ]
@@ -241,4 +257,63 @@ async function generate() {
 
   btn.disabled = false;
   btn.textContent = selectedBrand==='intelixa' ? '[ GENERER ]' : '✨ Générer';
+}
+
+// ===== OPTIMISER (relance ciblée sur critères faibles) =====
+async function optimizeContent(failedScores) {
+  const resultEl = document.getElementById('resultContent');
+  const currentText = resultEl?.textContent?.trim();
+  if(!currentText || currentText === '—') return;
+
+  const token = getGithubToken();
+  if(!token) { alert('Token manquant'); return; }
+
+  const btn = document.querySelector('.seo-optimize-btn');
+  if(btn) { btn.disabled = true; btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:tplSpin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Optimisation…'; }
+
+  const brand = BRAND_CONTEXT[selectedBrand];
+  const fixes = [];
+
+  if(failedScores.includes('seo')) {
+    const kw = (typeof SEO_KEYWORDS !== 'undefined' && SEO_KEYWORDS[selectedBrand])
+      ? SEO_KEYWORDS[selectedBrand].slice(0,5).join(', ') : '';
+    if(kw) fixes.push(`- SEO : intègre naturellement ces mots-clés : ${kw}`);
+  }
+  if(failedScores.includes('aeo')) {
+    fixes.push(`- AEO : ajoute une question ou tournure interrogative (comment, pourquoi, est-ce que…)`);
+  }
+  if(failedScores.includes('readability')) {
+    fixes.push(`- Lisibilité : raccourcis les phrases (max 20 mots chacune)`);
+  }
+  if(failedScores.includes('length')) {
+    const [min, max] = _IDEAL_LENGTHS[selectedPlatform] || [200, 1500];
+    fixes.push(`- Longueur : ajuste pour atteindre ${min}–${max} caractères`);
+  }
+  if(!fixes.length) return;
+
+  const fixPrompt = `Réécris ce post en améliorant uniquement ces points, sans changer le fond :\n${fixes.join('\n')}\n\nPost original :\n${currentText}`;
+
+  try {
+    const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({
+        model: 'gpt-4o', max_tokens: 1000,
+        messages: [
+          { role: 'system', content: `Tu es un expert CM pour ${brand.label}. Retourne uniquement le post réécrit, sans commentaire.` },
+          { role: 'user', content: fixPrompt }
+        ]
+      })
+    });
+    const data = await resp.json();
+    if(!resp.ok || !data.choices) throw new Error(data?.error?.message || `HTTP ${resp.status}`);
+    const result = data.choices[0].message.content.trim();
+    resultEl.textContent = result;
+    saveToHistory(document.getElementById('theme')?.value || 'Optimisé', result, 'OPT');
+    renderSEOPanel(result, selectedBrand);
+    checkPostGenLength(result, selectedPlatform);
+  } catch(err) {
+    document.getElementById('errorMsg').innerHTML = `<div class="error-msg">❌ ${err.message}</div>`;
+    if(btn) { btn.disabled = false; btn.textContent = '⚡ Optimiser'; }
+  }
 }

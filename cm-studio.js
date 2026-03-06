@@ -388,6 +388,17 @@ function renderSEOPanel(text, brand) {
   const bar = (s, color) => `<div style="height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:4px;">
     <div style="height:100%;width:${s}%;background:${color};border-radius:3px;transition:width .6s ease;"></div></div>`;
 
+  // Bouton Optimiser pour les scores rouges (<40)
+  const weakScores = [];
+  if(data.seo < 40) weakScores.push('seo');
+  if(data.aeo < 40) weakScores.push('aeo');
+  if(data.readability < 40) weakScores.push('readability');
+  if(data.length < 40) weakScores.push('length');
+  const weakLabels = {seo:'SEO', aeo:'AEO', readability:'Lisibilité', length:'Longueur'};
+  const optimizeBtn = weakScores.length
+    ? `<button class="seo-optimize-btn" onclick="optimizeContent(${JSON.stringify(weakScores)})">⚡ Optimiser (${weakScores.map(k=>weakLabels[k]).join(', ')})</button>`
+    : '';
+
   box.innerHTML = `
     <div class="seo-panel-inner">
       <div class="seo-title">📊 Analyse SEO / AEO</div>
@@ -413,6 +424,7 @@ function renderSEOPanel(text, brand) {
           <div class="seo-item-sub">Idéal : ${data.ideal} caractères</div>
         </div>
       </div>
+      ${optimizeBtn}
     </div>`;
 }
 
