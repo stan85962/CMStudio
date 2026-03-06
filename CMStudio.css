@@ -2862,3 +2862,274 @@ body.theme-intelixa .seo-optimize-btn {
 body.theme-intelixa .seo-optimize-btn:hover {
   background: rgba(255,152,0,.15);
 }
+
+/* ========================================================
+   RESPONSIVE MOBILE — max-width: 768px
+   Cible : 390px (iPhone 14) — desktop intact
+   ======================================================== */
+@media (max-width: 768px) {
+
+  /* ── 1. TOP NAV ───────────────────────────────────────── */
+  /* Ligne 1 : logo | autopilot | ☰       Ligne 2 : onglets */
+  .top-nav {
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    gap: 0;
+    align-items: center;
+  }
+
+  /* Logo — s'étend sur l'espace dispo en ligne 1 */
+  .nav-logo {
+    order: 1;
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+  }
+
+  /* Switch AUTOPILOT — ligne 1, après logo */
+  .nav-autopilot {
+    order: 2;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  /* Masquer les boutons timer rapides (pas de place) */
+  .autopilot-quick   { display: none; }
+  .autopilot-switch-text { display: none; }
+
+  /* ☰ Ressources — ligne 1, tout à droite */
+  .help-btn {
+    order: 3;
+    flex-shrink: 0;
+    margin-left: 6px;
+  }
+
+  /* Onglets — ligne 2, pleine largeur, scroll horizontal sans scrollbar */
+  .nav-tabs {
+    order: 4;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    margin-top: 7px;
+    padding: 3px;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .nav-tab {
+    padding: 6px 10px;
+    font-size: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── 2. PADDING GÉNÉRAL DES PAGES ───────────────────── */
+  .page { padding: 14px 10px 40px; overflow-x: hidden; }
+
+  .section-label {
+    max-width: 100%;
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+
+  /* ── 3. GRILLE MARQUES ───────────────────────────────── */
+  .brand-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    max-width: 100%;
+    width: 100%;
+  }
+  .brand-btn {
+    padding: 16px 10px;
+    min-width: 0;      /* empêche le débordement grid */
+    overflow: hidden;
+  }
+  .brand-btn img {
+    max-width: 100%;
+    max-height: 36px;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Carte Stan : pleine largeur centrée */
+  .brand-btn.stan {
+    max-width: 100%;
+    grid-column: 1 / -1;
+  }
+
+  /* ── 4. STATS ────────────────────────────────────────── */
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    max-width: 100%;
+  }
+  .stat-card  { padding: 14px 10px; }
+  .stat-num   { font-size: 24px; }
+
+  /* ── 5. GRILLE PLATEFORMES ───────────────────────────── */
+  .platforms-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    max-width: 100%;
+  }
+  .platform-btn {
+    min-height: 70px;
+    aspect-ratio: unset;
+    padding: 10px 6px;
+    border-radius: 12px;
+  }
+  .platform-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+  .platform-label { font-size: 11px; }
+
+  /* YouTube — pleine largeur grid, mais bouton 50% centré */
+  .platform-btn--youtube {
+    grid-column: 1 / -1;
+    width: 50%;
+    justify-self: center;
+    height: 62px;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  /* ── 6. STUDIO — TEXTAREA / BOUTONS ─────────────────── */
+  .step       { max-width: 100%; margin-bottom: 14px; }
+  .theme-card { max-width: 100%; padding: 14px; }
+  textarea    { font-size: 14px; width: 100%; }
+
+  /* Générer + J'ai pas d'idée : empilés verticalement */
+  .btn-row {
+    flex-direction: column;
+    max-width: 100%;
+    gap: 8px;
+  }
+  .btn-row .generate-btn {
+    width: 100%;
+    margin-top: 0;
+  }
+  .idea-btn {
+    width: 100%;
+    white-space: normal;
+    padding: 14px 16px;
+    flex: none;
+  }
+
+  /* Boutons A/B */
+  .ab-toggle { flex-wrap: wrap; }
+  .ab-btn    { flex: 1; text-align: center; }
+
+  /* ── 7. RÉSULTAT & A/B ───────────────────────────────── */
+  .result-box   { max-width: 100%; }
+  .result-content { padding: 16px; }
+
+  /* A/B en colonne */
+  .ab-results {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .result-footer { flex-wrap: wrap; gap: 6px; }
+  .copy-btn      { min-width: unset; flex: 1; }
+
+  /* ── 8. SEO PANEL ────────────────────────────────────── */
+  .seo-panel      { max-width: 100%; }
+  .seo-panel-inner { padding: 14px; }
+  .seo-grid       { grid-template-columns: 1fr; }
+  .seo-optimize-btn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  /* ── 9. ÉLÉMENTS DASHBOARD ───────────────────────────── */
+  .dash-hero    { max-width: 100%; margin-bottom: 20px; }
+  .dash-hero h1 { font-size: clamp(18px, 6vw, 28px); }
+  .dash-hero p  { font-size: 12px; }
+
+  .greeting-banner { max-width: 100%; }
+  .recent-list     { max-width: 100%; }
+  .recent-item     { padding: 12px 14px; gap: 10px; }
+
+  /* Streak / perf */
+  .streak-card { max-width: 100%; }
+  #perfBlock   { max-width: 100%; }
+
+  /* ── 10. CALENDRIER — VUE MOIS ───────────────────────── */
+  .cal-day {
+    min-height: 56px;
+    padding: 4px;
+    border-radius: 8px;
+  }
+  .cal-day-num {
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+  .cal-grid-header div {
+    font-size: 8px;
+    padding: 4px 0;
+    letter-spacing: 0;
+  }
+  .cal-title { font-size: 16px; }
+
+  /* Événements : 1 seul visible, tronqué */
+  .cal-post               { display: none; }
+  .cal-post:first-child   { display: flex; overflow: hidden; }
+  .cal-post-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .cal-post-badge  { display: none; }
+
+  /* Formulaire d'ajout */
+  .cal-add-form { padding: 12px; }
+  .cal-quick-btn { padding: 10px 12px; font-size: 12px; }
+
+  /* Masquer le bouton "Semaine" — garder Mois uniquement */
+  #calViewSemaine { display: none; }
+
+  /* ── 11. CHATBOT FLOTTANT ────────────────────────────── */
+  .chat-window {
+    width: calc(100vw - 32px);
+    right: 16px;
+    bottom: 80px;
+    height: 420px;
+  }
+  .chat-fab {
+    bottom: 20px;
+    right: 16px;
+  }
+
+  /* ── 12. MODALS (prévisualisation + historique) ──────── */
+  .preview-modal-inner {
+    width: 95vw;
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+  .hist-modal-box {
+    width: 95vw;
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+
+  /* ── 13. PANEL AUTOPILOT ─────────────────────────────── */
+  .ap-panel     { padding: 14px 14px; max-width: 100%; }
+  .ap-plat-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* ── 14. DRAWER RESSOURCES ───────────────────────────── */
+  .res-drawer { width: 100vw; }
+
+  /* ── 15. MODE VEILLE ─────────────────────────────────── */
+  .veille-label-desc { display: none; }
+
+  /* ── 16. REGEN / RESULT ACTIONS ─────────────────────── */
+  .regen-btn { width: 100%; justify-content: center; box-sizing: border-box; }
+
+  /* ── 17. RAPPELS / REMINDERS ─────────────────────────── */
+  .reminders-block { max-width: 100%; }
+
+} /* end @media (max-width: 768px) */
