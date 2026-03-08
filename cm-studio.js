@@ -91,21 +91,122 @@ function setABMode(mode, el) {
 }
 
 // ===== TEMPLATES =====
-function _renderTemplatesStatic() {
+let _currentDisplayedTplIds = [];
+
+async function _pickFreshTemplates(brand, platform, excludeIds) {
+  const templates = (TEMPLATES[brand] || {})[platform] || [];
+  if(!templates.length) return [];
+
+  const key = `templates-seen-${brand}-${platform}`;
+  let seen = [];
+  try { const r = await window.storage.get(key); if(r) seen = JSON.parse(r.value); } catch(e){}
+
+  // All published? Auto-reset
+  if(seen.length >= templates.length) {
+    seen = [];
+    await window.storage.set(key, JSON.stringify([]));
+  }
+
+  // Prefer unseen & not currently displayed
+  let pool = templates.filter(t => !seen.includes(t.id) && !excludeIds.includes(t.id));
+
+  // Not enough excluding current display? Expand to all unseen
+  if(pool.length < 4) pool = templates.filter(t => !seen.includes(t.id));
+
+  // Still not enough (total < 4)? Use all
+  if(pool.length < 4) pool = [...templates];
+
+  return [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(4, pool.length));
+}
+
+function _renderTemplateCards(row, templates, brand, platform) {
+  row.innerHTML = templates.map(t =>
+    `<div class="template-card">
+      <button class="template-chip" data-text="${t.text.replace(/"/g,'&quot;')}"
+        onclick="document.getElementById('theme').value=this.dataset.text">${t.text}</button>
+      <button class="template-published-btn"
+        onclick="markTemplatePublished('${brand}','${platform}',${t.id})">✓ Publié</button>
+    </div>`
+  ).join('');
+}
+
+function _ensureRefreshRow(brand, platform) {
+  const row = document.getElementById('templatesRow');
+  if(!row) return;
+  let rr = document.getElementById('templatesRefreshRow');
+  if(!rr) {
+    rr = document.createElement('div');
+    rr.id = 'templatesRefreshRow';
+    row.insertAdjacentElement('afterend', rr);
+  }
+  rr.style.display = '';
+  rr.innerHTML = `<button class="template-refresh-btn" onclick="refreshTemplates()">↺ Nouvelles idées</button>`;
+}
+
+async function _renderTemplatesStatic() {
   const row = document.getElementById('templatesRow');
   if(!row || !selectedBrand) return;
   const byPlatform = TEMPLATES[selectedBrand] || {};
-  const list = selectedPlatform && byPlatform[selectedPlatform]
-    ? byPlatform[selectedPlatform]
-    : byPlatform[Object.keys(byPlatform)[0]] || [];
-  row.innerHTML = list.map(t =>
-    `<button class="template-chip" onclick="document.getElementById('theme').value='${t.replace(/'/g,"\'")}'">${t}</button>`
-  ).join('');
+  const platform = (selectedPlatform && byPlatform[selectedPlatform])
+    ? selectedPlatform
+    : Object.keys(byPlatform)[0];
+  if(!platform) return;
+
+  const picked = await _pickFreshTemplates(selectedBrand, platform, []);
+  _currentDisplayedTplIds = picked.map(t => t.id);
+  _renderTemplateCards(row, picked, selectedBrand, platform);
+  _ensureRefreshRow(selectedBrand, platform);
+}
+
+async function markTemplatePublished(brand, platform, id) {
+  const key = `templates-seen-${brand}-${platform}`;
+  let seen = [];
+  try { const r = await window.storage.get(key); if(r) seen = JSON.parse(r.value); } catch(e){}
+  if(!seen.includes(id)) seen.push(id);
+
+  const templates = (TEMPLATES[brand]||{})[platform] || [];
+  const allDone = seen.length >= templates.length;
+  await window.storage.set(key, JSON.stringify(allDone ? [] : seen));
+
+  _currentDisplayedTplIds = _currentDisplayedTplIds.filter(i => i !== id);
+
+  const row = document.getElementById('templatesRow');
+  if(!row) return;
+
+  if(allDone) {
+    row.innerHTML = `<div class="template-all-used">✨ Toutes les idées utilisées — on recommence !</div>`;
+    _currentDisplayedTplIds = [];
+    setTimeout(async () => {
+      const fresh = await _pickFreshTemplates(brand, platform, []);
+      _currentDisplayedTplIds = fresh.map(t => t.id);
+      _renderTemplateCards(row, fresh, brand, platform);
+    }, 2500);
+    return;
+  }
+
+  // Pick one replacement not already displayed or seen
+  const candidates = await _pickFreshTemplates(brand, platform, _currentDisplayedTplIds);
+  if(candidates.length > 0) {
+    _currentDisplayedTplIds.push(candidates[0].id);
+  }
+  const currentTpls = _currentDisplayedTplIds
+    .map(i => templates.find(t => t.id === i)).filter(Boolean);
+  _renderTemplateCards(row, currentTpls, brand, platform);
+}
+
+async function refreshTemplates() {
+  const row = document.getElementById('templatesRow');
+  if(!row || !selectedBrand || !selectedPlatform) return;
+  const picked = await _pickFreshTemplates(selectedBrand, selectedPlatform, _currentDisplayedTplIds);
+  _currentDisplayedTplIds = picked.map(t => t.id);
+  _renderTemplateCards(row, picked, selectedBrand, selectedPlatform);
 }
 
 async function _renderVeilleTemplates() {
   const row = document.getElementById('templatesRow');
   if(!row || !selectedBrand || !selectedPlatform) return;
+  const rr = document.getElementById('templatesRefreshRow');
+  if(rr) rr.style.display = 'none';
 
   row.innerHTML = '<span class="template-loading"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="template-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Tendances en cours…</span>';
 

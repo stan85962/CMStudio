@@ -151,6 +151,31 @@ body.theme-intelixa .platform-btn.active .platform-label{color:#6fa3ff;}
 body.theme-intelixa .template-chip{background:var(--surface);border-color:#2a2a2a;}
 body.theme-intelixa .template-chip:hover{border-color:#4f8ef7;color:var(--text);}
 
+/* Template rotation system */
+.template-card{display:flex;flex-direction:column;gap:4px;}
+.template-published-btn{
+  padding:3px 8px;border-radius:12px;border:1px solid var(--border);
+  background:none;font-size:11px;font-weight:600;color:var(--muted);
+  cursor:pointer;transition:all .15s;align-self:flex-start;
+}
+.template-published-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,0,0,.04);}
+.template-all-used{
+  font-size:13px;font-weight:600;color:var(--muted);padding:8px 4px;
+  animation:fadeIn .4s ease;
+}
+#templatesRefreshRow{margin-top:2px;margin-bottom:8px;}
+.template-refresh-btn{
+  padding:5px 14px;border-radius:16px;border:1.5px dashed var(--border);
+  background:none;font-size:12px;font-weight:600;color:var(--muted);
+  cursor:pointer;transition:all .2s;
+}
+.template-refresh-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* Intelixa overrides */
+body.theme-intelixa .template-published-btn{border-color:#2a2a3e;color:#55557a;}
+body.theme-intelixa .template-published-btn:hover{border-color:#4f8ef7;color:#4f8ef7;background:rgba(79,142,247,.06);}
+body.theme-intelixa .template-refresh-btn{border-color:#2a2a3e;color:#55557a;}
+body.theme-intelixa .template-refresh-btn:hover{border-color:#4f8ef7;color:#4f8ef7;}
+
 /* ===== TEXTAREA ===== */
 .theme-card{padding:20px;width:100%;max-width:740px;}
 textarea{
