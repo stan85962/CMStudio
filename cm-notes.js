@@ -12,6 +12,7 @@ let activeNoteCat = 'all';
 let openMoveId = null;
 let notesView = 'notes';
 let activeAccrochePlatform = 'all';
+let _editingNoteId = null;
 
 const notesKey = () => selectedBrand ? 'notes-'+selectedBrand : null;
 
@@ -55,6 +56,31 @@ async function moveNote(id, newCat) {
   try { await window.storage.set(notesKey(), JSON.stringify(notes)); } catch(e){}
   openMoveId = null;
   renderNotes(notes);
+}
+
+function startEditNote(id) {
+  _editingNoteId = id;
+  openMoveId = null;
+  getNotes().then(renderNotes);
+}
+
+async function saveEditedNote(id) {
+  const textarea = document.getElementById('edit-' + id);
+  if(!textarea) return;
+  const newText = textarea.value.trim();
+  if(!newText) return;
+  const notes = await getNotes();
+  const n = notes.find(n => n.id === id);
+  if(n) n.text = newText;
+  try { await window.storage.set(notesKey(), JSON.stringify(notes)); } catch(e) {}
+  _editingNoteId = null;
+  renderNotes(notes);
+  updateStats();
+}
+
+function cancelEdit() {
+  _editingNoteId = null;
+  getNotes().then(renderNotes);
 }
 
 function toggleMoveMenu(id, e) {
@@ -122,17 +148,32 @@ function renderNotes(notes) {
     'urgent':'#ffcdd2','archive':'#f5f5f5'
   };
 
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
   wall.innerHTML = filtered.map(n => {
     const catInfo = CATEGORIES.find(c=>c.id===n.cat) || CATEGORIES[1];
     const bgColor = CAT_COLORS[n.cat] || '#fff9c4';
     const showMenu = openMoveId===n.id;
     const otherCats = CATEGORIES.filter(c=>c.id!=='all'&&c.id!==n.cat);
+
+    if(_editingNoteId === n.id) {
+      return `<div class="postit postit--editing" style="background:${bgColor};">
+        <div class="postit-cat-badge">${icon(catInfo.iconName, 12)} ${catInfo.label}</div>
+        <textarea class="postit-textarea" id="edit-${n.id}">${esc(n.text)}</textarea>
+        <div class="postit-edit-actions">
+          <button class="postit-save-btn" onclick="saveEditedNote(${n.id})">${icon('check',13)} Valider</button>
+          <button class="postit-cancel-btn" onclick="cancelEdit()">${icon('x',13)} Annuler</button>
+        </div>
+      </div>`;
+    }
+
     return `<div class="postit" style="background:${bgColor};">
       <div class="postit-cat-badge">${icon(catInfo.iconName, 12)} ${catInfo.label}</div>
       <div class="postit-text">${n.text.replace(/\n/g,'<br>')}</div>
       <div class="postit-footer">
         <span class="postit-date">${n.date}</span>
         <div class="postit-actions" style="position:relative;">
+          <button class="postit-edit" onclick="startEditNote(${n.id})" title="Modifier">${icon('pencil',14)}</button>
           <button class="postit-move" onclick="toggleMoveMenu(${n.id},event)" title="Déplacer">${icon('arrowUpDown',14)}</button>
           <button class="postit-delete" onclick="deleteNote(${n.id})" title="Supprimer">${icon('x',14)}</button>
           ${showMenu ? `<div class="move-dropdown">
