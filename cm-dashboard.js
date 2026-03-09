@@ -3,8 +3,8 @@ async function updateStats() {
   let total=0, notes=0, calPosts=0;
   for(const b of ['intelixa','doudelio']) {
     try { const r=await window.storage.get('history-'+b); if(r) total+=JSON.parse(r.value).length; } catch(e){}
-    try { const r=await window.storage.get('notes-'+b); if(r) notes+=JSON.parse(r.value).length; } catch(e){}
   }
+  try { const r=await window.storage.get('notes-global'); if(r) notes=JSON.parse(r.value).length; } catch(e){}
   // Count cal posts this month
   const now=new Date();
   try {

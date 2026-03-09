@@ -13,13 +13,35 @@ let openMoveId = null;
 let notesView = 'notes';
 let activeAccrochePlatform = 'all';
 let _editingNoteId = null;
+let _migrationDone = false;
 
-const notesKey = () => selectedBrand ? 'notes-'+selectedBrand : null;
+const notesKey = () => 'notes-global';
+
+async function _migrateNotesToGlobal() {
+  if(_migrationDone) return;
+  _migrationDone = true;
+  const hasOld = ['intelixa','doudelio'].some(b => localStorage.getItem('notes-'+b) !== null);
+  if(!hasOld) return;
+  let merged = [];
+  try { const r = await window.storage.get('notes-global'); if(r) merged = JSON.parse(r.value); } catch(e){}
+  const existingIds = new Set(merged.map(n => n.id));
+  for(const b of ['intelixa','doudelio']) {
+    try {
+      const r = await window.storage.get('notes-'+b);
+      if(!r) continue;
+      JSON.parse(r.value).forEach(n => {
+        if(!existingIds.has(n.id)) { merged.push({...n, brand: n.brand || b}); existingIds.add(n.id); }
+      });
+      localStorage.removeItem('notes-'+b);
+    } catch(e){}
+  }
+  merged.sort((a,b) => b.id - a.id);
+  try { await window.storage.set('notes-global', JSON.stringify(merged)); } catch(e){}
+}
 
 function handleNoteKey(e) {
   if(e.key==='Enter' && !e.shiftKey) {
     e.preventDefault();
-    if(!selectedBrand) { alert('Choisis une marque !'); return; }
     const text = document.getElementById('noteInput').value.trim();
     if(!text) return;
     const cat = document.getElementById('noteCatSelect').value || 'idee';
@@ -32,6 +54,7 @@ async function saveNote(text, cat='idee') {
   const notes = await getNotes();
   notes.unshift({
     id: Date.now(), text, cat,
+    brand: selectedBrand || null,
     date: new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
   });
   try { await window.storage.set(notesKey(), JSON.stringify(notes)); } catch(e){}
@@ -39,8 +62,7 @@ async function saveNote(text, cat='idee') {
 }
 
 async function getNotes() {
-  const k = notesKey(); if(!k) return [];
-  try { const r=await window.storage.get(k); return r?JSON.parse(r.value):[]; } catch(e){return[];}
+  try { const r=await window.storage.get(notesKey()); return r?JSON.parse(r.value):[]; } catch(e){return[];}
 }
 
 async function deleteNote(id) {
@@ -102,15 +124,9 @@ function filterCat(catId) {
 }
 
 async function loadNotes() {
+  await _migrateNotesToGlobal();
   const h = document.getElementById('notesHeader');
-  if(!selectedBrand) {
-    if(h) h.textContent='Mes Notes';
-    document.getElementById('notesWall').innerHTML='<div class="empty-state">Choisis une marque pour voir tes notes</div>';
-    document.getElementById('notesCatTabs').innerHTML='';
-    if(notesView === 'accroches') renderAccroches();
-    return;
-  }
-  if(h) h.innerHTML='Notes — '+(selectedBrand==='intelixa'?icon('zap',14)+' Intelixa':selectedBrand==='stan'?'👤 Stan':icon('leaf',14)+' Doudelio');
+  if(h) h.textContent = 'Mes Notes';
   if(notesView === 'accroches') { renderAccroches(); return; }
   const notes = await getNotes();
   renderCatTabs(notes);
@@ -167,11 +183,13 @@ function renderNotes(notes) {
       </div>`;
     }
 
+    const brandBadge = n.brand === 'intelixa' ? `<span style="font-size:10px;opacity:.45;margin-left:4px;">${icon('zap',10)}</span>`
+      : n.brand === 'doudelio' ? `<span style="font-size:10px;opacity:.45;margin-left:4px;">${icon('leaf',10)}</span>` : '';
     return `<div class="postit" style="background:${bgColor};">
       <div class="postit-cat-badge">${icon(catInfo.iconName, 12)} ${catInfo.label}</div>
       <div class="postit-text">${n.text.replace(/\n/g,'<br>')}</div>
       <div class="postit-footer">
-        <span class="postit-date">${n.date}</span>
+        <span class="postit-date">${n.date}${brandBadge}</span>
         <div class="postit-actions" style="position:relative;">
           <button class="postit-edit" onclick="startEditNote(${n.id})" title="Modifier">${icon('pencil',14)}</button>
           <button class="postit-move" onclick="toggleMoveMenu(${n.id},event)" title="Déplacer">${icon('arrowUpDown',14)}</button>
