@@ -220,6 +220,7 @@ async function renderCalendar() {
 }
 
 async function renderMonthView() {
+  if(!_semaineTypeData) await _loadSemaineType();
   const posts = await getCalPosts();
   const today = new Date();
   const firstDay = new Date(calYear, calMonth, 1);
@@ -251,10 +252,12 @@ async function renderMonthView() {
       const statusIcon = STATUS_ICONS[p.status] ? STATUS_ICONS[p.status]() : '•';
       const statusText = { brouillon: 'Brouillon', 'a-publier': 'À publier', publie: 'Publié' }[p.status] || p.status;
       const ratingPastille = p.rating ? `<span class="cal-post-rating" title="Ressenti : ${p.rating}">${p.rating}</span>` : '';
+      const stBadge = p.fromST ? `<span class="cal-post-st-badge">ST</span>` : '';
       return `
         <div class="cal-post ${p.status}" title="${p.platform} · ${statusText}${p.rating ? ' · ' + p.rating : ''}">
           <span class="cal-post-icon">${_platIcon(p.platform) || '•'}</span>
           <span class="cal-post-label">${p.platform}</span>
+          ${stBadge}
           <span class="cal-post-badge">${statusIcon} ${statusText}</span>
           ${ratingPastille}
           <button class="cal-post-delete" onclick="event.stopPropagation();deletePost(${d},${i})">${icon('x',12)}</button>
@@ -262,13 +265,24 @@ async function renderMonthView() {
       `;
     }).join('');
 
+    // Ghost preview: semaine-type slots for days with no existing posts
+    const stDayIndex = (new Date(calYear, calMonth, d).getDay() + 6) % 7;
+    const stSlots = dayPosts.length === 0 ? (_semaineTypeData[stDayIndex] || []).filter(s => s.brand && s.platform) : [];
+    const ghostHtml = stSlots.map(s => `
+      <div class="cal-post a-publier st-ghost" title="Semaine type: ${s.platform}">
+        <span class="cal-post-icon">${_platIcon(s.platform) || '•'}</span>
+        <span class="cal-post-label">${s.platform}</span>
+        <span class="cal-post-st-badge">ST</span>
+      </div>
+    `).join('');
+
     const hasFete = fetes.length > 0;
-    const dayClasses = ['cal-day', isToday?'today':'', hasFete?'has-fete':'', hasPosts?'has-posts':''].filter(Boolean).join(' ');
+    const dayClasses = ['cal-day', isToday?'today':'', hasFete?'has-fete':'', hasPosts?'has-posts':'', stSlots.length&&!hasPosts?'has-st-ghost':''].filter(Boolean).join(' ');
 
     html += `<div class="${dayClasses}"${primaryBrand ? ` data-brand="${primaryBrand}"` : ''} onclick="openAddForm(${d})">
       <div class="cal-day-num">${d}</div>
       ${fetesHtml}
-      <div class="cal-posts">${postsHtml}</div>
+      <div class="cal-posts">${postsHtml}${ghostHtml}</div>
     </div>`;
   }
 
@@ -276,6 +290,7 @@ async function renderMonthView() {
 }
 
 async function renderWeekView() {
+  if(!_semaineTypeData) await _loadSemaineType();
   const monday = _getWeekMonday();
   const sunday = new Date(monday); sunday.setDate(sunday.getDate() + 6);
 
@@ -321,20 +336,32 @@ async function renderWeekView() {
       </div>
     `).join('');
 
+    const stDayIdx = (d.getDay() + 6) % 7;
+    const stWeekSlots = dayPosts.length === 0 ? (_semaineTypeData[stDayIdx] || []).filter(s => s.brand && s.platform) : [];
+
     const postsHtml = dayPosts.map((p, i) => {
       const statusIcon = STATUS_ICONS[p.status] ? STATUS_ICONS[p.status]() : '•';
       const statusText = { brouillon: 'Brouillon', 'a-publier': 'À publier', publie: 'Publié' }[p.status] || p.status;
       const ratingPastille = p.rating ? `<span class="cal-post-rating">${p.rating}</span>` : '';
+      const stBadge = p.fromST ? `<span class="cal-post-st-badge">ST</span>` : '';
       return `
         <div class="cal-post ${p.status}">
           <span class="cal-post-icon">${_platIcon(p.platform) || '•'}</span>
           <span class="cal-post-label">${p.platform}</span>
+          ${stBadge}
           <span class="cal-post-badge">${statusIcon} ${statusText}</span>
           ${ratingPastille}
           <button class="cal-post-delete" onclick="event.stopPropagation();deletePostForDate(${y},${m},${day},${i})">${icon('x',12)}</button>
         </div>
       `;
     }).join('');
+    const weekGhostHtml = stWeekSlots.map(s => `
+      <div class="cal-post a-publier st-ghost" title="Semaine type: ${s.platform}">
+        <span class="cal-post-icon">${_platIcon(s.platform) || '•'}</span>
+        <span class="cal-post-label">${s.platform}</span>
+        <span class="cal-post-st-badge">ST</span>
+      </div>
+    `).join('');
 
     html += `
       <div class="cal-week-col${isToday ? ' today' : ''}" onclick="openAddFormForDate(${y},${m},${day})">
@@ -343,7 +370,7 @@ async function renderWeekView() {
           <span class="cal-week-day-num${isToday ? ' today' : ''}">${day}</span>
         </div>
         ${fetesHtml}
-        <div class="cal-week-posts">${postsHtml}</div>
+        <div class="cal-week-posts">${postsHtml}${weekGhostHtml}</div>
       </div>
     `;
   }
@@ -412,6 +439,126 @@ async function deletePostForDate(year, month, day, index) {
 
 async function deletePost(day, index) {
   await deletePostForDate(calYear, calMonth, day, index);
+}
+
+// ===== SEMAINE TYPE =====
+let _semaineTypeData = null;
+const _ST_DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const _ST_PLATFORMS = ['tiktok','linkedin','instagram','gmb','facebook','pinterest','spotify','brevo','youtube'];
+
+async function _loadSemaineType() {
+  try {
+    const r = await window.storage.get('semaine-type');
+    _semaineTypeData = r ? JSON.parse(r.value) : {};
+  } catch(e) { _semaineTypeData = {}; }
+  for(let i = 0; i < 7; i++) { if(!_semaineTypeData[i]) _semaineTypeData[i] = []; }
+  return _semaineTypeData;
+}
+
+async function openSemaineTypeModal() {
+  await _loadSemaineType();
+  _renderSemaineTypeModal();
+  document.getElementById('stModal').style.display = 'flex';
+}
+
+function closeSemaineTypeModal() {
+  document.getElementById('stModal').style.display = 'none';
+}
+
+function _renderSemaineTypeModal() {
+  const body = document.getElementById('stModalBody');
+  if(!body) return;
+  body.innerHTML = _ST_DAYS.map((dayName, di) => {
+    const slots = (_semaineTypeData[di] || []);
+    const slotsHtml = slots.map((s, si) => `
+      <div class="st-slot">
+        <select class="st-brand-sel" onchange="_stUpdateSlot(${di},${si},'brand',this.value)">
+          <option value="">Marque…</option>
+          <option value="intelixa"${s.brand==='intelixa'?' selected':''}>⚡ Intelixa</option>
+          <option value="doudelio"${s.brand==='doudelio'?' selected':''}>🌿 Doudelio</option>
+        </select>
+        <select class="st-plat-sel" onchange="_stUpdateSlot(${di},${si},'platform',this.value)">
+          <option value="">Plateforme…</option>
+          ${_ST_PLATFORMS.map(p => `<option value="${p}"${s.platform===p?' selected':''}>${p}</option>`).join('')}
+        </select>
+        <button class="st-remove-btn" onclick="_stRemoveSlot(${di},${si})" title="Supprimer">×</button>
+      </div>
+    `).join('');
+    return `
+      <div class="st-day-col">
+        <div class="st-day-name">${dayName}</div>
+        <div class="st-slots" id="stSlots${di}">${slotsHtml}</div>
+        <button class="st-add-btn" onclick="_stAddSlot(${di})">+</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function _stAddSlot(di) {
+  if(!_semaineTypeData[di]) _semaineTypeData[di] = [];
+  _semaineTypeData[di].push({brand:'', platform:''});
+  _renderSemaineTypeModal();
+}
+
+function _stRemoveSlot(di, si) {
+  if(_semaineTypeData[di]) _semaineTypeData[di].splice(si, 1);
+  _renderSemaineTypeModal();
+}
+
+function _stUpdateSlot(di, si, field, value) {
+  if(_semaineTypeData[di] && _semaineTypeData[di][si]) _semaineTypeData[di][si][field] = value;
+}
+
+async function saveSemaineType() {
+  for(let di = 0; di < 7; di++) {
+    const container = document.getElementById('stSlots' + di);
+    if(!container) continue;
+    _semaineTypeData[di] = [];
+    container.querySelectorAll('.st-slot').forEach(slot => {
+      const brand    = slot.querySelector('.st-brand-sel')?.value || '';
+      const platform = slot.querySelector('.st-plat-sel')?.value || '';
+      _semaineTypeData[di].push({brand, platform});
+    });
+    _semaineTypeData[di] = _semaineTypeData[di].filter(s => s.brand || s.platform);
+  }
+  try { await window.storage.set('semaine-type', JSON.stringify(_semaineTypeData)); } catch(e) {}
+  closeSemaineTypeModal();
+  renderCalendar();
+}
+
+async function resetSemaineType() {
+  if(!confirm('Réinitialiser ta semaine type ?')) return;
+  for(let di = 0; di < 7; di++) _semaineTypeData[di] = [];
+  try { await window.storage.set('semaine-type', JSON.stringify(_semaineTypeData)); } catch(e) {}
+  _renderSemaineTypeModal();
+}
+
+async function applyWeekToMonth() {
+  if(!_semaineTypeData) await _loadSemaineType();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const postsToAdd = {};
+  let countToAdd = 0;
+
+  for(let d = 1; d <= daysInMonth; d++) {
+    const stDayIndex = (new Date(calYear, calMonth, d).getDay() + 6) % 7;
+    const slots = (_semaineTypeData[stDayIndex] || []).filter(s => s.brand && s.platform);
+    if(slots.length) { postsToAdd[d] = slots; countToAdd += slots.length; }
+  }
+
+  if(!countToAdd) { alert('Ta semaine type est vide — configure-la d\'abord !'); return; }
+
+  const monthLabel = new Date(calYear, calMonth).toLocaleDateString('fr-FR', {month:'long', year:'numeric'});
+  if(!confirm(`Appliquer ta semaine type sur ${monthLabel} ?\n${countToAdd} post${countToAdd>1?'s':''} seront ajoutés.`)) return;
+
+  const existing = await getCalPosts();
+  for(const [dayStr, slots] of Object.entries(postsToAdd)) {
+    const d = parseInt(dayStr);
+    if(!existing[d]) existing[d] = [];
+    for(const s of slots) existing[d].push({brand:s.brand, platform:s.platform, status:'a-publier', fromST:true});
+  }
+  await saveCalPosts(existing);
+  closeSemaineTypeModal();
+  renderCalendar();
 }
 
 // ===== ALERTES "À PUBLIER" DÉPASSÉES =====
