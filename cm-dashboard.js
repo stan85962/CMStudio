@@ -1,3 +1,57 @@
+// ===== TODAY CARD =====
+async function renderTodayCard() {
+  const el = document.getElementById('todayCard');
+  if (!el) return;
+  const result = (typeof getUpcomingFete === 'function') ? getUpcomingFete(7) : null;
+  if (!result) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = _buildTodayCardHtml(result.fete, result.daysAhead);
+}
+
+function _buildTodayCardHtml(fete, daysAhead) {
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  if (daysAhead === 0) {
+    return `
+      <div class="today-card-date">${dateStr}</div>
+      <div class="today-card-event">
+        <span class="today-card-emoji">${fete.emoji}</span>
+        <span class="today-card-label">${fete.label}</span>
+      </div>
+      <div class="today-card-actions">
+        <button class="today-card-btn intelixa" onclick="_goStudioWithEvent('intelixa','${fete.label.replace(/'/g,"\\'")}')">
+          ${icon('zap',13)} Idée Intelixa →
+        </button>
+        <button class="today-card-btn doudelio" onclick="_goStudioWithEvent('doudelio','${fete.label.replace(/'/g,"\\'")}')">
+          ${icon('leaf',13)} Idée Doudelio →
+        </button>
+      </div>
+    `;
+  }
+  return `
+    <div class="today-card-date">${dateStr}</div>
+    <div class="today-card-upcoming">
+      ${icon('calendar',14)} Dans ${daysAhead} jour${daysAhead > 1 ? 's' : ''} :
+      <span class="today-card-emoji">${fete.emoji}</span>
+      <strong>${fete.label}</strong>
+    </div>
+  `;
+}
+
+function _goStudioWithEvent(brand, eventLabel) {
+  const studioTab = [...document.querySelectorAll('.nav-tab')]
+    .find(t => (t.getAttribute('onclick') || '').includes("'studio'"));
+  if (studioTab) switchPage('studio', studioTab);
+  setTimeout(() => {
+    const brandBtn = document.querySelector(`.brand-btn[onclick*="${brand}"]`);
+    if (brandBtn) brandBtn.click();
+    setTimeout(() => {
+      const themeInput = document.getElementById('theme');
+      if (themeInput) themeInput.value = eventLabel;
+    }, 100);
+  }, 150);
+}
+
 // ===== STATS =====
 async function updateStats() {
   let total=0, notes=0, calPosts=0;
@@ -28,6 +82,7 @@ async function updateStats() {
     } catch(e){}
     el('statWeek').textContent=week;
   }
+  renderTodayCard();
 }
 
 // ===== GREETING =====
