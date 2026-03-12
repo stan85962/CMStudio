@@ -1421,6 +1421,45 @@ body.theme-intelixa .trec-col-label { font-family: 'Orbitron', sans-serif; font-
   .trec-section { grid-template-columns: 1fr; }
 }
 
+/* ===== TOKEN SETUP (premier lancement) ===== */
+.token-setup-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(10,10,20,.92);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.token-setup-card {
+  background: #fff; border-radius: 20px; padding: 32px 28px;
+  max-width: 380px; width: 100%;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.35);
+  text-align: center;
+}
+.token-setup-icon { font-size: 36px; line-height: 1; }
+.token-setup-title { font-size: 18px; font-weight: 800; color: #111; margin: 0; }
+.token-setup-desc { font-size: 13px; color: #666; margin: 0; line-height: 1.5; }
+.token-setup-input {
+  width: 100%; box-sizing: border-box;
+  border: 2px solid #e0e0e0; border-radius: 12px;
+  padding: 12px 14px; font-size: 14px; font-family: monospace;
+  color: #111; background: #f9f9f9; outline: none;
+  transition: border-color .15s;
+}
+.token-setup-input:focus { border-color: #4f8ef7; background: #fff; }
+.token-setup-input.token-setup-error { border-color: #f44336; animation: shake .3s ease; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+.token-setup-btn {
+  width: 100%; padding: 13px; border: none; border-radius: 12px;
+  background: #4f8ef7; color: #fff; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: opacity .15s;
+}
+.token-setup-btn:hover { opacity: .88; }
+.token-setup-hint { font-size: 11px; color: #aaa; margin: 0; }
+
 /* ===== SAVE ACCROCHE BTN ===== */
 .save-accroche-btn {
   padding: 8px 16px;

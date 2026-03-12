@@ -1,3 +1,38 @@
+// ===== SETUP TOKEN (premier lancement) =====
+function _hasToken() {
+  return !!(
+    (typeof CONFIG !== 'undefined' && CONFIG.GITHUB_TOKEN ? CONFIG.GITHUB_TOKEN : '') ||
+    localStorage.getItem('cm_github_token') || ''
+  ).trim();
+}
+
+function _showTokenSetup() {
+  const overlay = document.createElement('div');
+  overlay.id = 'tokenSetupOverlay';
+  overlay.className = 'token-setup-overlay';
+  overlay.innerHTML = `
+    <div class="token-setup-card">
+      <div class="token-setup-icon">🔑</div>
+      <h2 class="token-setup-title">Clé API requise</h2>
+      <p class="token-setup-desc">Pour utiliser la génération IA, colle ton token GitHub Models ci-dessous. Il sera sauvegardé sur cet appareil.</p>
+      <input type="password" id="tokenSetupInput" class="token-setup-input"
+        placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+        onkeydown="if(event.key==='Enter')_saveTokenSetup()" />
+      <button class="token-setup-btn" onclick="_saveTokenSetup()">Enregistrer →</button>
+      <p class="token-setup-hint">Token GitHub Models → <strong>github.com/settings/tokens</strong></p>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('tokenSetupInput')?.focus(), 300);
+}
+
+function _saveTokenSetup() {
+  const val = document.getElementById('tokenSetupInput')?.value.trim();
+  if (!val) { document.getElementById('tokenSetupInput')?.classList.add('token-setup-error'); return; }
+  localStorage.setItem('cm_github_token', val);
+  document.getElementById('tokenSetupOverlay')?.remove();
+  checkConnectivity();
+}
+
 // ===== CONNECTIVITÉ & TOKEN =====
 function checkConnectivity() {
   const banner      = document.getElementById('statusBanner');
@@ -45,6 +80,7 @@ function switchPage(page, el) {
 }
 
 // ===== INIT =====
+if (!_hasToken()) _showTokenSetup();
 updateStats();
 loadRecentDashboard();
 setTimeout(checkReminders, 500);
