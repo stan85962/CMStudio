@@ -559,3 +559,21 @@ const PLANNING_HEBDO = {
     "Webinaire (1x/mois — dimanche/lundi soir)"
   ]
 };
+
+// ===== TÂCHES RÉCURRENTES =====
+const TACHES_RECURRENTES = {
+  quotidien: [
+    { text: "50 interactions LinkedIn",       platforms: ["linkedin"] },
+    { text: "TikTok Doudelio — 1 vidéo/jour", platforms: ["tiktok"] }
+  ],
+  hebdomadaire: [
+    { text: "Changer la pub Facebook/Instagram", platforms: ["facebook", "instagram"] },
+    { text: "Pinterest — 3 posts/semaine",        platforms: ["pinterest"] },
+    { text: "Google My Business — 1 post/semaine",platforms: ["gmb"] }
+  ],
+  ponctuel: [
+    { text: "Programmer un webinaire",         platforms: ["calendar"] },
+    { text: "Enregistrer YouTube / Podcast",   platforms: ["youtube"] },
+    { text: "Newsletter mensuelle",            platforms: ["brevo"] }
+  ]
+};

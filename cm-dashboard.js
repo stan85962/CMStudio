@@ -1,82 +1,51 @@
 // ===== TODAY CARD =====
-let _planningEditMode = false;
-
-function _getTodayPlanningDay() {
-  const jsDay = new Date().getDay();
-  return jsDay === 0 ? 6 : jsDay - 1; // 0=Lundi … 6=Dimanche
-}
-
-async function renderTodayCard() {
+function renderTodayCard() {
   const el = document.getElementById('todayCard');
   if (!el) return;
 
   const today = new Date();
-  const planningDay = _getTodayPlanningDay();
+  today.setHours(0, 0, 0, 0);
 
-  // Custom ou défaut
-  let tasks = null;
-  try {
-    const r = await window.storage.get(`planning-custom-${planningDay}`);
-    if (r) tasks = JSON.parse(r.value);
-  } catch(e) {}
-  if (!tasks) tasks = (typeof PLANNING_HEBDO !== 'undefined' ? PLANNING_HEBDO[planningDay] : null) || [];
-
-  // Fête du jour
-  const fetes = (typeof getFetesForDay === 'function')
-    ? getFetesForDay(today.getFullYear(), today.getMonth(), today.getDate())
-    : [];
-
-  el.style.display = 'block';
-  el.innerHTML = _buildTodayCardHtml(today, planningDay, tasks, fetes);
-}
-
-function _buildTodayCardHtml(today, planningDay, tasks, fetes) {
-  const dateStr = today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-  const isEditMode = _planningEditMode;
-  const isSaturday = planningDay === 5;
-
-  const headerRight = isEditMode
-    ? `<div class="today-card-header-actions">
-        <button class="today-card-reset-btn" onclick="_planningReset()">${icon('rotateCcw',12)} Réinitialiser</button>
-        <button class="today-card-validate-btn" onclick="_planningValidate()">${icon('check',13)} Valider</button>
-       </div>`
-    : `<button class="today-card-edit-btn" onclick="_planningToggleEdit()" title="Modifier">${icon('edit2',14)}</button>`;
-
-  let tasksHtml;
-  if (isSaturday && !isEditMode) {
-    tasksHtml = `<p class="today-card-rest">Repos — pas de publication aujourd'hui 👌</p>`;
-  } else if (isEditMode) {
-    const items = tasks.map((t, i) => `
-      <li class="today-task-edit-item">
-        <input class="today-task-input" value="${t.replace(/"/g, '&quot;')}" />
-        <button class="today-task-remove-btn" onclick="_planningRemoveTask(this)">${icon('x',12)}</button>
-      </li>
-    `).join('');
-    tasksHtml = `
-      <ul class="today-card-tasks edit">
-        ${items}
-        <li class="today-task-add-item">
-          <input class="today-task-add-input" id="tc-new-task" placeholder="Ajouter une tâche…"
-            onkeydown="if(event.key==='Enter')_planningAddTask()" />
-          <button class="today-task-add-btn" onclick="_planningAddTask()">${icon('plus',13)}</button>
-        </li>
-      </ul>`;
-  } else if (tasks.length === 0) {
-    tasksHtml = `<p class="today-card-rest">Aucune tâche pour aujourd'hui 👌</p>`;
-  } else {
-    const items = tasks.map(t => `<li class="today-task-item">${t}</li>`).join('');
-    tasksHtml = `<ul class="today-card-tasks">${items}</ul>`;
+  // Collecter tous les événements des 7 prochains jours
+  const events = [];
+  for (let offset = 0; offset < 7; offset++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + offset);
+    const fetes = (typeof getFetesForDay === 'function')
+      ? getFetesForDay(d.getFullYear(), d.getMonth(), d.getDate())
+      : [];
+    fetes.forEach(f => events.push({ fete: f, daysAhead: offset, date: d }));
   }
 
-  let feteHtml = '';
-  if (fetes.length > 0) {
-    const f = fetes[0];
-    const safeLabel = f.label.replace(/'/g, "\\'");
-    feteHtml = `
-      <div class="today-card-fete">
-        <span class="today-card-emoji">${f.emoji}</span>
-        <span class="today-card-fete-label">${f.label}</span>
-        <div class="today-card-fete-actions">
+  // Aucun événement dans les 7 jours → masquer la card
+  if (events.length === 0) {
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = 'block';
+  el.innerHTML = _buildTodayCardHtml(today, events);
+}
+
+function _buildTodayCardHtml(today, events) {
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const dateStr = cap(today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }));
+
+  const eventsHtml = events.map(({ fete, daysAhead, date }) => {
+    const safeLabel = fete.label.replace(/'/g, "\\'");
+    const isToday = daysAhead === 0;
+    const badge = isToday
+      ? `<span class="tc-badge today">Aujourd'hui</span>`
+      : `<span class="tc-badge upcoming">dans ${daysAhead} jour${daysAhead > 1 ? 's' : ''}</span>`;
+    const dateLine = isToday ? '' : `<span class="tc-event-date">${cap(date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }))}</span>`;
+    return `
+      <div class="tc-event${isToday ? ' is-today' : ''}">
+        <div class="tc-event-top">
+          <span class="tc-event-emoji">${fete.emoji}</span>
+          <span class="tc-event-name">${fete.label}</span>
+          ${badge}
+        </div>
+        ${dateLine}
+        <div class="tc-event-actions">
           <button class="today-card-btn intelixa" onclick="_goStudioWithEvent('intelixa','${safeLabel}')">
             ${icon('zap',13)} Idée Intelixa →
           </button>
@@ -85,59 +54,14 @@ function _buildTodayCardHtml(today, planningDay, tasks, fetes) {
           </button>
         </div>
       </div>`;
-  }
+  }).join('');
 
   return `
     <div class="today-card-header">
       <span class="today-card-date">${dateStr}</span>
-      ${headerRight}
     </div>
-    ${tasksHtml}
-    ${feteHtml}
+    ${eventsHtml}
   `;
-}
-
-function _planningToggleEdit() {
-  _planningEditMode = !_planningEditMode;
-  renderTodayCard();
-}
-
-async function _planningValidate() {
-  const inputs = document.querySelectorAll('.today-task-input');
-  const tasks = [...inputs].map(i => i.value.trim()).filter(Boolean);
-  const planningDay = _getTodayPlanningDay();
-  try {
-    await window.storage.set(`planning-custom-${planningDay}`, JSON.stringify(tasks));
-  } catch(e) {}
-  _planningEditMode = false;
-  renderTodayCard();
-}
-
-async function _planningReset() {
-  const planningDay = _getTodayPlanningDay();
-  try { localStorage.removeItem(`planning-custom-${planningDay}`); } catch(e) {}
-  _planningEditMode = false;
-  renderTodayCard();
-}
-
-function _planningRemoveTask(btn) {
-  btn.closest('.today-task-edit-item').remove();
-}
-
-function _planningAddTask() {
-  const input = document.getElementById('tc-new-task');
-  if (!input || !input.value.trim()) return;
-  const addItem = document.querySelector('.today-task-add-item');
-  if (!addItem) return;
-  const li = document.createElement('li');
-  li.className = 'today-task-edit-item';
-  li.innerHTML = `
-    <input class="today-task-input" value="${input.value.trim().replace(/"/g, '&quot;')}" />
-    <button class="today-task-remove-btn" onclick="_planningRemoveTask(this)">${icon('x',12)}</button>
-  `;
-  addItem.parentNode.insertBefore(li, addItem);
-  input.value = '';
-  input.focus();
 }
 
 function _goStudioWithEvent(brand, eventLabel) {
