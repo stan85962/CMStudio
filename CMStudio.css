@@ -1060,33 +1060,89 @@ body.theme-intelixa .cal-view-btn:hover { border-color: #4f8ef7; color: var(--te
 .today-card {
   background: var(--surface); border: 1.5px solid var(--border);
   border-radius: 16px; padding: 16px 18px; margin-bottom: 16px;
-  display: flex; flex-direction: column; gap: 10px;
+  display: flex; flex-direction: column; gap: 12px;
   animation: fadeIn .3s ease;
 }
+.today-card-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
 .today-card-date {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  font-size: 12px; font-weight: 800; text-transform: uppercase;
   letter-spacing: .06em; color: var(--muted);
 }
-.today-card-event {
-  display: flex; align-items: center; gap: 10px;
+.today-card-edit-btn {
+  background: none; border: 1.5px solid var(--border); border-radius: 8px;
+  color: var(--muted); cursor: pointer; padding: 4px 7px;
+  display: inline-flex; align-items: center; transition: all .15s;
 }
-.today-card-emoji { font-size: 26px; line-height: 1; }
-.today-card-label { font-size: 17px; font-weight: 800; color: var(--text); }
-.today-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.today-card-edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+.today-card-header-actions { display: flex; gap: 6px; align-items: center; }
+.today-card-validate-btn {
+  background: var(--accent); color: #fff; border: none;
+  border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 700;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: opacity .15s;
+}
+.today-card-validate-btn:hover { opacity: .85; }
+.today-card-reset-btn {
+  background: none; border: 1.5px solid var(--border); border-radius: 8px;
+  color: var(--muted); cursor: pointer; padding: 4px 10px; font-size: 12px;
+  display: inline-flex; align-items: center; gap: 4px; transition: all .15s;
+}
+.today-card-reset-btn:hover { border-color: #f44336; color: #f44336; }
+/* Tasks list */
+.today-card-tasks {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.today-task-item {
+  font-size: 13px; color: var(--text); padding: 6px 10px;
+  background: var(--surface2); border-radius: 8px;
+  border-left: 3px solid var(--accent);
+}
+.today-card-rest { font-size: 13px; color: var(--muted); margin: 0; }
+/* Edit mode */
+.today-card-tasks.edit { gap: 6px; }
+.today-task-edit-item { display: flex; align-items: center; gap: 6px; }
+.today-task-input {
+  flex: 1; background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 6px 10px; font-size: 13px; color: var(--text);
+  font-family: inherit; transition: border-color .15s;
+}
+.today-task-input:focus { outline: none; border-color: var(--accent); }
+.today-task-remove-btn {
+  background: none; border: none; cursor: pointer; color: var(--muted);
+  padding: 4px 5px; border-radius: 6px; flex-shrink: 0;
+  display: inline-flex; align-items: center; transition: color .15s;
+}
+.today-task-remove-btn:hover { color: #f44336; }
+.today-task-add-item { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.today-task-add-input {
+  flex: 1; background: none; border: 1.5px dashed var(--border);
+  border-radius: 8px; padding: 6px 10px; font-size: 13px; color: var(--text);
+  font-family: inherit; transition: border-color .15s;
+}
+.today-task-add-input:focus { outline: none; border-color: var(--accent); border-style: solid; }
+.today-task-add-btn {
+  background: var(--accent); color: #fff; border: none;
+  border-radius: 8px; width: 28px; height: 28px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+/* Fête du jour */
+.today-card-fete {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding-top: 10px; border-top: 1px solid var(--border);
+}
+.today-card-emoji { font-size: 20px; line-height: 1; }
+.today-card-fete-label { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; min-width: 100px; }
+.today-card-fete-actions { display: flex; gap: 6px; flex-wrap: wrap; width: 100%; }
 .today-card-btn {
   display: inline-flex; align-items: center; gap: 6px;
-  border: none; border-radius: 10px; padding: 8px 16px;
-  font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .15s;
+  border: none; border-radius: 10px; padding: 7px 14px;
+  font-size: 12px; font-weight: 700; cursor: pointer; transition: opacity .15s;
 }
 .today-card-btn.intelixa { background: #4f8ef7; color: #fff; }
 .today-card-btn.doudelio { background: var(--accent); color: #fff; }
 .today-card-btn:hover { opacity: .85; }
-.today-card-upcoming {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 13px; color: var(--muted);
-}
-.today-card-upcoming .today-card-emoji { font-size: 18px; }
-.today-card-upcoming strong { color: var(--text); }
 /* Clickable status badge */
 .cal-post-badge {
   background: none; border: none; cursor: pointer;
@@ -1095,6 +1151,9 @@ body.theme-intelixa .cal-view-btn:hover { border-color: #4f8ef7; color: var(--te
 }
 /* Intelixa overrides */
 body.theme-intelixa .today-card { background: #13132a; border-color: #2a2a3e; }
+body.theme-intelixa .today-task-item { background: #1a1a2e; border-left-color: #4f8ef7; }
+body.theme-intelixa .today-task-input { background: #1a1a2e; border-color: #2a2a3e; }
+body.theme-intelixa .today-card-fete { border-top-color: #2a2a3e; }
 body.theme-intelixa .today-card-btn.doudelio { background: #4f8ef7; }
 
 /* Vue semaine */

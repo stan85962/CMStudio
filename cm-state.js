@@ -516,3 +516,47 @@ Contraintes SEO : intégrer naturellement les mots-clés crèche, auxiliaire de 
     }
   }
 };
+
+// ===== PLANNING HEBDOMADAIRE =====
+// 0=Lundi … 6=Dimanche
+const PLANNING_HEBDO = {
+  0: [
+    "Publication Meta — 19h",
+    "Google My Business Intelixa",
+    "50 actions LinkedIn",
+    "TikTok Doudelio — 1/jour",
+    "Webinaire (1x/mois — dimanche/lundi soir)"
+  ],
+  1: [
+    "Story Meta (portrait formatrice ou prochaine session avec lien site)",
+    "Publication LinkedIn — 11h30",
+    "Google My Business Doudelio",
+    "50 actions LinkedIn",
+    "TikTok Doudelio — 1/jour"
+  ],
+  2: [
+    "Publication Meta — soir",
+    "Publication LinkedIn",
+    "50 actions LinkedIn",
+    "TikTok Doudelio — 1/jour",
+    "Pinterest — 3x/semaine"
+  ],
+  3: [
+    "Story Meta",
+    "Publication LinkedIn — 11h30",
+    "50 actions LinkedIn",
+    "TikTok Doudelio — 1/jour"
+  ],
+  4: [
+    "Publication Meta — matin ou midi",
+    "50 actions LinkedIn",
+    "TikTok Doudelio — 1/jour",
+    "Pinterest — 3x/semaine"
+  ],
+  5: [],
+  6: [
+    "Newsletter (1x/mois)",
+    "YouTube / Podcast (1x/semaine)",
+    "Webinaire (1x/mois — dimanche/lundi soir)"
+  ]
+};
