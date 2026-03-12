@@ -969,43 +969,58 @@ body.theme-intelixa .today-card-fete { border-top-color: #2a2a3e; }
 body.theme-intelixa .today-card-btn.doudelio { background: #4f8ef7; }
 
 /* ===== PLANNING HEBDO ===== */
+/* Scroll wrapper (#planGrid) */
 .plan-week-grid {
-  display: grid;
-  gap: 8px;
   width: 100%;
-  max-width: 960px;
-  padding: 4px 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
 }
+/* Inner grid (injected by JS) */
+.plan-inner-grid {
+  display: grid;
+  gap: 10px;
+  /* grid-template-columns set inline by renderPlanningView() */
+}
+/* Column card */
 .plan-week-col {
   background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 10px;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  transition: border-color .15s;
-  min-width: 0;
+  gap: 12px;
+  transition: border-color .15s, background .15s;
+  min-width: 180px;
+  min-height: 200px;
 }
 .plan-week-col.today {
   border-color: var(--accent) !important;
-  background: var(--surface2);
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
 }
-body.theme-intelixa .plan-week-col { border-color: #2a2a2a; }
-body.theme-intelixa .plan-week-col.today { border-color: #4f8ef7 !important; background: var(--surface2); }
+/* Dimanche — fond légèrement plus doux */
+.plan-week-col.dimanche {
+  opacity: .92;
+  border-style: dashed;
+}
+body.theme-intelixa .plan-week-col { background: #0e0e1e; border-color: #2a2a2a; }
+body.theme-intelixa .plan-week-col.today { border-color: #4f8ef7 !important; background: rgba(79,142,247,.08); }
+body.theme-intelixa .plan-week-col.dimanche { border-color: #222236; }
+/* Column header */
 .plan-col-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid var(--border);
 }
 .plan-col-day {
   font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: .06em;
+  letter-spacing: .08em;
   color: var(--muted);
 }
 .plan-week-col.today .plan-col-day { color: var(--accent); }
@@ -1017,20 +1032,21 @@ body.theme-intelixa .plan-col-day { font-family: 'Orbitron', monospace; font-siz
   border-radius: 7px;
   color: var(--muted);
   cursor: pointer;
-  padding: 3px 6px;
+  padding: 4px 7px;
   display: inline-flex;
   align-items: center;
   transition: all .15s;
   flex-shrink: 0;
+  opacity: .5;
 }
-.plan-col-edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+.plan-col-edit-btn:hover { border-color: var(--accent); color: var(--accent); opacity: 1; }
 .plan-col-edit-actions { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
 .plan-col-validate-btn {
   background: var(--accent);
   color: #fff;
   border: none;
   border-radius: 7px;
-  padding: 4px 9px;
+  padding: 5px 10px;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -1045,43 +1061,85 @@ body.theme-intelixa .plan-col-validate-btn { background: #4f8ef7; }
   border-radius: 7px;
   color: var(--muted);
   cursor: pointer;
-  padding: 3px 7px;
+  padding: 4px 8px;
   font-size: 11px;
   font-weight: 700;
   font-family: inherit;
   transition: all .15s;
 }
 .plan-col-reset-btn:hover { border-color: #f44336; color: #f44336; }
+/* Task list */
 .plan-col-tasks {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
+/* Task card (view mode) */
 .plan-task-item {
-  font-size: 11px;
-  color: var(--text);
-  padding: 5px 8px;
-  background: var(--surface2);
-  border-radius: 7px;
-  border-left: 2.5px solid var(--accent);
-  line-height: 1.35;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 12px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.06);
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
   word-break: break-word;
+  line-height: 1.4;
 }
-body.theme-intelixa .plan-task-item { border-left-color: #4f8ef7; background: #1a1a2e; }
-.plan-col-empty { font-size: 11px; color: var(--muted); font-style: italic; padding: 4px 0; }
+body.theme-intelixa .plan-task-item { background: #1a1a2e; border-color: #2a2a3e; box-shadow: none; }
+/* Platform icon wrapper */
+.plan-task-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  opacity: .75;
+}
+.plan-task-icon svg { width: 16px !important; height: 16px !important; }
+/* Task text */
+.plan-task-text {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 600;
+  min-width: 0;
+}
+/* Brand badges */
+.plan-task-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.plan-badge-intelixa {
+  background: rgba(220, 50, 50, .12);
+  color: #c0392b;
+}
+.plan-badge-doudelio {
+  background: rgba(56, 142, 60, .13);
+  color: #388e3c;
+}
+body.theme-intelixa .plan-badge-intelixa { background: rgba(79,142,247,.18); color: #4f8ef7; }
+body.theme-intelixa .plan-badge-doudelio { background: rgba(76,175,80,.15); color: #66bb6a; }
+.plan-col-empty { font-size: 12px; color: var(--muted); font-style: italic; padding: 6px 2px; }
 /* Edit mode */
-.plan-col-tasks.edit { gap: 5px; }
-.plan-task-edit-item { display: flex; align-items: center; gap: 5px; }
+.plan-col-tasks.edit { gap: 6px; }
+.plan-task-edit-item { display: flex; align-items: center; gap: 6px; }
 .plan-task-input {
   flex: 1;
   background: var(--surface2);
   border: 1.5px solid var(--border);
-  border-radius: 7px;
-  padding: 5px 8px;
-  font-size: 11px;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12px;
   color: var(--text);
   font-family: inherit;
   transition: border-color .15s;
@@ -1094,22 +1152,22 @@ body.theme-intelixa .plan-task-input { background: #1a1a2e; border-color: #2a2a3
   border: none;
   cursor: pointer;
   color: var(--muted);
-  padding: 3px 4px;
-  border-radius: 5px;
+  padding: 4px 5px;
+  border-radius: 6px;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   transition: color .15s;
 }
 .plan-task-remove-btn:hover { color: #f44336; }
-.plan-task-add-item { display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+.plan-task-add-item { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
 .plan-task-add-input {
   flex: 1;
   background: none;
   border: 1.5px dashed var(--border);
-  border-radius: 7px;
-  padding: 5px 8px;
-  font-size: 11px;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12px;
   color: var(--text);
   font-family: inherit;
   transition: border-color .15s;
@@ -1120,9 +1178,9 @@ body.theme-intelixa .plan-task-input { background: #1a1a2e; border-color: #2a2a3
   background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 7px;
-  width: 26px;
-  height: 26px;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -1130,13 +1188,6 @@ body.theme-intelixa .plan-task-input { background: #1a1a2e; border-color: #2a2a3
   flex-shrink: 0;
 }
 body.theme-intelixa .plan-task-add-btn { background: #4f8ef7; }
-/* Responsive planning */
-@media (max-width: 880px) {
-  .plan-week-grid { grid-template-columns: repeat(3, 1fr) !important; }
-}
-@media (max-width: 540px) {
-  .plan-week-grid { grid-template-columns: repeat(2, 1fr) !important; }
-}
 
 /* ===== SAVE ACCROCHE BTN ===== */
 .save-accroche-btn {

@@ -287,6 +287,36 @@ async function _getPlanTasks(day) {
   return (PLANNING_HEBDO[day] || []).slice();
 }
 
+// Détecte la plateforme principale d'une tâche
+function _detectPlatform(task) {
+  const t = task.toLowerCase();
+  if (t.includes('tiktok'))                          return { type: 'meta',   key: 'tiktok' };
+  if (t.includes('linkedin'))                        return { type: 'meta',   key: 'linkedin' };
+  if (t.includes('google my business') || t.includes('gmb')) return { type: 'meta', key: 'gmb' };
+  if (t.includes('pinterest'))                       return { type: 'meta',   key: 'pinterest' };
+  if (t.includes('youtube') || t.includes('podcast')) return { type: 'meta', key: 'youtube' };
+  if (t.includes('newsletter') || t.includes('brevo')) return { type: 'meta', key: 'brevo' };
+  if (t.includes('spotify'))                         return { type: 'meta',   key: 'spotify' };
+  if (t.includes('instagram'))                       return { type: 'meta',   key: 'instagram' };
+  if (t.includes('meta') || t.includes('story'))     return { type: 'meta',   key: 'facebook' };
+  if (t.includes('webinaire'))                       return { type: 'lucide', key: 'calendar' };
+  return { type: 'lucide', key: 'sparkles' };
+}
+
+function _taskIcon(task) {
+  const p = _detectPlatform(task);
+  if (p.type === 'meta') return _platIcon(p.key) || icon('sparkles', 18);
+  return icon(p.key, 18);
+}
+
+// Retourne les badges marque détectés dans le texte de la tâche
+function _taskBrandBadges(task) {
+  let html = '';
+  if (/intelixa/i.test(task)) html += `<span class="plan-task-badge plan-badge-intelixa">${icon('zap', 10)}</span>`;
+  if (/doudelio/i.test(task)) html += `<span class="plan-task-badge plan-badge-doudelio">${icon('leaf', 10)}</span>`;
+  return html;
+}
+
 async function renderPlanningView() {
   const grid = document.getElementById('planGrid');
   if (!grid) return;
@@ -312,7 +342,7 @@ async function renderPlanningView() {
     const tasks = allTasks[day];
     const isToday = day === todayDow;
     const isEditing = _planColEditDay === day;
-    const colClass = 'plan-week-col' + (isToday ? ' today' : '');
+    const colClass = ['plan-week-col', isToday ? 'today' : '', day === 6 ? 'dimanche' : ''].filter(Boolean).join(' ');
 
     const headerHtml = isEditing
       ? `<div class="plan-col-header">
@@ -324,7 +354,7 @@ async function renderPlanningView() {
         </div>`
       : `<div class="plan-col-header">
           <span class="plan-col-day">${name}</span>
-          <button class="plan-col-edit-btn" onclick="_planColToggleEdit(${day})" title="Modifier">${icon('pencil', 12)}</button>
+          <button class="plan-col-edit-btn" onclick="_planColToggleEdit(${day})" title="Modifier">${icon('pencil', 13)}</button>
         </div>`;
 
     let tasksHtml = '';
@@ -344,15 +374,19 @@ async function renderPlanningView() {
     } else if (tasks.length === 0) {
       tasksHtml = `<div class="plan-col-empty">Repos</div>`;
     } else {
-      const itemsHtml = tasks.map(t => `<li class="plan-task-item">${t}</li>`).join('');
+      const itemsHtml = tasks.map(t => `
+        <li class="plan-task-item">
+          <span class="plan-task-icon">${_taskIcon(t)}</span>
+          <span class="plan-task-text">${t}</span>
+          ${_taskBrandBadges(t)}
+        </li>`).join('');
       tasksHtml = `<ul class="plan-col-tasks">${itemsHtml}</ul>`;
     }
 
     html += `<div class="${colClass}">${headerHtml}${tasksHtml}</div>`;
   }
 
-  grid.innerHTML = html;
-  grid.style.gridTemplateColumns = `repeat(${activeDays.length}, 1fr)`;
+  grid.innerHTML = `<div class="plan-inner-grid" style="grid-template-columns:repeat(${activeDays.length},minmax(180px,1fr));">${html}</div>`;
 }
 
 function _planColToggleEdit(day) {
