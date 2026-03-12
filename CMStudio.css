@@ -436,84 +436,6 @@ body.theme-intelixa .move-dropdown { border-color:#2a2a2a; }
 }
 .move-option:hover { background:var(--surface2); }
 
-/* ===== CALENDRIER ===== */
-.cal-nav-btn{
-  background:var(--surface);border:2px solid var(--border);border-radius:12px;
-  width:42px;height:42px;font-size:22px;font-weight:900;color:var(--text);
-  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;
-}
-.cal-nav-btn:hover{background:var(--accent);color:white;border-color:var(--accent);}
-body.theme-intelixa .cal-nav-btn:hover{background:#4f8ef7;border-color:#4f8ef7;}
-.cal-title{font-weight:900;font-size:20px;color:var(--text);text-transform:capitalize;}
-body.theme-intelixa .cal-title{font-family:'Orbitron',monospace;font-size:14px;letter-spacing:3px;}
-.cal-grid-header{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;}
-.cal-grid-header div{text-align:center;font-size:10px;font-weight:800;color:var(--muted);padding:6px 0;text-transform:uppercase;letter-spacing:1px;}
-body.theme-intelixa .cal-grid-header div{font-family:'Orbitron',monospace;font-size:8px;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
-.cal-day{
-  background:var(--surface);border:2px solid var(--border);border-radius:12px;
-  min-height:110px;padding:8px;cursor:pointer;transition:all .2s ease;position:relative;
-}
-.cal-day:hover{border-color:var(--accent);transform:scale(1.02);}
-body.theme-intelixa .cal-day{background:var(--surface);border-color:#2a2a2a;}
-body.theme-intelixa .cal-day:hover{border-color:#4f8ef7;}
-.cal-day.empty{background:transparent;border-color:transparent;cursor:default;}
-.cal-day.empty:hover{transform:none;}
-.cal-day.today{border-color:var(--accent) !important;background:var(--surface2);}
-body.theme-intelixa .cal-day.today{border-color:#4f8ef7 !important;background:var(--surface2);}
-.cal-day-num{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;}
-.cal-day.today .cal-day-num{color:var(--accent);font-weight:900;}
-body.theme-intelixa .cal-day.today .cal-day-num{color:#4f8ef7;}
-
-/* Jours avec posts — fond teinté selon la marque */
-.cal-day.has-posts:not(.today)[data-brand="intelixa"]{background:rgba(180,20,20,.07);border-color:rgba(180,20,20,.28);}
-.cal-day.has-posts:not(.today)[data-brand="doudelio"]{background:rgba(56,71,134,.08);border-color:rgba(56,71,134,.28);}
-body.theme-intelixa .cal-day.has-posts:not(.today)[data-brand="intelixa"]{background:rgba(79,142,247,.12);border-color:rgba(79,142,247,.4);}
-body.theme-intelixa .cal-day.has-posts:not(.today)[data-brand="doudelio"]{background:rgba(56,71,134,.14);border-color:rgba(80,100,180,.4);}
-
-/* Post cards */
-.cal-posts{display:flex;flex-direction:column;gap:3px;margin-top:2px;}
-.cal-post{
-  border-radius:7px;padding:4px 6px 4px 8px;font-size:9px;font-weight:700;
-  display:flex;align-items:center;gap:4px;line-height:1.3;
-  border-left:3px solid transparent;position:relative;overflow:hidden;
-}
-.cal-post-icon{font-size:11px;flex-shrink:0;line-height:1;}
-.cal-post-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;text-transform:capitalize;}
-.cal-post-badge{font-size:8px;font-weight:900;padding:1px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0;}
-.cal-post-delete{margin-left:2px;opacity:0;font-size:8px;background:none;border:none;cursor:pointer;color:inherit;flex-shrink:0;line-height:1;}
-.cal-post:hover .cal-post-delete{opacity:1;}
-
-/* Statut brouillon — gris */
-.cal-post.brouillon{background:#f5f5f5;color:#757575;border-left-color:#9e9e9e;}
-.cal-post.brouillon .cal-post-badge{background:#e0e0e0;color:#616161;}
-body.theme-intelixa .cal-post.brouillon{background:rgba(255,255,255,.05);color:#888;border-left-color:#555;}
-body.theme-intelixa .cal-post.brouillon .cal-post-badge{background:rgba(255,255,255,.08);color:#777;}
-
-/* Statut à publier — orange */
-.cal-post.a-publier{background:#fff3e0;color:#e65100;border-left-color:#ff9800;}
-.cal-post.a-publier .cal-post-badge{background:#ffe0b2;color:#bf360c;}
-body.theme-intelixa .cal-post.a-publier{background:rgba(255,152,0,.12);color:#ffb74d;border-left-color:#ff9800;}
-body.theme-intelixa .cal-post.a-publier .cal-post-badge{background:rgba(255,152,0,.22);color:#ffa726;}
-
-/* Statut publié — vert */
-.cal-post.publie{background:#e8f5e9;color:#2e7d32;border-left-color:#4caf50;}
-.cal-post.publie .cal-post-badge{background:#c8e6c9;color:#1b5e20;}
-body.theme-intelixa .cal-post.publie{background:rgba(76,175,80,.12);color:#81c784;border-left-color:#4caf50;}
-body.theme-intelixa .cal-post.publie .cal-post-badge{background:rgba(76,175,80,.2);color:#66bb6a;}
-.cal-add-form{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px;animation:popIn .3s ease;}
-body.theme-intelixa .cal-add-form{border-color:#2a2a2a;}
-.cal-select{
-  width:100%;background:var(--surface2);border:2px solid var(--border);
-  border-radius:10px;padding:10px 12px;color:var(--text);
-  font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;outline:none;cursor:pointer;
-}
-body.theme-intelixa .cal-select{background:var(--surface2);border-color:#2a2a2a;color:var(--text);font-family:'Orbitron',monospace;font-size:10px;}
-.cal-confirm-btn{padding:10px 20px;border-radius:10px;border:none;background:var(--accent);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;white-space:nowrap;}
-.cal-confirm-btn:hover{opacity:.85;}
-body.theme-intelixa .cal-confirm-btn{background:#4f8ef7;font-family:'Orbitron',monospace;font-size:10px;}
-.cal-cancel-btn{padding:10px 14px;border-radius:10px;border:2px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s;}
-.cal-cancel-btn:hover{border-color:#e53935;color:#e53935;}
 
 /* ===== MISC ===== */
 .empty-state{text-align:center;color:var(--muted);font-size:14px;font-weight:600;padding:48px 20px;width:100%;}
@@ -548,10 +470,6 @@ body.theme-intelixa .dash-hero p{font-family:'Orbitron',monospace;font-size:10px
   .platforms-grid{grid-template-columns:repeat(3,1fr);}
   .ab-results{grid-template-columns:1fr;}
   .result-footer{flex-wrap:wrap;}
-  .cal-day{min-height:72px;padding:5px;}
-  .cal-post{display:none;}
-  .cal-post:first-child{display:flex;}
-  .cal-post-badge{display:none;}
 }
 /* ===== REGENERATE BTN ===== */
 .regen-btn {
@@ -799,72 +717,6 @@ body.theme-intelixa .greeting-text p{font-family:'Orbitron',monospace;font-size:
 @keyframes wave{0%,100%{transform:rotate(0deg);}25%{transform:rotate(20deg);}75%{transform:rotate(-10deg);}}}
 
 
-/* ===== FÊTES CALENDRIER ===== */
-.cal-fete {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 5px;
-  border-radius: 5px;
-  font-size: 10px;
-  font-weight: 700;
-  margin-bottom: 2px;
-  line-height: 1.2;
-  cursor: default;
-  pointer-events: none;
-}
-.cal-fete-emoji { font-size: 11px; }
-.cal-fete-label { 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 90px;
-}
-.cal-fete-ferie {
-  background: #fff3e0;
-  color: #e65100;
-  border-left: 3px solid #ff9800;
-}
-.cal-fete-commercial {
-  background: #fce4ec;
-  color: #c2185b;
-  border-left: 3px solid #e91e63;
-}
-.cal-fete-marketing {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border-left: 3px solid #4caf50;
-}
-.cal-day.has-fete {
-  background: linear-gradient(135deg, #fff 85%, #fff9f0 100%);
-}
-.cal-day.has-fete .cal-day-num {
-  color: var(--accent);
-}
-
-/* Légende fêtes */
-.cal-legend {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 8px 12px;
-  font-size: 11px;
-  opacity: 0.8;
-  margin-bottom: 8px;
-}
-.cal-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.cal-legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-}
-.cal-legend-dot.ferie { background: #ff9800; }
-.cal-legend-dot.commercial { background: #e91e63; }
-.cal-legend-dot.marketing { background: #4caf50; }
 
 /* ===== STATUS BANNER (hors-ligne / token manquant) ===== */
 .status-banner {
@@ -1021,40 +873,6 @@ body.theme-intelixa .perf-rating-btn.bien  { background: rgba(76,175,80,.1); }
 body.theme-intelixa .perf-rating-btn.moyen { background: rgba(158,158,158,.1); }
 body.theme-intelixa .perf-rating-btn.flop  { background: rgba(244,67,54,.1); }
 
-/* ===== CAL RATING PASTILLE ===== */
-.cal-post-rating {
-  font-size: 12px;
-  margin-left: 2px;
-}
-
-/* ===== CALENDRIER — TOGGLE VUE & VUE SEMAINE ===== */
-
-/* Toggle Mois/Semaine */
-.cal-view-toggle {
-  display: flex;
-  gap: 4px;
-}
-.cal-view-btn {
-  padding: 6px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 20px;
-  background: var(--surface);
-  color: var(--muted);
-  font-family: 'Nunito', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background .15s, color .15s, border-color .15s;
-}
-.cal-view-btn:hover { border-color: var(--accent); color: var(--text); }
-.cal-view-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
-body.theme-intelixa .cal-view-btn { background: var(--surface); border-color: #2a2a2a; color: var(--muted); font-family: 'Orbitron', monospace; font-size: 9px; }
-body.theme-intelixa .cal-view-btn.active { background: #4f8ef7; border-color: #4f8ef7; color: #fff; }
-body.theme-intelixa .cal-view-btn:hover { border-color: #4f8ef7; color: var(--text); }
 
 /* ===== TODAY CARD ===== */
 .today-card {
@@ -1143,12 +961,6 @@ body.theme-intelixa .cal-view-btn:hover { border-color: #4f8ef7; color: var(--te
 .today-card-btn.intelixa { background: #4f8ef7; color: #fff; }
 .today-card-btn.doudelio { background: var(--accent); color: #fff; }
 .today-card-btn:hover { opacity: .85; }
-/* Clickable status badge */
-.cal-post-badge {
-  background: none; border: none; cursor: pointer;
-  padding: 0; font: inherit; color: inherit;
-  display: inline-flex; align-items: center; gap: 3px;
-}
 /* Intelixa overrides */
 body.theme-intelixa .today-card { background: #13132a; border-color: #2a2a3e; }
 body.theme-intelixa .today-task-item { background: #1a1a2e; border-left-color: #4f8ef7; }
@@ -1156,80 +968,174 @@ body.theme-intelixa .today-task-input { background: #1a1a2e; border-color: #2a2a
 body.theme-intelixa .today-card-fete { border-top-color: #2a2a3e; }
 body.theme-intelixa .today-card-btn.doudelio { background: #4f8ef7; }
 
-/* Vue semaine */
-.cal-week-grid {
+/* ===== PLANNING HEBDO ===== */
+.plan-week-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 8px;
   width: 100%;
+  max-width: 960px;
+  padding: 4px 0;
 }
-.cal-week-col {
+.plan-week-col {
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 14px;
-  padding: 10px 8px;
-  min-height: 200px;
-  cursor: pointer;
-  transition: border-color .15s, background .15s;
+  padding: 12px 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
+  transition: border-color .15s;
+  min-width: 0;
 }
-.cal-week-col:hover { border-color: var(--accent); background: var(--surface2); }
-.cal-week-col.today { border-color: var(--accent) !important; background: var(--surface2); }
-body.theme-intelixa .cal-week-col { background: var(--surface); border-color: #2a2a2a; }
-body.theme-intelixa .cal-week-col:hover { border-color: #4f8ef7; }
-body.theme-intelixa .cal-week-col.today { border-color: #4f8ef7 !important; }
-
-.cal-week-col-header {
+.plan-week-col.today {
+  border-color: var(--accent) !important;
+  background: var(--surface2);
+}
+body.theme-intelixa .plan-week-col { border-color: #2a2a2a; }
+body.theme-intelixa .plan-week-col.today { border-color: #4f8ef7 !important; background: var(--surface2); }
+.plan-col-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-  margin-bottom: 4px;
-  padding-bottom: 6px;
+  justify-content: space-between;
+  gap: 6px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
 }
-.cal-week-day-name {
-  font-size: 9px;
+.plan-col-day {
+  font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: .06em;
   color: var(--muted);
 }
-.cal-week-day-num {
-  font-size: 18px;
-  font-weight: 900;
+.plan-week-col.today .plan-col-day { color: var(--accent); }
+body.theme-intelixa .plan-week-col.today .plan-col-day { color: #4f8ef7; }
+body.theme-intelixa .plan-col-day { font-family: 'Orbitron', monospace; font-size: 7px; }
+.plan-col-edit-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
   color: var(--muted);
-  line-height: 1;
+  cursor: pointer;
+  padding: 3px 6px;
+  display: inline-flex;
+  align-items: center;
+  transition: all .15s;
+  flex-shrink: 0;
 }
-.cal-week-day-num.today { color: var(--accent); }
-body.theme-intelixa .cal-week-day-num.today { color: #4f8ef7; }
-body.theme-intelixa .cal-week-day-name { font-family: 'Orbitron', monospace; font-size: 7px; }
-
-.cal-week-posts {
+.plan-col-edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+.plan-col-edit-actions { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+.plan-col-validate-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s;
+  font-family: inherit;
+}
+.plan-col-validate-btn:hover { opacity: .85; }
+body.theme-intelixa .plan-col-validate-btn { background: #4f8ef7; }
+.plan-col-reset-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 3px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  transition: all .15s;
+}
+.plan-col-reset-btn:hover { border-color: #f44336; color: #f44336; }
+.plan-col-tasks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 2px;
 }
-
-/* La vue semaine affiche les posts en full (pas compressés) */
-.cal-week-col .cal-post {
-  font-size: 10px;
+.plan-task-item {
+  font-size: 11px;
+  color: var(--text);
+  padding: 5px 8px;
+  background: var(--surface2);
+  border-radius: 7px;
+  border-left: 2.5px solid var(--accent);
+  line-height: 1.35;
+  word-break: break-word;
 }
-.cal-week-col .cal-post-label { font-size: 10px; }
-.cal-week-col .cal-post-badge { font-size: 9px; }
-.cal-week-col .cal-post-delete { opacity: 0; }
-.cal-week-col .cal-post:hover .cal-post-delete { opacity: 1; }
-
-/* Responsive semaine — stack sous 700px */
-@media (max-width: 700px) {
-  .cal-week-grid { grid-template-columns: repeat(3, 1fr); }
+body.theme-intelixa .plan-task-item { border-left-color: #4f8ef7; background: #1a1a2e; }
+.plan-col-empty { font-size: 11px; color: var(--muted); font-style: italic; padding: 4px 0; }
+/* Edit mode */
+.plan-col-tasks.edit { gap: 5px; }
+.plan-task-edit-item { display: flex; align-items: center; gap: 5px; }
+.plan-task-input {
+  flex: 1;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 8px;
+  font-size: 11px;
+  color: var(--text);
+  font-family: inherit;
+  transition: border-color .15s;
+  min-width: 0;
 }
-@media (max-width: 480px) {
-  .cal-week-grid { grid-template-columns: repeat(2, 1fr); }
-  .cal-view-btn { font-size: 11px; padding: 5px 10px; }
+.plan-task-input:focus { outline: none; border-color: var(--accent); }
+body.theme-intelixa .plan-task-input { background: #1a1a2e; border-color: #2a2a3e; }
+.plan-task-remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 3px 4px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  transition: color .15s;
+}
+.plan-task-remove-btn:hover { color: #f44336; }
+.plan-task-add-item { display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+.plan-task-add-input {
+  flex: 1;
+  background: none;
+  border: 1.5px dashed var(--border);
+  border-radius: 7px;
+  padding: 5px 8px;
+  font-size: 11px;
+  color: var(--text);
+  font-family: inherit;
+  transition: border-color .15s;
+  min-width: 0;
+}
+.plan-task-add-input:focus { outline: none; border-color: var(--accent); border-style: solid; }
+.plan-task-add-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+body.theme-intelixa .plan-task-add-btn { background: #4f8ef7; }
+/* Responsive planning */
+@media (max-width: 880px) {
+  .plan-week-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+@media (max-width: 540px) {
+  .plan-week-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 /* ===== SAVE ACCROCHE BTN ===== */
@@ -3224,39 +3130,7 @@ body.theme-intelixa .seo-optimize-btn:hover {
   .streak-card { max-width: 100%; }
   #perfBlock   { max-width: 100%; }
 
-  /* ── 10. CALENDRIER — VUE MOIS ───────────────────────── */
-  .cal-day {
-    min-height: 56px;
-    padding: 4px;
-    border-radius: 8px;
-  }
-  .cal-day-num {
-    font-size: 10px;
-    margin-bottom: 2px;
-  }
-  .cal-grid-header div {
-    font-size: 8px;
-    padding: 4px 0;
-    letter-spacing: 0;
-  }
-  .cal-title { font-size: 16px; }
-
-  /* Événements : 1 seul visible, tronqué */
-  .cal-post               { display: none; }
-  .cal-post:first-child   { display: flex; overflow: hidden; }
-  .cal-post-label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .cal-post-badge  { display: none; }
-
-  /* Formulaire d'ajout */
-  .cal-add-form { padding: 12px; }
   .cal-quick-btn { padding: 10px 12px; font-size: 12px; }
-
-  /* Masquer le bouton "Semaine" — garder Mois uniquement */
-  #calViewSemaine { display: none; }
 
   /* ── 11. CHATBOT FLOTTANT ────────────────────────────── */
   .chat-window {

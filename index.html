@@ -275,57 +275,7 @@
 
 <!-- ===== PAGE : CALENDRIER ===== -->
 <div id="page-calendrier" class="page">
-  <div style="width:100%;max-width:760px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
-      <div class="cal-view-toggle">
-        <button id="calViewMois" class="cal-view-btn active" onclick="setCalView('mois')">Mois</button>
-        <button id="calViewSemaine" class="cal-view-btn" onclick="setCalView('semaine')">Semaine</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <button onclick="calNavPrev()" class="cal-nav-btn">‹</button>
-        <div id="calTitle" class="cal-title"></div>
-        <button onclick="calNavNext()" class="cal-nav-btn">›</button>
-      </div>
-    </div>
-    <div class="cal-add-form" id="calAddForm" style="display:none;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-        <select id="calBrand" class="cal-select">
-          <option value="">Marque...</option>
-          <option value="intelixa"> Intelixa</option>
-          <option value="doudelio"> Doudelio</option>
-        </select>
-        <select id="calPlatform" class="cal-select">
-          <option value="">Plateforme...</option>
-          <option value="tiktok">TikTok</option>
-          <option value="linkedin">LinkedIn</option>
-          <option value="instagram">Instagram</option>
-          <option value="gmb">Google My Business</option>
-          <option value="facebook">Facebook</option>
-          <option value="pinterest">Pinterest</option>
-          <option value="spotify">Spotify</option>
-          <option value="brevo">Brevo</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:10px;">
-        <select id="calStatus" class="cal-select" style="flex:1;">
-          <option value="brouillon"> Brouillon</option>
-          <option value="a-publier"> À publier</option>
-          <option value="publie"> Publié</option>
-        </select>
-        <button onclick="confirmAddPost()" class="cal-confirm-btn">Ajouter</button>
-        <button onclick="cancelAddPost()" class="cal-cancel-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
-      </div>
-    </div>
-    <div class="cal-legend">
-      <div class="cal-legend-item"><div class="cal-legend-dot ferie"></div> Jour férié</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot commercial"></div> Fête commerciale</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot marketing"></div> Événement marketing</div>
-    </div>
-    <div class="cal-grid-header" id="calGridHeader">
-      <div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div>Sam</div><div>Dim</div>
-    </div>
-    <div id="calGrid" class="cal-grid"></div>
-  </div>
+  <div id="planGrid" class="plan-week-grid"></div>
 </div>
 
 

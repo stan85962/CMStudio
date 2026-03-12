@@ -1,65 +1,3 @@
-// ===== CALENDRIER =====
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth();
-let calView = 'mois';
-let calWeekDate = new Date();
-let pendingDay = null;
-let pendingYear = null;
-let pendingMonth = null;
-
-const _MONTH_NAMES_SHORT = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
-const _DAY_NAMES = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-
-function _getWeekMonday(date) {
-  const d = new Date(date || calWeekDate);
-  const dow = d.getDay();
-  const diff = dow === 0 ? -6 : 1 - dow;
-  d.setDate(d.getDate() + diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-async function initCalendarView() {
-  try {
-    const r = await window.storage.get('cal-view');
-    if (r && r.value === 'semaine') calView = 'semaine';
-  } catch(e) {}
-}
-
-async function setCalView(view) {
-  calView = view;
-  await window.storage.set('cal-view', view);
-  _updateCalViewButtons();
-  renderCalendar();
-}
-
-function _updateCalViewButtons() {
-  const btnMois = document.getElementById('calViewMois');
-  const btnSem  = document.getElementById('calViewSemaine');
-  if (btnMois) btnMois.classList.toggle('active', calView === 'mois');
-  if (btnSem)  btnSem.classList.toggle('active', calView === 'semaine');
-}
-
-function calNavPrev() {
-  if (calView === 'semaine') changeWeek(-1);
-  else changeMonth(-1);
-}
-function calNavNext() {
-  if (calView === 'semaine') changeWeek(1);
-  else changeMonth(1);
-}
-
-function changeWeek(dir) {
-  calWeekDate.setDate(calWeekDate.getDate() + dir * 7);
-  renderCalendar();
-}
-
-const STATUS_ICONS = {
-  brouillon: () => icon('fileText', 13),
-  'a-publier': () => icon('calendar', 13),
-  publie: () => icon('checkCircle', 13)
-};
-
 // ===== FÊTES & ÉVÉNEMENTS MARKETING =====
 const FETES = {
   // Format: 'MM-DD': { label, emoji, type }
@@ -185,252 +123,6 @@ function getFetesForDay(year, month, day) {
   return result;
 }
 
-function getCalKey() {
-  return 'cal-' + calYear + '-' + calMonth;
-}
-
-async function getCalPosts() {
-  try {
-    const r = await window.storage.get(getCalKey());
-    return r ? JSON.parse(r.value) : {};
-  } catch(e) { return {}; }
-}
-
-async function saveCalPosts(posts) {
-  try { await window.storage.set(getCalKey(), JSON.stringify(posts)); } catch(e) {}
-}
-
-function changeMonth(dir) {
-  calMonth += dir;
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  if (calMonth < 0) { calMonth = 11; calYear--; }
-  renderCalendar();
-}
-
-async function renderCalendar() {
-  _updateCalViewButtons();
-  const header = document.getElementById('calGridHeader');
-  if (calView === 'semaine') {
-    if (header) header.style.display = 'none';
-    await renderWeekView();
-  } else {
-    if (header) header.style.display = '';
-    await renderMonthView();
-  }
-}
-
-async function renderMonthView() {
-  const posts = await getCalPosts();
-  const today = new Date();
-  const firstDay = new Date(calYear, calMonth, 1);
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  let startDow = firstDay.getDay();
-  startDow = startDow === 0 ? 6 : startDow - 1;
-
-  document.getElementById('calTitle').textContent =
-    new Date(calYear, calMonth).toLocaleDateString('fr-FR', {month:'long', year:'numeric'});
-
-  let html = '';
-  for (let i = 0; i < startDow; i++) html += '<div class="cal-day empty"></div>';
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    const isToday = today.getFullYear()===calYear && today.getMonth()===calMonth && today.getDate()===d;
-    const dayPosts = posts[d] || [];
-    const hasPosts = dayPosts.length > 0;
-    const primaryBrand = dayPosts.find(p => p.brand)?.brand || '';
-
-    const fetes = getFetesForDay(calYear, calMonth, d);
-    const fetesHtml = fetes.map(f => `
-      <div class="cal-fete cal-fete-${f.type}" title="${f.label}">
-        <span class="cal-fete-emoji">${f.emoji}</span>
-        <span class="cal-fete-label">${f.label}</span>
-      </div>
-    `).join('');
-
-    const postsHtml = dayPosts.map((p, i) => {
-      const statusIcon = STATUS_ICONS[p.status] ? STATUS_ICONS[p.status]() : '•';
-      const statusText = { brouillon: 'Brouillon', 'a-publier': 'À publier', publie: 'Publié' }[p.status] || p.status;
-      const ratingPastille = p.rating ? `<span class="cal-post-rating" title="Ressenti : ${p.rating}">${p.rating}</span>` : '';
-      return `
-        <div class="cal-post ${p.status}" title="${p.platform} · ${statusText}${p.rating ? ' · ' + p.rating : ''}">
-          <span class="cal-post-icon">${_platIcon(p.platform) || '•'}</span>
-          <span class="cal-post-label">${p.platform}</span>
-          <button class="cal-post-badge" onclick="event.stopPropagation();cyclePostStatus(${calYear},${calMonth},${d},${i})">${statusIcon} ${statusText}</button>
-          ${ratingPastille}
-          <button class="cal-post-delete" onclick="event.stopPropagation();deletePost(${d},${i})">${icon('x',12)}</button>
-        </div>
-      `;
-    }).join('');
-
-    const hasFete = fetes.length > 0;
-    const dayClasses = ['cal-day', isToday?'today':'', hasFete?'has-fete':'', hasPosts?'has-posts':''].filter(Boolean).join(' ');
-
-    html += `<div class="${dayClasses}"${primaryBrand ? ` data-brand="${primaryBrand}"` : ''} onclick="openAddForm(${d})">
-      <div class="cal-day-num">${d}</div>
-      ${fetesHtml}
-      <div class="cal-posts">${postsHtml}</div>
-    </div>`;
-  }
-
-  document.getElementById('calGrid').innerHTML = html;
-}
-
-async function renderWeekView() {
-  const monday = _getWeekMonday();
-  const sunday = new Date(monday); sunday.setDate(sunday.getDate() + 6);
-
-  // Title
-  const from = monday.getDate() + ' ' + _MONTH_NAMES_SHORT[monday.getMonth()];
-  const to   = sunday.getDate()  + ' ' + _MONTH_NAMES_SHORT[sunday.getMonth()];
-  const y1   = monday.getFullYear(), y2 = sunday.getFullYear();
-  document.getElementById('calTitle').textContent =
-    'Semaine du ' + from + (y1 !== y2 ? ' ' + y1 : '') + ' au ' + to + ' ' + y2;
-
-  // Collect the 7 days
-  const days = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday); d.setDate(d.getDate() + i);
-    days.push(d);
-  }
-
-  // Fetch posts for each unique year-month in the week
-  const postsCache = {};
-  const monthKeys = [...new Set(days.map(d => `${d.getFullYear()}-${d.getMonth()}`))];
-  for (const key of monthKeys) {
-    const [y, m] = key.split('-').map(Number);
-    try {
-      const r = await window.storage.get(`cal-${y}-${m}`);
-      postsCache[key] = r ? JSON.parse(r.value) : {};
-    } catch(e) { postsCache[key] = {}; }
-  }
-
-  const today = new Date();
-  let html = '<div class="cal-week-grid">';
-
-  for (const d of days) {
-    const y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
-    const key = `${y}-${m}`;
-    const dayPosts = (postsCache[key] || {})[day] || [];
-    const fetes    = getFetesForDay(y, m, day);
-    const isToday  = today.getFullYear()===y && today.getMonth()===m && today.getDate()===day;
-
-    const fetesHtml = fetes.map(f => `
-      <div class="cal-fete cal-fete-${f.type}">
-        <span class="cal-fete-emoji">${f.emoji}</span>
-        <span class="cal-fete-label">${f.label}</span>
-      </div>
-    `).join('');
-
-    const postsHtml = dayPosts.map((p, i) => {
-      const statusIcon = STATUS_ICONS[p.status] ? STATUS_ICONS[p.status]() : '•';
-      const statusText = { brouillon: 'Brouillon', 'a-publier': 'À publier', publie: 'Publié' }[p.status] || p.status;
-      const ratingPastille = p.rating ? `<span class="cal-post-rating">${p.rating}</span>` : '';
-      return `
-        <div class="cal-post ${p.status}">
-          <span class="cal-post-icon">${_platIcon(p.platform) || '•'}</span>
-          <span class="cal-post-label">${p.platform}</span>
-          <button class="cal-post-badge" onclick="event.stopPropagation();cyclePostStatus(${y},${m},${day},${i})">${statusIcon} ${statusText}</button>
-          ${ratingPastille}
-          <button class="cal-post-delete" onclick="event.stopPropagation();deletePostForDate(${y},${m},${day},${i})">${icon('x',12)}</button>
-        </div>
-      `;
-    }).join('');
-
-    html += `
-      <div class="cal-week-col${isToday ? ' today' : ''}" onclick="openAddFormForDate(${y},${m},${day})">
-        <div class="cal-week-col-header">
-          <span class="cal-week-day-name">${_DAY_NAMES[d.getDay()]}</span>
-          <span class="cal-week-day-num${isToday ? ' today' : ''}">${day}</span>
-        </div>
-        ${fetesHtml}
-        <div class="cal-week-posts">${postsHtml}</div>
-      </div>
-    `;
-  }
-
-  html += '</div>';
-  document.getElementById('calGrid').innerHTML = html;
-}
-
-function openAddFormForDate(year, month, day) {
-  pendingYear = year;
-  pendingMonth = month;
-  pendingDay = day;
-  document.getElementById('calAddForm').style.display = 'block';
-  document.getElementById('calBrand').value = selectedBrand || '';
-  document.getElementById('calPlatform').value = '';
-  document.getElementById('calStatus').value = 'brouillon';
-}
-
-function openAddForm(day) {
-  openAddFormForDate(calYear, calMonth, day);
-}
-
-function cancelAddPost() {
-  pendingDay = null;
-  pendingYear = null;
-  pendingMonth = null;
-  document.getElementById('calAddForm').style.display = 'none';
-}
-
-async function confirmAddPost() {
-  const brand = document.getElementById('calBrand').value;
-  const platform = document.getElementById('calPlatform').value;
-  const status = document.getElementById('calStatus').value;
-  if (!platform) { alert('Choisis une plateforme !'); return; }
-
-  const y = pendingYear ?? calYear;
-  const m = pendingMonth ?? calMonth;
-  const calKey = `cal-${y}-${m}`;
-  let posts = {};
-  try {
-    const r = await window.storage.get(calKey);
-    posts = r ? JSON.parse(r.value) : {};
-  } catch(e) {}
-  if (!posts[pendingDay]) posts[pendingDay] = [];
-  posts[pendingDay].push({ brand, platform, status });
-  await window.storage.set(calKey, JSON.stringify(posts));
-
-  cancelAddPost();
-  renderCalendar();
-}
-
-async function deletePostForDate(year, month, day, index) {
-  const calKey = `cal-${year}-${month}`;
-  try {
-    const r = await window.storage.get(calKey);
-    if (!r) return;
-    const posts = JSON.parse(r.value);
-    if (posts[day]) {
-      posts[day].splice(index, 1);
-      if (!posts[day].length) delete posts[day];
-      await window.storage.set(calKey, JSON.stringify(posts));
-      renderCalendar();
-    }
-  } catch(e) {}
-}
-
-async function deletePost(day, index) {
-  await deletePostForDate(calYear, calMonth, day, index);
-}
-
-// ===== CYCLE STATUT =====
-const STATUS_CYCLE = { brouillon: 'a-publier', 'a-publier': 'publie', publie: 'brouillon' };
-
-async function cyclePostStatus(year, month, day, index) {
-  const calKey = `cal-${year}-${month}`;
-  try {
-    const r = await window.storage.get(calKey);
-    if (!r) return;
-    const posts = JSON.parse(r.value);
-    if (posts[day] && posts[day][index]) {
-      posts[day][index].status = STATUS_CYCLE[posts[day][index].status] || 'a-publier';
-      await window.storage.set(calKey, JSON.stringify(posts));
-      renderCalendar();
-    }
-  } catch(e) {}
-}
-
 // ===== HELPER TODAY CARD =====
 function getUpcomingFete(maxDaysAhead) {
   const today = new Date();
@@ -541,11 +233,9 @@ async function savePostRating(year, month, day, postIndex, rating) {
     if (!posts[day] || !posts[day][postIndex]) return;
     const post = posts[day][postIndex];
 
-    // Inscrire le rating sur l'objet post (pour la pastille calendrier)
     post.rating = rating;
     await window.storage.set(calKey, JSON.stringify(posts));
 
-    // Sauvegarder dans la clé perf dédiée
     const RATING_NUM = { '🔥': 4, '👍': 3, '😐': 2, '👎': 1 };
     const perfKey = `perf-${post.brand}-${post.platform}-${year}-${month}-${day}-${postIndex}`;
     await window.storage.set(perfKey, JSON.stringify({
@@ -558,10 +248,6 @@ async function savePostRating(year, month, day, postIndex, rating) {
       timestamp: Date.now()
     }));
 
-    // Re-render calendrier si on est sur le bon mois
-    if (year === calYear && month === calMonth) renderCalendar();
-
-    // Rafraîchir les rappels et le récap perf
     checkReminders();
     if (typeof renderPerfRecap === 'function') renderPerfRecap();
   } catch(e) {}
@@ -577,10 +263,136 @@ async function markPostPublished(year, month, day, postIndex) {
     if (posts[day] && posts[day][postIndex]) {
       posts[day][postIndex].status = 'publie';
       await window.storage.set(key, JSON.stringify(posts));
-      // Re-rendu du calendrier si on est sur le bon mois
-      if (year === calYear && month === calMonth) renderCalendar();
-      // Rafraîchir les rappels
       checkReminders();
     }
   } catch(e) {}
+}
+
+// ===== PLANNING HEBDOMADAIRE — VUE CALENDRIER =====
+let _planColEditDay = null;
+
+// Stubs requis par cm-init.js : initCalendarView().then(renderCalendar)
+async function initCalendarView() {} // no-op
+function renderCalendar() { renderPlanningView(); }
+
+async function _getPlanTasks(day) {
+  const key = 'planning-custom-' + day;
+  try {
+    const r = await window.storage.get(key);
+    if (r && r.value !== undefined) {
+      const arr = JSON.parse(r.value);
+      if (Array.isArray(arr)) return arr;
+    }
+  } catch(e) {}
+  return (PLANNING_HEBDO[day] || []).slice();
+}
+
+async function renderPlanningView() {
+  const grid = document.getElementById('planGrid');
+  if (!grid) return;
+
+  const today = new Date();
+  // Convertir getDay() (0=Dim) en index 0=Lun…6=Dim
+  const todayDow = today.getDay() === 0 ? 6 : today.getDay() - 1;
+
+  const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Dimanche'];
+  const BASE_DAYS = [0, 1, 2, 3, 4]; // Lun-Ven toujours affichés
+
+  // Afficher Dimanche seulement si des tâches existent
+  const sundayTasks = await _getPlanTasks(6);
+  const activeDays = sundayTasks.length ? [...BASE_DAYS, 6] : BASE_DAYS;
+
+  // Précharger toutes les tâches en parallèle
+  const allTasks = {};
+  await Promise.all(activeDays.map(async d => { allTasks[d] = await _getPlanTasks(d); }));
+
+  let html = '';
+  for (const day of activeDays) {
+    const name = day === 6 ? DAY_NAMES[5] : DAY_NAMES[day];
+    const tasks = allTasks[day];
+    const isToday = day === todayDow;
+    const isEditing = _planColEditDay === day;
+    const colClass = 'plan-week-col' + (isToday ? ' today' : '');
+
+    const headerHtml = isEditing
+      ? `<div class="plan-col-header">
+          <span class="plan-col-day">${name}</span>
+          <div class="plan-col-edit-actions">
+            <button class="plan-col-validate-btn" onclick="_planColValidate(${day})">Valider</button>
+            <button class="plan-col-reset-btn" onclick="_planColReset(${day})">Réinitialiser</button>
+          </div>
+        </div>`
+      : `<div class="plan-col-header">
+          <span class="plan-col-day">${name}</span>
+          <button class="plan-col-edit-btn" onclick="_planColToggleEdit(${day})" title="Modifier">${icon('pencil', 12)}</button>
+        </div>`;
+
+    let tasksHtml = '';
+    if (isEditing) {
+      const itemsHtml = tasks.map((t, i) => `
+        <li class="plan-task-edit-item">
+          <input type="text" class="plan-task-input" value="${t.replace(/"/g, '&quot;')}" data-idx="${i}" />
+          <button class="plan-task-remove-btn" onclick="_planColRemoveTask(this)" title="Supprimer">${icon('x', 11)}</button>
+        </li>`).join('');
+      tasksHtml = `
+        <ul class="plan-col-tasks edit" id="planColTasks${day}">${itemsHtml}</ul>
+        <div class="plan-task-add-item">
+          <input type="text" class="plan-task-add-input" id="planColAddInput${day}" placeholder="Nouvelle tâche…"
+            onkeydown="if(event.key==='Enter')_planColAddTask(${day})" />
+          <button class="plan-task-add-btn" onclick="_planColAddTask(${day})">${icon('plus', 13)}</button>
+        </div>`;
+    } else if (tasks.length === 0) {
+      tasksHtml = `<div class="plan-col-empty">Repos</div>`;
+    } else {
+      const itemsHtml = tasks.map(t => `<li class="plan-task-item">${t}</li>`).join('');
+      tasksHtml = `<ul class="plan-col-tasks">${itemsHtml}</ul>`;
+    }
+
+    html += `<div class="${colClass}">${headerHtml}${tasksHtml}</div>`;
+  }
+
+  grid.innerHTML = html;
+  grid.style.gridTemplateColumns = `repeat(${activeDays.length}, 1fr)`;
+}
+
+function _planColToggleEdit(day) {
+  _planColEditDay = _planColEditDay === day ? null : day;
+  renderPlanningView();
+}
+
+function _planColValidate(day) {
+  const list = document.getElementById('planColTasks' + day);
+  const tasks = list
+    ? Array.from(list.querySelectorAll('.plan-task-input')).map(i => i.value.trim()).filter(Boolean)
+    : [];
+  const addInput = document.getElementById('planColAddInput' + day);
+  if (addInput && addInput.value.trim()) tasks.push(addInput.value.trim());
+  window.storage.set('planning-custom-' + day, JSON.stringify(tasks));
+  _planColEditDay = null;
+  renderPlanningView();
+}
+
+function _planColReset(day) {
+  window.storage.set('planning-custom-' + day, JSON.stringify(PLANNING_HEBDO[day] || []));
+  _planColEditDay = null;
+  renderPlanningView();
+}
+
+function _planColRemoveTask(btn) {
+  const item = btn.closest('.plan-task-edit-item');
+  if (item) item.remove();
+}
+
+function _planColAddTask(day) {
+  const input = document.getElementById('planColAddInput' + day);
+  if (!input || !input.value.trim()) return;
+  const list = document.getElementById('planColTasks' + day);
+  if (!list) return;
+  const li = document.createElement('li');
+  li.className = 'plan-task-edit-item';
+  li.innerHTML = `<input type="text" class="plan-task-input" value="${input.value.trim().replace(/"/g, '&quot;')}" />
+    <button class="plan-task-remove-btn" onclick="_planColRemoveTask(this)">${icon('x', 11)}</button>`;
+  list.appendChild(li);
+  input.value = '';
+  input.focus();
 }

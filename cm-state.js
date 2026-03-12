@@ -524,8 +524,7 @@ const PLANNING_HEBDO = {
     "Publication Meta — 19h",
     "Google My Business Intelixa",
     "50 actions LinkedIn",
-    "TikTok Doudelio — 1/jour",
-    "Webinaire (1x/mois — dimanche/lundi soir)"
+    "TikTok Doudelio — 1/jour"
   ],
   1: [
     "Story Meta (portrait formatrice ou prochaine session avec lien site)",
