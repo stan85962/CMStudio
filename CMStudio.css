@@ -27,6 +27,311 @@ body.theme-intelixa{
 
 body.theme-intelixa>*{position:relative;z-index:1;}
 
+/* ===== DOUDELIO THEME ===== */
+body.theme-doudelio {
+  --bg: #f7f5f2;
+  --surface: #ffffff;
+  --surface2: #f0ece8;
+  --border: #e0d9d3;
+  --text: #2c2c2c;
+  --muted: #8a8078;
+  --accent: #455a83;
+  --accent2: #de6164;
+  --shadow: rgba(69,90,131,0.12);
+  background: #f7f5f2;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(69,90,131,.05) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(222,97,100,.04) 0%, transparent 45%);
+}
+
+/* Nav : fond blanc chaud, bordure basse */
+body.theme-doudelio .top-nav {
+  background: rgba(247,245,242,.95);
+  border-bottom: 1.5px solid #e0d9d3;
+  position: sticky;
+  z-index: 200;
+}
+body.theme-doudelio .preview-modal { position: fixed; z-index: 1000; }
+body.theme-doudelio .res-drawer   { position: fixed; z-index: 300; }
+body.theme-doudelio .res-overlay  { position: fixed; z-index: 299; }
+body.theme-doudelio .chat-fab     { position: fixed; }
+body.theme-doudelio .chat-window  { position: fixed; }
+
+/* Logo nav */
+body.theme-doudelio .nav-logo {
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  letter-spacing: normal;
+  color: #455a83;
+  font-weight: 900;
+}
+
+/* Nav tab active */
+body.theme-doudelio .nav-tab {
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  letter-spacing: normal;
+  font-weight: 800;
+}
+body.theme-doudelio .nav-tab.active {
+  background: #455a83;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(69,90,131,.22);
+}
+
+/* Section labels : bleu Doudelio */
+body.theme-doudelio .section-label { color: #455a83; }
+
+/* Cartes generiques */
+body.theme-doudelio .card { background: var(--surface); border-color: #e0d9d3; }
+
+/* === BRAND BTN === */
+body.theme-doudelio .brand-btn { background: var(--surface); border-color: #e0d9d3; }
+body.theme-doudelio .brand-btn img { filter: none; }
+body.theme-doudelio .brand-btn:hover { box-shadow: 0 10px 28px rgba(69,90,131,.15); }
+body.theme-doudelio .brand-btn.doudelio.active {
+  border-color: #455a83;
+  background: rgba(69,90,131,.06);
+  box-shadow: 0 8px 28px rgba(69,90,131,.18);
+}
+
+/* === BADGE DOUDELIO === */
+body.theme-doudelio .badge-doudelio {
+  background: rgba(69,90,131,.12);
+  color: #455a83;
+}
+
+/* === PLATFORM BTN === */
+body.theme-doudelio .platform-btn { background: var(--surface); border-color: #e0d9d3; }
+body.theme-doudelio .platform-btn:hover { border-color: #455a83; background: rgba(69,90,131,.04); }
+body.theme-doudelio .platform-btn.active {
+  border-color: #455a83;
+  background: rgba(69,90,131,.07);
+  box-shadow: 0 4px 16px rgba(69,90,131,.18);
+}
+body.theme-doudelio .platform-btn.active .platform-label { color: #455a83; }
+
+/* === GENERATE BTN === */
+body.theme-doudelio .generate-btn {
+  font-family: 'Nunito', sans-serif;
+  letter-spacing: normal;
+  font-size: 17px;
+  background: linear-gradient(135deg, #455a83, #3a4d72);
+  box-shadow: 0 6px 20px rgba(69,90,131,.35), 0 2px 8px rgba(69,90,131,.2);
+  border: none;
+  animation: none;
+}
+body.theme-doudelio .generate-btn:hover:not(:disabled) {
+  box-shadow: 0 12px 32px rgba(69,90,131,.45), 0 4px 12px rgba(69,90,131,.3);
+}
+
+/* === IDEA BTN === */
+body.theme-doudelio .idea-btn {
+  font-family: 'Nunito', sans-serif;
+  letter-spacing: normal;
+  font-size: 14px;
+  border-color: #455a83;
+  color: #455a83;
+}
+body.theme-doudelio .idea-btn:hover:not(:disabled) {
+  background: #455a83;
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(69,90,131,.35);
+}
+body.theme-doudelio .idea-badge {
+  background: rgba(69,90,131,.08);
+  border-color: #455a83;
+  color: #455a83;
+}
+
+/* === TEMPLATES === */
+body.theme-doudelio .template-chip { background: var(--surface); border-color: #e0d9d3; }
+body.theme-doudelio .template-chip:hover { border-color: #455a83; color: var(--text); }
+body.theme-doudelio .template-published-btn:hover { border-color: #455a83; color: #455a83; background: rgba(69,90,131,.04); }
+body.theme-doudelio .template-refresh-btn:hover  { border-color: #455a83; color: #455a83; }
+
+/* === AB BTNS === */
+body.theme-doudelio .ab-btn { font-family: 'Nunito', sans-serif; letter-spacing: normal; }
+body.theme-doudelio .ab-btn.active { border-color: #455a83; color: #455a83; }
+
+/* === COPY / REGEN / CALENDAR QUICK BTNS === */
+body.theme-doudelio .copy-btn { border-color: #e0d9d3; }
+body.theme-doudelio .copy-btn:hover, body.theme-doudelio .copy-btn.copied { background: #455a83; border-color: #455a83; color: #fff; }
+body.theme-doudelio .cal-quick-btn { border-color: #e0d9d3; }
+body.theme-doudelio .cal-quick-btn:hover { background: #455a83; border-color: #455a83; color: #fff; }
+body.theme-doudelio .regen-btn { font-family: 'Nunito', sans-serif; border-color: #e0d9d3; }
+body.theme-doudelio .regen-btn:hover { background: #455a83; border-color: #455a83; color: #fff; }
+
+/* === RESULT / AB LABELS === */
+body.theme-doudelio .ab-label { color: #455a83; font-family: 'Nunito', sans-serif; }
+body.theme-doudelio .result-content { font-family: 'Nunito', sans-serif; color: var(--text); }
+body.theme-doudelio .ab-text { font-family: 'Nunito', sans-serif; color: var(--text); }
+body.theme-doudelio .result-platform { font-family: 'Nunito', sans-serif; letter-spacing: normal; }
+
+/* === TEXTAREA === */
+body.theme-doudelio textarea { font-family: 'Nunito', sans-serif; font-size: 14px; border-color: #e0d9d3; background: var(--surface2); }
+body.theme-doudelio textarea::placeholder { color: #8a8078; }
+body.theme-doudelio textarea:focus { border-color: #455a83; box-shadow: 0 0 0 3px rgba(69,90,131,.1); }
+
+/* === STAT CARDS === */
+body.theme-doudelio .stat-card { background: var(--surface); border-color: #e0d9d3; }
+body.theme-doudelio .stat-num { color: #455a83; font-family: 'Nunito', sans-serif; font-size: 30px; }
+
+/* === STREAK CARD : tons bleu chauds au lieu du jaune === */
+body.theme-doudelio .streak-card { background: rgba(69,90,131,.06); border-color: #455a83; }
+body.theme-doudelio .streak-num  { color: #455a83; }
+body.theme-doudelio .streak-unit { color: #455a83; opacity: .75; }
+body.theme-doudelio .streak-sub  { color: #8a8078; }
+body.theme-doudelio .streak-fire svg { stroke: #de6164; filter: drop-shadow(0 0 4px rgba(222,97,100,.4)); }
+
+/* === PERF RECAP === */
+body.theme-doudelio .perf-rating-btn.top   { background: rgba(69,90,131,.08); border-color: #455a83; color: #455a83; }
+body.theme-doudelio .perf-rating-btn.bien  { background: rgba(69,90,131,.05); border-color: #6d88b3; color: #455a83; }
+body.theme-doudelio .perf-rating-btn.moyen { background: rgba(222,97,100,.06); border-color: #de8a8c; color: #a04040; }
+body.theme-doudelio .perf-rating-btn.flop  { background: rgba(222,97,100,.1); border-color: #de6164; color: #de6164; }
+
+/* === POST-ITS : crème/beige chauds harmonisés === */
+body.theme-doudelio .postit { border-radius: 14px; }
+body.theme-doudelio .postit-cat-badge { background: rgba(69,90,131,.1); color: #455a83; }
+body.theme-doudelio .postit-text { color: #2c2c2c; }
+body.theme-doudelio .postit-date { color: #8a8078; opacity: 1; }
+body.theme-doudelio .postit-textarea { background: rgba(0,0,0,.04); color: #2c2c2c; }
+body.theme-doudelio .postit-save-btn   { background: rgba(69,90,131,.15); color: #2c2c2c; }
+body.theme-doudelio .postit-cancel-btn { background: rgba(0,0,0,.06); color: #8a8078; }
+
+/* Couleurs par catégorie — tons chauds et professionnels */
+body.theme-doudelio .postit-a-publier     { background: #fef6e4; border: 1.5px solid #e0d9d3; border-top: 3px solid #f5a623; }
+body.theme-doudelio .postit-a-retravailler{ background: #fdeef0; border: 1.5px solid #e0d9d3; border-top: 3px solid #de6164; }
+body.theme-doudelio .postit-idee          { background: #eef2fb; border: 1.5px solid #d5ddf0; border-top: 3px solid #455a83; }
+body.theme-doudelio .postit-urgent        { background: #fdecea; border: 1.5px solid #f5c2c2; border-top: 3px solid #c0392b; }
+body.theme-doudelio .postit-archive       { background: #f5f3f0; border: 1.5px solid #e0d9d3; border-top: 3px solid #8a8078; }
+
+/* Notes : catégorie tabs & view toggle */
+body.theme-doudelio .notes-view-btn { background: #f0ece8; border-color: #e0d9d3; color: #8a8078; }
+body.theme-doudelio .notes-view-btn:hover { border-color: #455a83; color: #455a83; }
+body.theme-doudelio .notes-view-btn.active { background: #455a83; border-color: #455a83; color: #fff; }
+body.theme-doudelio .cat-tab { font-family: 'Nunito', sans-serif; font-size: 12px; letter-spacing: normal; border-color: #e0d9d3; }
+body.theme-doudelio .cat-tab.active { background: #455a83 !important; border-color: #455a83 !important; color: #fff !important; }
+body.theme-doudelio .note-cat-select { background: var(--surface2); border-color: #e0d9d3; color: var(--text); font-family: 'Nunito', sans-serif; }
+
+/* Accroche section */
+body.theme-doudelio .accroche-filter-btn.active { background: #455a83; border-color: #455a83; color: #fff; }
+body.theme-doudelio .save-accroche-btn { border-color: #455a83; color: #455a83; }
+body.theme-doudelio .save-accroche-btn.saved { background: rgba(69,90,131,.12); border-color: #455a83; }
+
+/* === RAPPELS / REMINDERS === */
+body.theme-doudelio .reminder-badge { background: rgba(222,97,100,.1); color: #de6164; }
+body.theme-doudelio .reminder-item.cal-alert .reminder-msg { color: #de6164; }
+body.theme-doudelio .reminder-publish-btn { font-family: 'Nunito', sans-serif; background: #455a83; }
+
+/* Dupe alert */
+body.theme-doudelio .dupe-alert { border-color: #de6164; }
+body.theme-doudelio .dupe-alert-title { font-family: 'Nunito', sans-serif; color: #de6164; }
+body.theme-doudelio .dupe-item { background: rgba(222,97,100,.07); }
+
+/* === GREETING === */
+body.theme-doudelio .greeting-banner { border-color: #e0d9d3; }
+body.theme-doudelio .greeting-text h2 { font-family: 'Nunito', sans-serif; font-size: 20px; letter-spacing: normal; }
+body.theme-doudelio .greeting-text p  { font-family: 'Nunito', sans-serif; font-size: 14px; letter-spacing: normal; }
+
+/* Dash hero */
+body.theme-doudelio .dash-hero h1 {
+  font-family: 'Nunito', sans-serif;
+  letter-spacing: normal;
+  font-size: clamp(22px, 4vw, 34px);
+  background: none;
+  -webkit-text-fill-color: #455a83;
+  color: #455a83;
+  font-weight: 900;
+}
+body.theme-doudelio .dash-hero p { font-family: 'Nunito', sans-serif; font-size: 14px; letter-spacing: normal; }
+
+/* === TODAY CARD === */
+body.theme-doudelio .tc-event.is-today { border-color: #455a83; background: rgba(69,90,131,.06); }
+body.theme-doudelio .tc-badge.today    { background: #455a83; color: #fff; }
+body.theme-doudelio .tc-badge.upcoming { background: #f0ece8; border-color: #e0d9d3; color: #8a8078; }
+body.theme-doudelio .today-card-btn.intelixa { background: #455a83; }
+body.theme-doudelio .today-card-btn.doudelio { background: #de6164; }
+
+/* === RECENT ITEMS === */
+body.theme-doudelio .recent-item { background: var(--surface); border-color: #e0d9d3; }
+body.theme-doudelio .recent-item:hover { border-color: #455a83; }
+
+/* === SEO PANEL === */
+body.theme-doudelio .seo-panel-inner { border-color: #e0d9d3; }
+body.theme-doudelio .seo-title { font-family: 'Nunito', sans-serif; letter-spacing: normal; color: #455a83; font-weight: 800; }
+body.theme-doudelio .seo-item-label { color: var(--text); }
+
+/* === PREVIEW MODAL === */
+body.theme-doudelio .preview-modal-inner { border-color: #e0d9d3; }
+body.theme-doudelio .preview-modal-header { background: var(--surface2); border-color: #e0d9d3; }
+body.theme-doudelio .preview-modal-title { font-family: 'Nunito', sans-serif; letter-spacing: normal; }
+body.theme-doudelio .prev-tab { font-family: 'Nunito', sans-serif; font-size: 12px; letter-spacing: normal; border-color: #e0d9d3; }
+body.theme-doudelio .prev-tab.active { background: #455a83; border-color: #455a83; }
+
+/* === CURSOR (typing animation) === */
+body.theme-doudelio .cursor { background: #455a83; }
+
+/* === HISTORIQUE === */
+body.theme-doudelio .hist-filter-btn { background: var(--surface); border-color: #e0d9d3; color: #8a8078; font-family: 'Nunito', sans-serif; font-size: 12px; }
+body.theme-doudelio .hist-filter-btn:hover { border-color: #455a83; color: #455a83; }
+body.theme-doudelio .hist-filter-btn.active { background: #455a83; border-color: #455a83; color: #fff; }
+body.theme-doudelio .hist-filter-sep { background: #e0d9d3; }
+body.theme-doudelio .hist-filter-reset { background: rgba(222,97,100,.06); }
+body.theme-doudelio .hist-item:hover { background: rgba(69,90,131,.04); }
+body.theme-doudelio .hist-copy-btn:hover    { background: rgba(69,90,131,.08); border-color: #455a83; color: #455a83; }
+body.theme-doudelio .hist-relaunch-btn:hover { background: rgba(222,97,100,.08); border-color: #de6164; color: #de6164; }
+body.theme-doudelio .hist-modal-copy { border-color: #455a83; background: rgba(69,90,131,.06); color: #455a83; }
+body.theme-doudelio .hist-modal-copy:hover { background: rgba(69,90,131,.12); }
+body.theme-doudelio .hist-modal-close:hover { background: rgba(222,97,100,.08); border-color: #de6164; color: #de6164; }
+
+/* === CALENDRIER / PLANNING === */
+body.theme-doudelio .wcal-nav-today:hover { border-color: #455a83; background: rgba(69,90,131,.08); color: #455a83; }
+body.theme-doudelio .wcal-col-header.today .wcal-col-dow { color: #455a83; }
+body.theme-doudelio .wcal-col-num.today { background: #455a83; color: #fff; }
+body.theme-doudelio .wcal-allday-cell.today { background: rgba(69,90,131,.06); }
+body.theme-doudelio .wcal-timed-col { border-color: #e0d9d3; }
+body.theme-doudelio .wcal-timed-col.today { background-color: rgba(69,90,131,.04); }
+body.theme-doudelio .wcal-modal-inner { background: var(--surface); border-color: #e0d9d3; }
+body.theme-doudelio .wcal-modal-input { background: var(--surface2); border-color: #e0d9d3; }
+body.theme-doudelio .wcal-modal-num   { background: var(--surface2); border-color: #e0d9d3; }
+body.theme-doudelio .wcal-modal-save  { background: #455a83; }
+body.theme-doudelio .plan-icon-btn { border-color: #e0d9d3; color: #8a8078; }
+body.theme-doudelio .plan-icon-btn:hover  { border-color: #455a83; color: #455a83; }
+body.theme-doudelio .plan-icon-btn.active { border-color: #455a83; background: rgba(69,90,131,.12); color: #455a83; }
+
+/* Tâches récurrentes */
+body.theme-doudelio .trec-col { background: rgba(69,90,131,.03); border-color: #e0d9d3; }
+body.theme-doudelio .trec-col-label { color: #455a83; font-family: 'Nunito', sans-serif; font-size: 11px; letter-spacing: normal; }
+body.theme-doudelio .trec-section::before { border-color: #e0d9d3; }
+
+/* === AUTOPILOT === */
+body.theme-doudelio .ap-quick-btn:hover { border-color: #455a83; color: #455a83; }
+body.theme-doudelio .ap-panel { border-color: #455a83; box-shadow: 0 0 0 1px #455a83; }
+body.theme-doudelio .ap-panel-header { color: #455a83; }
+body.theme-doudelio .ap-brand-radio:has(input:checked) { border-color: #455a83; color: #455a83; background: rgba(69,90,131,.06); }
+body.theme-doudelio .ap-plat-item:has(input:checked) { border-color: #455a83; background: rgba(69,90,131,.06); }
+body.theme-doudelio .ap-run-btn { background: #455a83; }
+body.theme-doudelio .ap-result-textarea:focus { border-color: #455a83; }
+body.theme-doudelio .ap-copy-btn:hover, body.theme-doudelio .ap-regen-btn:hover { border-color: #455a83; color: #455a83; }
+
+/* === CHATBOT FAB & WINDOW === */
+body.theme-doudelio .chat-fab { background: #455a83; }
+body.theme-doudelio .chat-win-title { color: #455a83; }
+
+/* === AIDE / RESOURCES DRAWER === */
+body.theme-doudelio .res-drawer { background: var(--surface); }
+body.theme-doudelio .help-btn { background: var(--surface); border-color: #e0d9d3; }
+body.theme-doudelio .help-btn:hover { background: var(--surface2); color: var(--text); border-color: #455a83; }
+
+/* === TOKEN SETUP === */
+body.theme-doudelio .token-setup-btn { background: #455a83; }
+
+/* === CUSTOM BRANDS === */
+body.theme-doudelio .brand-custom.active { border-color: #455a83; }
+body.theme-doudelio .add-brand-btn-save { background: #455a83; }
+
+
 /* ===== TOP NAV ===== */
 .top-nav{
   display:flex;align-items:center;justify-content:space-between;
