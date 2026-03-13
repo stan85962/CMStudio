@@ -210,25 +210,20 @@ function setNotesView(view) {
   notesView = view;
   const btnNotes     = document.getElementById('notesViewNotes');
   const btnAccroches = document.getElementById('notesViewAccroches');
-  const btnStan      = document.getElementById('notesViewStan');
   const inputArea    = document.querySelector('.note-input-area');
   const catTabs      = document.getElementById('notesCatTabs');
   const wall         = document.getElementById('notesWall');
   const accSection   = document.getElementById('accrocheSection');
-  const stanSection  = document.getElementById('stanSection');
 
   if(btnNotes)     btnNotes.classList.toggle('active',     view === 'notes');
   if(btnAccroches) btnAccroches.classList.toggle('active', view === 'accroches');
-  if(btnStan)      btnStan.classList.toggle('active',      view === 'stan');
 
   if(inputArea)  inputArea.style.display  = view === 'notes' ? '' : 'none';
   if(catTabs)    catTabs.style.display    = view === 'notes' ? '' : 'none';
   if(wall)       wall.style.display       = view === 'notes' ? '' : 'none';
   if(accSection) accSection.style.display = view === 'accroches' ? 'block' : 'none';
-  if(stanSection) stanSection.style.display = view === 'stan' ? 'block' : 'none';
 
   if(view === 'accroches') renderAccroches();
-  if(view === 'stan' && typeof loadStanSpace === 'function') loadStanSpace();
 }
 
 async function getAccroches() {

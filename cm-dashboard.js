@@ -341,25 +341,134 @@ async function renderPerfRecap() {
   `;
 }
 
-// ===== STAN DASHBOARD =====
-function _injectStanDashWelcome() {
-  if (document.getElementById('stanDashWelcome')) return;
-  const welcome = document.createElement('div');
-  welcome.id = 'stanDashWelcome';
-  welcome.className = 'stan-dash-welcome';
-  welcome.innerHTML = `
-    <div class="stan-dash-title">Bienvenue Stan</div>
-    <div class="stan-dash-sub">Ton espace perso</div>
-    <button class="stan-dash-cta" onclick="_stanGoToIdeas()">Mes idées →</button>
-  `;
-  const brandRow = document.querySelector('#page-dashboard .brand-row');
-  if (brandRow) brandRow.insertAdjacentElement('afterend', welcome);
-  else document.getElementById('page-dashboard')?.appendChild(welcome);
+// ===== CUSTOM BRANDS =====
+let _customBrandsCache = null;
+
+async function _loadCustomBrands() {
+  if (_customBrandsCache !== null) return _customBrandsCache;
+  try {
+    const r = await window.storage.get('custom-brands');
+    if (r && r.value) {
+      const arr = JSON.parse(r.value);
+      if (Array.isArray(arr)) { _customBrandsCache = arr; return arr; }
+    }
+  } catch(e) {}
+  _customBrandsCache = [];
+  return [];
 }
 
-function _stanGoToIdeas() {
-  const notesTab = [...document.querySelectorAll('.nav-tab')]
-    .find(t => (t.getAttribute('onclick') || '').includes("'notes'"));
-  if (notesTab) switchPage('notes', notesTab);
-  setTimeout(() => { if (typeof setNotesView === 'function') setNotesView('stan'); }, 80);
+async function _saveCustomBrands(brands) {
+  _customBrandsCache = brands;
+  await window.storage.set('custom-brands', JSON.stringify(brands));
+}
+
+async function renderCustomBrandCards() {
+  const container = document.getElementById('customBrandsContainer');
+  if (!container) return;
+  const brands = await _loadCustomBrands();
+  container.innerHTML = brands.map((b, i) => `
+    <button class="brand-btn brand-custom" onclick="_selectCustomBrandByIdx(${i}, this)">
+      <span class="brand-custom-del" onclick="event.stopPropagation();_deleteCustomBrand(${i})" title="Supprimer">×</span>
+      ${b.logo ? `<img src="${b.logo}" alt="${b.name}" class="brand-custom-logo">` : '<div class="brand-custom-placeholder"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'}
+      <div class="brand-tag">${b.name}</div>
+    </button>
+  `).join('') + `
+    <button class="brand-btn brand-add-btn" onclick="openAddBrandModal()">
+      <span class="brand-add-plus">+</span>
+      <div class="brand-tag">Ajouter une marque</div>
+    </button>
+  `;
+}
+
+function _selectCustomBrandByIdx(idx, el) {
+  if (!_customBrandsCache || idx >= _customBrandsCache.length) return;
+  const brand = _customBrandsCache[idx];
+  // Set global selectedBrand
+  if (typeof window !== 'undefined') window._currentCustomBrand = brand;
+  selectedBrand = brand.id;
+  // Inject BRAND_CONTEXT entry
+  if (typeof BRAND_CONTEXT !== 'undefined') {
+    BRAND_CONTEXT[brand.id] = {
+      label: brand.name.toUpperCase(),
+      desc: `Tu es un expert Community Manager pour ${brand.name}. Génère du contenu professionnel prêt à publier.`
+    };
+  }
+  // Theme
+  document.body.className = document.body.className
+    .split(' ').filter(c => !c.startsWith('theme-')).join(' ');
+  document.body.classList.add('theme-custom');
+  // Active state
+  document.querySelectorAll('.brand-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  // Dashboard title
+  const dashTitle = document.getElementById('dashTitle');
+  const dashSub   = document.getElementById('dashSubtitle');
+  if (dashTitle) { dashTitle.textContent = brand.name.toUpperCase(); dashTitle.style.cssText = ''; }
+  if (dashSub)   { dashSub.textContent = 'Community Manager · Marque personnalisée'; dashSub.style.cssText = ''; }
+  // Standard updates
+  if (typeof renderTemplates    === 'function') renderTemplates();
+  if (typeof updateStats        === 'function') updateStats();
+  if (typeof loadRecentDashboard=== 'function') loadRecentDashboard();
+  if (typeof checkReminders     === 'function') checkReminders();
+}
+
+function openAddBrandModal() {
+  const modal = document.getElementById('addBrandModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function _closeAddBrandModal() {
+  const modal = document.getElementById('addBrandModal');
+  if (modal) modal.style.display = 'none';
+  const nameInput = document.getElementById('newBrandName');
+  const preview   = document.getElementById('brandLogoPreview');
+  const previewWrap = document.getElementById('brandLogoPreviewWrap');
+  const hint      = document.getElementById('brandLogoHint');
+  if (nameInput)    nameInput.value = '';
+  if (preview)      preview.src = '';
+  if (previewWrap)  previewWrap.style.display = 'none';
+  if (hint)         hint.style.display = '';
+  window._pendingBrandLogo = null;
+}
+
+function _brandLogoPreview(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    window._pendingBrandLogo = e.target.result;
+    const preview    = document.getElementById('brandLogoPreview');
+    const previewWrap = document.getElementById('brandLogoPreviewWrap');
+    const hint       = document.getElementById('brandLogoHint');
+    if (preview)      preview.src = e.target.result;
+    if (previewWrap)  previewWrap.style.display = 'block';
+    if (hint)         hint.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function _saveNewBrand() {
+  const name = document.getElementById('newBrandName')?.value.trim();
+  if (!name) { alert('Entrez un nom de marque'); return; }
+  const logo = window._pendingBrandLogo || '';
+  const id   = 'custom_' + Date.now();
+  const brands = await _loadCustomBrands();
+  brands.push({ id, name, logo });
+  await _saveCustomBrands(brands);
+  _closeAddBrandModal();
+  renderCustomBrandCards();
+}
+
+async function _deleteCustomBrand(idx) {
+  if (!confirm('Supprimer cette marque ?')) return;
+  const brands = await _loadCustomBrands();
+  const deleted = brands[idx];
+  brands.splice(idx, 1);
+  await _saveCustomBrands(brands);
+  if (deleted && selectedBrand === deleted.id) {
+    selectedBrand = null;
+    document.body.className = document.body.className
+      .split(' ').filter(c => !c.startsWith('theme-')).join(' ');
+  }
+  renderCustomBrandCards();
 }

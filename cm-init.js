@@ -81,6 +81,7 @@ function switchPage(page, el) {
 
 // ===== INIT =====
 if (!_hasToken()) _showTokenSetup();
+renderCustomBrandCards();
 updateStats();
 loadRecentDashboard();
 setTimeout(checkReminders, 500);
