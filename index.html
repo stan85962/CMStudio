@@ -11,7 +11,7 @@
 
 <!-- ===== TOP NAV ===== -->
 <nav class="top-nav">
-  <div class="nav-logo">✦ Studio CM</div>
+  <div class="nav-logo">Studio CM</div>
 
   <div class="nav-autopilot">
     <label class="autopilot-switch-label" title="Mode AUTOPILOT">
@@ -66,7 +66,6 @@
 <div id="page-dashboard" class="page active">
 
   <div class="dash-hero">
-    <div style="color:var(--accent);margin-bottom:12px;"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg></div>
     <h1 id="dashTitle">Bonjour !</h1>
     <p id="dashSubtitle">Choisis ta marque pour commencer</p>
   </div>
@@ -94,7 +93,6 @@
     <div class="stat-card" style="animation-delay:.15s"><div class="stat-num" id="statCal">0</div><div class="stat-label">Posts planifiés</div></div>
     <div class="stat-card" style="animation-delay:.2s"><div class="stat-num" id="statNotes">0</div><div class="stat-label">Notes</div></div>
   </div>
-  <div id="streakCard"></div>
   <div id="perfBlock" style="display:none;"></div>
 
   <div id="autopilotBlock"></div>
@@ -287,7 +285,7 @@
 </div>
 
 <script src="config.js?v=1"></script>
-<script src="cm-icons.js?v=1"></script>
+<script src="cm-icons.js?v=2"></script>
 <script src="cm-state.js?v=2"></script>
 <script src="cm-api.js?v=3"></script>
 <script src="cm-historique.js?v=2"></script>
@@ -295,9 +293,9 @@
 <script src="cm-calendrier.js?v=2"></script>
 <script src="cm-dashboard.js?v=2"></script>
 <script src="cm-autopilot.js?v=3"></script>
-<script src="cm-studio.js?v=4"></script>
+<script src="cm-studio.js?v=6"></script>
 <script src="cm-help.js?v=2"></script>
-<script src="cm-init.js?v=2"></script>
+<script src="cm-init.js?v=3"></script>
 
 <div id="histModal" style="display:none;position:fixed;inset:0;z-index:2000;align-items:center;justify-content:center;"></div>
 
@@ -306,7 +304,7 @@
   <div class="add-brand-modal">
     <div class="add-brand-modal-header">
       <span>Ajouter une marque</span>
-      <button class="add-brand-modal-close" onclick="_closeAddBrandModal()">✕</button>
+      <button class="add-brand-modal-close" onclick="_closeAddBrandModal()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
     </div>
     <div class="add-brand-modal-body">
       <label class="brand-logo-upload" for="brandLogoInput">

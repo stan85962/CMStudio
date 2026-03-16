@@ -4,8 +4,13 @@ function selectBrand(brand, el) {
   selectedBrand = brand;
   document.querySelectorAll('.brand-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.brand-btn.'+brand).forEach(b => b.classList.add('active'));
-  document.body.classList.remove('theme-intelixa','theme-doudelio','theme-stan');
+  document.body.classList.remove('theme-intelixa','theme-doudelio','theme-stan','theme-custom');
   document.body.classList.add('theme-'+brand);
+  document.body.style.removeProperty('--accent');
+  document.body.style.removeProperty('--accent2');
+  window._currentCustomBrand = null;
+  if (typeof _filterStudioPlatforms === 'function') _filterStudioPlatforms(null);
+  document.title = (brand === 'intelixa' ? 'INTELIXA' : brand === 'doudelio' ? 'Doudelio' : brand) + ' · Studio CM';
 
   // --- MODE STAN ---
   if (brand === 'stan') {
@@ -52,6 +57,8 @@ function selectBrand(brand, el) {
   const notesPage = document.getElementById('page-notes');
   if(notesPage && notesPage.classList.contains('active')) loadNotes();
   checkReminders();
+  if (typeof initContexteDuJour === 'function') initContexteDuJour();
+  _cvRenderPlatforms();
   const histPage = document.getElementById('page-historique');
   if(histPage && histPage.classList.contains('active')) loadHistorique();
   if (typeof renderAutopilotBlock === 'function') {
@@ -260,16 +267,89 @@ function renderTemplates() {
   }
 }
 
+// ===== STRUCTURED RESULT =====
+function parseStructuredResult(text) {
+  const sections = [];
+  const lines = text.split('\n');
+  let current = null;
+  for (const line of lines) {
+    const match = line.match(/^\*{0,2}(\d+)[\.\-\)]\s*\*{0,2}\s*(.+)/);
+    if (match) {
+      if (current) sections.push(current);
+      current = { title: match[2].replace(/\*+/g, '').trim(), content: '' };
+    } else if (current) {
+      current.content += (current.content ? '\n' : '') + line;
+    }
+  }
+  if (current) sections.push(current);
+  return sections;
+}
+
+function renderStructuredInto(el, text) {
+  const sections = parseStructuredResult(text);
+  if (sections.length < 3) return;
+  el.dataset.rawText = text;
+  const svgCopy = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+  el.innerHTML = '<div class="struct-list">' + sections.map((s, i) => {
+    const tSafe = s.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const bSafe = s.content.trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    return `<div class="struct-card">
+  <div class="struct-header">
+    <span class="struct-num">${i + 1}</span>
+    <span class="struct-title">${tSafe}</span>
+    <button class="struct-copy-btn" onclick="copySection(this)" title="Copier">${svgCopy}</button>
+  </div>
+  ${bSafe ? `<div class="struct-body">${bSafe}</div>` : ''}
+</div>`;
+  }).join('') + '</div>';
+}
+
+function copySection(btn) {
+  const card = btn.closest('.struct-card');
+  const title = card.querySelector('.struct-title').textContent.trim();
+  const body  = card.querySelector('.struct-body')?.innerText?.trim() || '';
+  const saved = btn.innerHTML;
+  navigator.clipboard.writeText(body ? `${title}\n${body}` : title).then(() => {
+    btn.textContent = '✓'; btn.classList.add('struct-copy-done');
+    setTimeout(() => { btn.innerHTML = saved; btn.classList.remove('struct-copy-done'); }, 1500);
+  });
+}
+
+function _initStructuredObserver() {
+  const watch = (elId) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    let _t, _busy = false;
+    new MutationObserver(() => {
+      if (_busy) return;
+      clearTimeout(_t);
+      _t = setTimeout(() => {
+        if (el.querySelector('.cursor')) return;
+        const text = el.textContent.trim();
+        if (!text || text === '—' || el.querySelector('.struct-card')) return;
+        _busy = true;
+        renderStructuredInto(el, text);
+        _busy = false;
+      }, 150);
+    }).observe(el, { childList: true, subtree: true, characterData: true });
+  };
+  watch('resultContent');
+  watch('abTextA');
+  watch('abTextB');
+}
+
 // ===== COPY =====
 function copyResult() {
-  navigator.clipboard.writeText(document.getElementById('resultContent').innerText).then(() => {
+  const el = document.getElementById('resultContent');
+  navigator.clipboard.writeText(el.dataset.rawText || el.innerText).then(() => {
     const btn = document.getElementById('copyBtn');
     btn.textContent='✅ Copié !'; btn.classList.add('copied');
     setTimeout(()=>{btn.textContent='📋 Copier';btn.classList.remove('copied');},2000);
   });
 }
 function copyAB(v) {
-  navigator.clipboard.writeText(document.getElementById('abText'+v).innerText);
+  const el = document.getElementById('abText' + v);
+  navigator.clipboard.writeText(el.dataset.rawText || el.innerText);
 }
 
 // ===== SAVE ACCROCHE =====
@@ -410,7 +490,7 @@ async function checkDuplicates() {
 
 // ===== SEO/AEO ANALYZER =====
 const SEO_KEYWORDS = {
-  intelixa: ['IA','automatisation','TPE','formation','CPF','Excel','productivité','digitalisation','performance','PME','entrepreneur','comptabilité','RH','dirigeant'],
+  intelixa: ['automatisation IA freelance','gagner du temps avec l\'IA','IA pour solopreneur','automatiser son business','productivité IA indépendant','économiser avec l\'IA','process automatisé IA','IA TPE PME 2026','formation IA entrepreneur','IA game changer business'],
   doudelio: ['crèche','petite enfance','auxiliaire','puéricultrice','éducatrice','accueil','tout-petits','formation','pédagogie','CAP','terrain','bienveillance']
 };
 
@@ -551,35 +631,109 @@ function checkPostGenLength(text, platform) {
 }
 
 // ===== POST PREVIEW =====
-const PREVIEW_TEMPLATES = {
-  linkedin: (text, brand) => `
-    <div class="preview-linkedin">
-      <div class="prev-header">
-        <div class="prev-avatar" style="background:${brand==='intelixa'?'#c0392b':'#384786'};">${brand==='intelixa'?'I':'D'}</div>
-        <div>
-          <div class="prev-name">${brand==='intelixa'?'Intelixa':'Doudelio'}</div>
-          <div class="prev-meta">Page entreprise · Maintenant · 🌐</div>
-        </div>
-      </div>
-      <div class="prev-body">${formatPreviewText(text)}</div>
-      <div class="prev-footer-linkedin">
-        <span>👍 J'aime</span><span>💬 Commenter</span><span>🔄 Republier</span><span>📤 Envoyer</span>
-      </div>
-    </div>`,
+// ===== PREVIEW HELPERS =====
+function _prevBrandData(brand) {
+  const ctx = (typeof BRAND_CONTEXT !== 'undefined' && BRAND_CONTEXT[brand]) || {};
+  const rawLabel = ctx.label || (brand.charAt(0).toUpperCase() + brand.slice(1));
+  const label = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1).toLowerCase();
+  const initials = rawLabel.substring(0, 2).toUpperCase();
+  const ig = brand === 'intelixa' ? 'intelixa_off'
+           : brand === 'doudelio' ? 'doudelio_creche'
+           : brand.toLowerCase().replace(/\s+/g, '_');
+  const sub1 = brand === 'intelixa' ? 'Expert IA & Automatisation · Intelixa'
+             : brand === 'doudelio' ? 'Spécialiste petite enfance · Doudelio'
+             : label;
+  return { label, initials, ig, sub1 };
+}
 
-  instagram: (text, brand) => `
-    <div class="preview-instagram">
-      <div class="prev-header">
-        <div class="prev-avatar ig-avatar" style="background:${brand==='intelixa'?'#c0392b':'#384786'};">${brand==='intelixa'?'I':'D'}</div>
-        <div class="prev-name">${brand==='intelixa'?'intelixa_officiel':'doudelio_creche'}</div>
-        <div class="prev-dots" style="margin-left:auto;">•••</div>
-      </div>
-      <div class="prev-ig-image" style="background:${brand==='intelixa'?'linear-gradient(135deg,#1a0a0a,#3a1515)':'linear-gradient(135deg,#e8f5e4,#c8e6c9)'};">
-        <span style="font-size:32px;">${brand==='intelixa'?'⚡':'🌱'}</span>
-      </div>
-      <div class="prev-ig-actions">❤️ &nbsp;💬 &nbsp;📤 &nbsp;<span style="margin-left:auto;">🔖</span></div>
-      <div class="prev-body" style="padding:0 12px 12px;">${formatPreviewText(text, 200)}</div>
-    </div>`,
+function _prevHashtags(text, color) {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/(#[\wÀ-ÿ]+)/g, `<span style="color:${color};font-weight:600">$1</span>`)
+    .replace(/\n/g, '<br>');
+}
+
+function _showPreviewToast(msg) {
+  let t = document.getElementById('_prvToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_prvToast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;opacity:0;transition:opacity .25s;white-space:nowrap';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+const PREVIEW_TEMPLATES = {
+  linkedin: (text, brand) => {
+    const bd = _prevBrandData(brand);
+    const isLong = text.length > 250;
+    const bodyHtml = _prevHashtags(isLong ? text.substring(0, 250) : text, '#0A66C2')
+                   + (isLong ? ' <strong style="cursor:pointer">… voir plus</strong>' : '');
+    const svgLike = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
+    const svgCom  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+    const svgRep  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
+    const svgSend = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+    return `<div class="prv-li-wrap"><div class="prv-li-card">
+  <div class="prv-li-header">
+    <div class="prv-li-avatar">${bd.initials}</div>
+    <div class="prv-li-info">
+      <div class="prv-li-name">${bd.label}</div>
+      <div class="prv-li-sub">${bd.sub1}</div>
+      <div class="prv-li-sub">1er · maintenant · 🌐</div>
+    </div>
+    <button class="prv-li-follow">Suivre +</button>
+    <span class="prv-li-dots">···</span>
+  </div>
+  <div class="prv-li-body">${bodyHtml}</div>
+  <div class="prv-li-reactions">👍 1 · ❤️ · 🎉 <span>12 réactions</span></div>
+  <div class="prv-li-sep"></div>
+  <div class="prv-li-actions">
+    <button class="prv-li-action-btn">${svgLike} J'aime</button>
+    <button class="prv-li-action-btn">${svgCom} Commenter</button>
+    <button class="prv-li-action-btn">${svgRep} Republier</button>
+    <button class="prv-li-action-btn">${svgSend} Envoyer</button>
+  </div>
+</div></div>`;
+  },
+
+  instagram: (text, brand) => {
+    const bd = _prevBrandData(brand);
+    const mainText = text.replace(/(#[\wÀ-ÿ]+)/g, '').replace(/\s{2,}/g, ' ').trim();
+    const isLong = mainText.length > 125;
+    const displayText = (isLong ? mainText.substring(0, 125) : mainText)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, ' ');
+    const hashtags = (text.match(/(#[\wÀ-ÿ]+)/g) || [])
+      .map(h => `<span style="color:#00376B;font-weight:600;margin-right:4px">${h}</span>`).join('');
+    const svgHeart = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+    const svgCom  = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+    const svgSend = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+    const svgBook = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>';
+    const svgImg  = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#AAAAAA" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+    return `<div class="prv-ig-wrap"><div class="prv-ig-card">
+  <div class="prv-ig-header">
+    <div class="prv-ig-avatar"></div>
+    <span class="prv-ig-uname">${bd.ig}</span>
+    <span class="prv-ig-follow">• Suivre</span>
+    <span class="prv-ig-hdots">···</span>
+  </div>
+  <div class="prv-ig-image">${svgImg}</div>
+  <div class="prv-ig-actions">
+    <div class="prv-ig-left">${svgHeart}${svgCom}${svgSend}</div>
+    <div class="prv-ig-right">${svgBook}</div>
+  </div>
+  <div class="prv-ig-likes">234 J'aime</div>
+  <div class="prv-ig-caption">
+    <span class="prv-ig-cname">${bd.ig}</span>${displayText}${isLong ? '<span class="prv-ig-more"> ... plus</span>' : ''}
+    ${hashtags ? `<div class="prv-ig-tags">${hashtags}</div>` : ''}
+  </div>
+  <div class="prv-ig-comments">Voir les 12 commentaires</div>
+  <div class="prv-ig-time">IL Y A 1 MINUTE</div>
+</div></div>`;
+  },
 
   gmb: (text, brand) => `
     <div class="preview-gmb">
@@ -594,20 +748,36 @@ const PREVIEW_TEMPLATES = {
       <div class="prev-gmb-btn">En savoir plus</div>
     </div>`,
 
-  facebook: (text, brand) => `
-    <div class="preview-facebook">
-      <div class="prev-header">
-        <div class="prev-avatar" style="background:${brand==='intelixa'?'#c0392b':'#384786'};">${brand==='intelixa'?'I':'D'}</div>
-        <div>
-          <div class="prev-name">${brand==='intelixa'?'Intelixa':'Doudelio'}</div>
-          <div class="prev-meta">Maintenant · 🌐</div>
-        </div>
-      </div>
-      <div class="prev-body">${formatPreviewText(text, 300)}</div>
-      <div class="prev-footer-linkedin" style="border-top:1px solid #eee;margin-top:10px;padding-top:10px;">
-        <span>👍 J'aime</span><span>💬 Commenter</span><span>↗ Partager</span>
-      </div>
-    </div>`,
+  facebook: (text, brand) => {
+    const bd = _prevBrandData(brand);
+    const bodyHtml = _prevHashtags(text, '#216FDB');
+    const svgLike  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#65676B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
+    const svgCom   = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#65676B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+    const svgShare = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#65676B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
+    const svgImg   = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#BCC0C4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+    return `<div class="prv-fb-wrap"><div class="prv-fb-card">
+  <div class="prv-fb-header">
+    <div class="prv-fb-avatar">${bd.initials}</div>
+    <div class="prv-fb-info">
+      <div class="prv-fb-name">${bd.label} <span class="prv-fb-badge">Page</span></div>
+      <div class="prv-fb-meta">maintenant · 🌍</div>
+    </div>
+    <div class="prv-fb-hright"><span>···</span><span style="font-size:16px">✕</span></div>
+  </div>
+  <div class="prv-fb-body">${bodyHtml}</div>
+  <div class="prv-fb-image">${svgImg}</div>
+  <div class="prv-fb-react-row">
+    <span>👍 ❤️ Vous et 12 autres personnes</span>
+    <span>3 commentaires · 1 partage</span>
+  </div>
+  <div class="prv-fb-sep"></div>
+  <div class="prv-fb-actions">
+    <button class="prv-fb-action">${svgLike} J'aime</button>
+    <button class="prv-fb-action prv-fb-action-mid">${svgCom} Commenter</button>
+    <button class="prv-fb-action">${svgShare} Partager</button>
+  </div>
+</div></div>`;
+  },
 
   pinterest: (text, brand) => `
     <div class="preview-pinterest">
@@ -672,21 +842,25 @@ function formatPreviewText(text, maxLen=400) {
 
 function openPreview() {
   const modal = document.getElementById('previewModal');
-  if(!modal) return;
+  if (!modal) return;
   const text = abMode
     ? (document.getElementById('abTextA').textContent || '')
     : (document.getElementById('resultContent').textContent || '');
-  if(!text || text.length < 5) return;
+  if (!text || text.trim() === '—' || text.length < 5) return;
 
-  // Set tabs
+  const platform = selectedPlatform || '';
+  const supported = ['linkedin', 'instagram', 'facebook'];
+  if (!supported.includes(platform)) {
+    _showPreviewToast('Aperçu disponible pour LinkedIn, Instagram et Facebook');
+    return;
+  }
+
   const tabs = document.getElementById('previewTabs');
-  const platforms = ['linkedin','instagram','gmb','facebook','tiktok','pinterest','spotify','brevo','youtube'];
-  tabs.innerHTML = platforms.map((p,i) =>
-    `<button class="prev-tab${i===0?' active':''}" onclick="switchPreview('${p}',this)">${p.charAt(0).toUpperCase()+p.slice(1)}</button>`
+  tabs.innerHTML = supported.map(p =>
+    `<button class="prev-tab${p === platform ? ' active' : ''}" onclick="switchPreview('${p}',this)">${p.charAt(0).toUpperCase() + p.slice(1)}</button>`
   ).join('');
-
-  renderPreviewFor(selectedPlatform || 'linkedin', text);
-  modal.style.display='flex';
+  renderPreviewFor(platform, text);
+  modal.style.display = 'flex';
 }
 
 function switchPreview(platform, el) {
@@ -707,3 +881,354 @@ function renderPreviewFor(platform, text) {
 function closePreview() {
   document.getElementById('previewModal').style.display='none';
 }
+
+// ===== CONTEXTE DU JOUR =====
+async function initContexteDuJour() {
+  if (!selectedBrand) return;
+  const brandId = selectedBrand;
+  const keyCtx  = 'contexte-du-jour-' + brandId;
+  const keyDate = 'contexte-date-' + brandId;
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  // Auto-reset quotidien
+  let text = '';
+  try {
+    const rDate = await window.storage.get(keyDate);
+    if (rDate && rDate.value === todayStr) {
+      const rCtx = await window.storage.get(keyCtx);
+      if (rCtx) text = rCtx.value || '';
+    } else {
+      await window.storage.set(keyCtx, '');
+      await window.storage.set(keyDate, todayStr);
+    }
+  } catch(e) {}
+
+  // Créer ou mettre à jour le bloc UI
+  let block = document.getElementById('contexteJourBlock');
+  if (!block) {
+    block = document.createElement('div');
+    block.id = 'contexteJourBlock';
+    block.className = 'contexte-jour-block';
+    // Insérer après la platforms-grid dans #page-studio
+    const grid = document.querySelector('#page-studio .platforms-grid');
+    if (grid) grid.insertAdjacentElement('afterend', block);
+    else document.getElementById('page-studio')?.appendChild(block);
+  }
+
+  const isActive = text.trim().length > 0;
+  block.innerHTML = `
+    <div class="cj-header" onclick="_cjToggle()">
+      <span class="cj-label">📋 Contexte du jour</span>
+      ${isActive ? '<span class="cj-badge">actif</span>' : ''}
+      <span class="cj-chevron" id="cjChevron">▾</span>
+    </div>
+    <div class="cj-body" id="cjBody" style="display:${isActive ? 'block' : 'none'}">
+      <textarea id="cjTextarea" class="cj-textarea" placeholder="Ex : Ce matin on lance notre nouvelle offre de formation. Mettre en avant le lancement aujourd'hui." onchange="_cjSave(this.value)">${text}</textarea>
+      <div class="cj-hint">Sera injecté en début de prompt pour chaque génération aujourd'hui.</div>
+    </div>`;
+}
+
+function _cjToggle() {
+  const body = document.getElementById('cjBody');
+  const chev = document.getElementById('cjChevron');
+  if (!body) return;
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  if (chev) chev.textContent = open ? '▾' : '▴';
+  if (!open) setTimeout(() => document.getElementById('cjTextarea')?.focus(), 50);
+}
+
+async function _cjSave(text) {
+  if (!selectedBrand) return;
+  const keyCtx  = 'contexte-du-jour-' + selectedBrand;
+  const keyDate = 'contexte-date-' + selectedBrand;
+  const todayStr = new Date().toISOString().slice(0, 10);
+  await window.storage.set(keyCtx, text);
+  await window.storage.set(keyDate, todayStr);
+  // Mettre à jour le badge actif
+  const block = document.getElementById('contexteJourBlock');
+  if (!block) return;
+  const isActive = text.trim().length > 0;
+  const existing = block.querySelector('.cj-badge');
+  if (isActive && !existing) {
+    block.querySelector('.cj-header')?.insertAdjacentHTML('beforeend', '<span class="cj-badge">actif</span>');
+  } else if (!isActive && existing) {
+    existing.remove();
+  }
+}
+
+// ===== CAPTION VISUEL =====
+let _cvImages = [];
+let _cvSelectedPlatforms = [];
+
+function initCaptionVisuel() {
+  const page = document.getElementById('page-studio');
+  if (!page || document.getElementById('cvTabBar')) return;
+
+  // Find the brand selector step (first direct .step child)
+  const brandStep = page.querySelector(':scope > .step');
+  if (!brandStep) return;
+
+  // Collect all children after the brand step → wrap in post wrapper
+  const children = [...page.children];
+  const brandIdx = children.indexOf(brandStep);
+  const postChildren = children.slice(brandIdx + 1);
+
+  const postWrapper = document.createElement('div');
+  postWrapper.id = 'studioPostWrapper';
+  postChildren.forEach(child => postWrapper.appendChild(child));
+
+  // Tab bar
+  const tabBar = document.createElement('div');
+  tabBar.id = 'cvTabBar';
+  tabBar.className = 'cv-tab-bar';
+  tabBar.innerHTML = `
+    <button class="cv-tab active" id="cvTabPost" onclick="switchStudioTab('post')">✦ Générer un post</button>
+    <button class="cv-tab" id="cvTabCaption" onclick="switchStudioTab('caption')">🖼 Caption visuel</button>
+  `;
+
+  // CV panel
+  const cvPanel = document.createElement('div');
+  cvPanel.id = 'cvPanel';
+  cvPanel.style.display = 'none';
+  cvPanel.innerHTML = `
+    <div class="step card cv-panel-card">
+      <div class="cv-drop-zone" id="cvDropZone"
+           onclick="document.getElementById('cvFileInput').click()"
+           ondragover="event.preventDefault();this.classList.add('cv-drop-hover')"
+           ondragleave="this.classList.remove('cv-drop-hover')"
+           ondrop="_cvHandleDrop(event)">
+        <div class="cv-drop-icon">🖼</div>
+        <div class="cv-drop-label">Glisse tes visuels ici ou clique pour sélectionner</div>
+        <div class="cv-drop-hint" id="cvDropHint">PNG, JPG, WebP — max 4 images</div>
+        <input type="file" id="cvFileInput" accept="image/*" multiple style="display:none">
+      </div>
+      <div class="cv-preview-grid" id="cvPreviewGrid" style="display:none"></div>
+      <div class="cv-section-label">Plateformes</div>
+      <div class="cv-plat-grid" id="cvPlatGrid"></div>
+      <div class="cv-context-row">
+        <input type="text" class="cv-context-input" id="cvContextInput"
+               placeholder="Contexte optionnel (ex : lancement produit, promo d'été…)">
+      </div>
+      <button class="cv-gen-btn" id="cvGenBtn" onclick="generateCaptions()" disabled>
+        🖼 Générer les captions
+      </button>
+      <div id="cvError" class="cv-error-msg" style="display:none"></div>
+      <div id="cvResults" class="cv-results"></div>
+    </div>
+  `;
+
+  // Insert: brandStep → tabBar → postWrapper → cvPanel
+  brandStep.insertAdjacentElement('afterend', cvPanel);
+  brandStep.insertAdjacentElement('afterend', postWrapper);
+  brandStep.insertAdjacentElement('afterend', tabBar);
+
+  // File input change binding
+  document.getElementById('cvFileInput').addEventListener('change', function() {
+    _cvHandleFiles(this.files);
+    this.value = '';
+  });
+
+  _cvRenderPlatforms();
+}
+
+function switchStudioTab(tab) {
+  const postWrapper = document.getElementById('studioPostWrapper');
+  const cvPanel     = document.getElementById('cvPanel');
+  const tabPost     = document.getElementById('cvTabPost');
+  const tabCaption  = document.getElementById('cvTabCaption');
+  if (!postWrapper || !cvPanel) return;
+
+  if (tab === 'post') {
+    postWrapper.style.display = '';
+    cvPanel.style.display     = 'none';
+    tabPost.classList.add('active');
+    tabCaption.classList.remove('active');
+  } else {
+    postWrapper.style.display = 'none';
+    cvPanel.style.display     = '';
+    tabPost.classList.remove('active');
+    tabCaption.classList.add('active');
+    _cvRenderPlatforms();
+  }
+}
+
+function _cvRenderPlatforms() {
+  const grid = document.getElementById('cvPlatGrid');
+  if (!grid || typeof PLATFORMS_META === 'undefined') return;
+  grid.innerHTML = Object.keys(PLATFORMS_META).map(p => {
+    const meta   = PLATFORMS_META[p];
+    const active = _cvSelectedPlatforms.includes(p);
+    return `<button class="cv-plat-btn${active ? ' active' : ''}" data-platform="${p}" onclick="_cvTogglePlatform('${p}',this)">${meta.icon}<span>${meta.label.split(' — ')[0]}</span></button>`;
+  }).join('');
+}
+
+function _cvHandleDrop(e) {
+  e.preventDefault();
+  document.getElementById('cvDropZone')?.classList.remove('cv-drop-hover');
+  _cvHandleFiles(e.dataTransfer.files);
+}
+
+function _cvHandleFiles(files) {
+  const toAdd = [...files].filter(f => f.type.startsWith('image/')).slice(0, 4 - _cvImages.length);
+  toAdd.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      _cvImages.push({ name: file.name, dataUrl: ev.target.result });
+      _cvRenderPreviews();
+      _cvUpdateGenBtn();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function _cvRemoveImage(idx) {
+  _cvImages.splice(idx, 1);
+  _cvRenderPreviews();
+  _cvUpdateGenBtn();
+}
+
+function _cvRenderPreviews() {
+  const grid = document.getElementById('cvPreviewGrid');
+  const hint = document.getElementById('cvDropHint');
+  if (!grid) return;
+
+  if (_cvImages.length === 0) {
+    grid.innerHTML = '';
+    grid.style.display = 'none';
+    if (hint) hint.textContent = 'PNG, JPG, WebP — max 4 images';
+    return;
+  }
+
+  grid.style.display = 'grid';
+  grid.innerHTML = _cvImages.map((img, i) => `
+    <div class="cv-preview-item">
+      <img src="${img.dataUrl}" class="cv-preview-img" alt="${img.name}">
+      <button class="cv-preview-del" onclick="_cvRemoveImage(${i})" title="Supprimer">×</button>
+    </div>
+  `).join('');
+
+  if (hint) {
+    const n = _cvImages.length;
+    hint.textContent = `${n}/4 image${n > 1 ? 's' : ''} sélectionnée${n > 1 ? 's' : ''}${n < 4 ? ' — glisse encore pour en ajouter' : ' — maximum atteint'}`;
+  }
+}
+
+function _cvTogglePlatform(platform, el) {
+  const idx = _cvSelectedPlatforms.indexOf(platform);
+  if (idx === -1) _cvSelectedPlatforms.push(platform);
+  else            _cvSelectedPlatforms.splice(idx, 1);
+  el.classList.toggle('active', _cvSelectedPlatforms.includes(platform));
+  _cvUpdateGenBtn();
+}
+
+function _cvUpdateGenBtn() {
+  const btn = document.getElementById('cvGenBtn');
+  if (btn) btn.disabled = _cvImages.length === 0 || _cvSelectedPlatforms.length === 0;
+}
+
+async function generateCaptions() {
+  if (!selectedBrand) { alert('Choisis une marque !'); return; }
+  if (_cvImages.length === 0 || _cvSelectedPlatforms.length === 0) return;
+
+  const btn    = document.getElementById('cvGenBtn');
+  const results = document.getElementById('cvResults');
+  const errEl  = document.getElementById('cvError');
+  btn.disabled = true;
+  btn.textContent = '⏳ Génération en cours…';
+  if (errEl) errEl.style.display = 'none';
+
+  const context = document.getElementById('cvContextInput')?.value?.trim() || '';
+  const brand   = BRAND_CONTEXT[selectedBrand];
+
+  // Loading cards
+  results.innerHTML = _cvSelectedPlatforms.map(p => {
+    const meta = PLATFORMS_META[p];
+    return `<div class="cv-result-card" id="cvCard-${p}">
+      <div class="cv-result-header">${meta.icon}<span>${meta.label.split(' — ')[0]}</span></div>
+      <div class="cv-result-body"><div class="cv-loading">⏳ Génération…</div></div>
+    </div>`;
+  }).join('');
+
+  // All platforms in parallel
+  await Promise.all(_cvSelectedPlatforms.map(async platform => {
+    const card = document.getElementById('cvCard-' + platform);
+    try {
+      const caption = await callClaudeVision(brand, _cvImages, platform, context);
+      if (!card) return;
+      const escaped = caption
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+      card.querySelector('.cv-result-body').innerHTML = `
+        <div class="cv-caption-text">${escaped}</div>
+        <div class="cv-result-actions">
+          <button class="cv-copy-btn" onclick="_cvCopyCaption('${platform}')">📋 Copier</button>
+          <button class="cv-regen-btn" onclick="_cvRegenCaption('${platform}')">↺ Relancer</button>
+          <button class="cv-save-btn" onclick="_cvSaveCaption('${platform}')">💾 Historique</button>
+        </div>`;
+      card.dataset.caption  = caption;
+      card.dataset.platform = platform;
+    } catch(err) {
+      if (card) card.querySelector('.cv-result-body').innerHTML =
+        `<span style="color:#e53935">❌ ${err.message}</span>`;
+    }
+  }));
+
+  btn.disabled    = false;
+  btn.textContent = '🖼 Générer les captions';
+}
+
+async function _cvCopyCaption(platform) {
+  const card = document.getElementById('cvCard-' + platform);
+  if (!card || !card.dataset.caption) return;
+  try {
+    await navigator.clipboard.writeText(card.dataset.caption);
+    const btn = card.querySelector('.cv-copy-btn');
+    if (btn) { btn.textContent = '✅ Copié !'; setTimeout(() => { btn.textContent = '📋 Copier'; }, 1500); }
+  } catch(e) {}
+}
+
+async function _cvRegenCaption(platform) {
+  const card = document.getElementById('cvCard-' + platform);
+  if (!card) return;
+  const context = document.getElementById('cvContextInput')?.value?.trim() || '';
+  const brand   = BRAND_CONTEXT[selectedBrand];
+  card.querySelector('.cv-result-body').innerHTML = '<div class="cv-loading">⏳ Régénération…</div>';
+  try {
+    const caption = await callClaudeVision(brand, _cvImages, platform, context);
+    const escaped = caption
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+    card.querySelector('.cv-result-body').innerHTML = `
+      <div class="cv-caption-text">${escaped}</div>
+      <div class="cv-result-actions">
+        <button class="cv-copy-btn" onclick="_cvCopyCaption('${platform}')">📋 Copier</button>
+        <button class="cv-regen-btn" onclick="_cvRegenCaption('${platform}')">↺ Relancer</button>
+        <button class="cv-save-btn" onclick="_cvSaveCaption('${platform}')">💾 Historique</button>
+      </div>`;
+    card.dataset.caption = caption;
+  } catch(err) {
+    card.querySelector('.cv-result-body').innerHTML =
+      `<span style="color:#e53935">❌ ${err.message}</span>`;
+  }
+}
+
+async function _cvSaveCaption(platform) {
+  const card = document.getElementById('cvCard-' + platform);
+  if (!card || !card.dataset.caption) return;
+  const context       = document.getElementById('cvContextInput')?.value?.trim() || '';
+  const caption       = card.dataset.caption;
+  const platformLabel = (PLATFORMS_META[platform]?.label?.split(' — ')[0]) || platform;
+  const theme         = context || ('Caption visuel — ' + platformLabel);
+
+  // Temporarily set selectedPlatform so saveToHistory tags the right platform
+  const prevPlatform  = selectedPlatform;
+  selectedPlatform    = platform;
+  await saveToHistory(theme, caption, 'CAPTION VISUEL');
+  selectedPlatform    = prevPlatform;
+
+  const btn = card.querySelector('.cv-save-btn');
+  if (btn) { btn.textContent = '✅ Sauvegardé !'; setTimeout(() => { btn.textContent = '💾 Historique'; }, 1500); }
+}
+
+// Initialize on page load
+initCaptionVisuel();
+_initStructuredObserver();

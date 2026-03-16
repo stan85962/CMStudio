@@ -514,6 +514,8 @@ async function renderPlanningView() {
         <button class="wcal-nav-today" onclick="_wcalGoToday()">Aujourd'hui</button>
         <button class="wcal-nav-btn" onclick="_wcalNextWeek()" title="Semaine suivante">›</button>
         <span class="wcal-nav-label">${weekLabel}</span>
+        <button class="wcal-export-btn" onclick="exportWeekCSV()" title="Exporter en CSV">📥 CSV</button>
+        <button class="wcal-export-btn wcal-export-pdf" onclick="exportWeekPDF()" title="Imprimer/PDF">🖨️ PDF</button>
       </div>
       <div class="wcal-grid">
         <div class="wcal-headers">
@@ -1066,4 +1068,41 @@ function _trecEditChip(event, col, idx) {
     if (e.key === 'Escape') { e.preventDefault(); done(originalText); }
   });
   input.addEventListener('blur', () => setTimeout(save, 120));
+}
+
+// ===== EXPORT SEMAINE =====
+async function exportWeekCSV() {
+  const weekStart = _wcalWeekStart();
+  const weekDates = Array.from({length: 7}, (_, i) => {
+    const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d;
+  });
+  const DOW_FR = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const rows = [['Jour','Date','Tâche','Plateformes','Heure']];
+  for (let i = 0; i < 7; i++) {
+    const d = weekDates[i];
+    const planDow = d.getDay() === 0 ? 6 : d.getDay() - 1;
+    const raw = await _getPlanTasks(planDow);
+    const tasks = raw.map(_normalizeTask);
+    const dow = DOW_FR[i === 6 ? 6 : i];
+    const dateStr = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+    if (!tasks.length) { rows.push([dow, dateStr, '', '', '']); continue; }
+    tasks.forEach(t => {
+      const hour = t.hour !== null ? `${String(t.hour).padStart(2,'0')}h${String(t.minute||0).padStart(2,'0')}` : '';
+      const plats = (t.platforms || []).join(', ');
+      rows.push([dow, dateStr, t.text, plats, hour]);
+    });
+  }
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const d0 = weekDates[0], d6 = weekDates[6];
+  a.download = `planning_${d0.getDate()}-${d6.getDate()}_${d6.toLocaleDateString('fr-FR',{month:'short',year:'numeric'}).replace(' ','_')}.csv`;
+  a.href = url;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportWeekPDF() {
+  window.print();
 }

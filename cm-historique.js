@@ -1,5 +1,7 @@
 // ===== HISTORIQUE =====
 let _histAllItems = [];
+let _histStarred = [];      // Set of starred post IDs
+let _histShowFavoris = false;
 let activeHistBrands = [];
 let activeHistPlatforms = [];
 
@@ -9,6 +11,54 @@ function _platIcon(p) {
 function _platLabel(p) {
   if (typeof PLATFORMS_META === 'undefined' || !PLATFORMS_META[p]) return p;
   return PLATFORMS_META[p].label.split(' — ')[0];
+}
+
+async function _loadStarred(brandId) {
+  try {
+    const key = 'posts-starred-' + (brandId || selectedBrand || 'all');
+    const r = await window.storage.get(key);
+    if (r) _histStarred = JSON.parse(r.value);
+    else   _histStarred = [];
+  } catch(e) { _histStarred = []; }
+}
+
+async function _saveStarred(brandId) {
+  const key = 'posts-starred-' + (brandId || selectedBrand || 'all');
+  await window.storage.set(key, JSON.stringify(_histStarred));
+}
+
+async function toggleHistStar(id) {
+  await _loadStarred(selectedBrand);
+  const idx = _histStarred.indexOf(id);
+  if (idx === -1) _histStarred.push(id);
+  else            _histStarred.splice(idx, 1);
+  await _saveStarred(selectedBrand);
+  // Re-render just the star button
+  const btn = document.querySelector(`.hist-star-btn[data-id="${id}"]`);
+  if (btn) btn.textContent = _histStarred.includes(id) ? '★' : '☆';
+  // Update nav badge
+  _renderStarNavBadge();
+}
+
+function _renderStarNavBadge() {
+  const count = _histStarred.length;
+  let badge = document.getElementById('_histStarBadge');
+  const histTab = [...document.querySelectorAll('.nav-tab')].find(t => (t.getAttribute('onclick')||'').includes("'historique'"));
+  if (!histTab) return;
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.id = '_histStarBadge';
+    badge.className = 'hist-star-nav-badge';
+    histTab.appendChild(badge);
+  }
+  badge.textContent = count > 0 ? count : '';
+  badge.style.display = count > 0 ? 'inline-flex' : 'none';
+}
+
+function toggleHistFavoris() {
+  _histShowFavoris = !_histShowFavoris;
+  _renderHistFilters(_histAllItems);
+  _renderHistList(_applyHistFilters(_histAllItems));
 }
 
 async function saveToHistory(theme, content, type) {
@@ -43,6 +93,7 @@ async function loadHistorique() {
     }
   } catch(e){}
   allItems.sort((a,b) => b.id - a.id);
+  await _loadStarred(selectedBrand);
   _histAllItems = allItems;
 
   const label = document.getElementById('histLabel');
@@ -52,12 +103,14 @@ async function loadHistorique() {
 
   _renderHistFilters(allItems);
   _renderHistList(_applyHistFilters(allItems));
+  _renderStarNavBadge();
 }
 
 function _applyHistFilters(items) {
   let out = items;
   if(activeHistBrands.length)    out = out.filter(h => activeHistBrands.includes(h.brand));
   if(activeHistPlatforms.length) out = out.filter(h => activeHistPlatforms.includes(h.platform));
+  if (_histShowFavoris) out = out.filter(h => _histStarred.includes(h.id));
   return out;
 }
 
@@ -77,11 +130,17 @@ function _renderHistFilters(allItems) {
     return `<button class="hist-filter-btn${on?' active':''}" onclick="toggleHistPlatform('${p}')"><span class="hist-filter-plat-icon">${_platIcon(p)}</span>${_platLabel(p)}</button>`;
   }).join('');
 
-  el.innerHTML = `<div class="hist-filters-row">
+  const favBtnHtml = `<button class="hist-filter-btn${_histShowFavoris?' active':''}" onclick="toggleHistFavoris()">⭐ Favoris${_histStarred.length ? ' ('+_histStarred.length+')' : ''}</button>`;
+
+  el.innerHTML = `
+  <div class="hist-filters-row">
+    ${favBtnHtml}
+    <span class="hist-filter-sep"></span>
     ${brandBtns}
     ${platforms.length ? '<span class="hist-filter-sep"></span>' : ''}
     ${platBtns}
     ${hasFilter ? `<button class="hist-filter-reset" onclick="resetHistFilters()">${icon('x',12)} Tout afficher</button>` : ''}
+    <button class="hist-export-btn" onclick="exportHistoriqueCSV()" title="Exporter en CSV">📥 Export CSV</button>
   </div>`;
 }
 
@@ -101,6 +160,7 @@ function _renderHistList(items) {
       <span class="brand-badge badge-${h.brand}">${h.brand==='intelixa'?icon('zap',12):icon('leaf',12)}</span>
       <div class="recent-date">${h.date}</div>
       <div class="hist-item-actions" onclick="event.stopPropagation()">
+        <button class="hist-star-btn" data-id="${h.id}" onclick="toggleHistStar(${h.id})" title="Mettre en favori">${_histStarred.includes(h.id) ? '★' : '☆'}</button>
         <button class="hist-copy-btn" onclick="copyHistItem(${h.id})" title="Copier le contenu">${icon('copy',14)}</button>
         <button class="hist-relaunch-btn" onclick="relaunchHistItem(${h.id})" title="Relancer ce thème">${icon('rotateCcw',14)}</button>
       </div>
@@ -218,4 +278,29 @@ async function loadRecentDashboard() {
       <div class="recent-date">${h.date}</div>
     </div>
   `).join('');
+}
+
+// ===== EXPORT HISTORIQUE =====
+async function exportHistoriqueCSV() {
+  const items = _applyHistFilters(_histAllItems);
+  if (!items.length) { alert('Aucun élément à exporter.'); return; }
+  const rows = [['Date','Marque','Plateforme','Thème','Contenu','Type']];
+  items.forEach(h => {
+    rows.push([
+      h.date || '',
+      h.brand || '',
+      h.platform || '',
+      h.theme || '',
+      (h.content || '').replace(/\n/g,' ').substring(0, 500),
+      h.type || ''
+    ]);
+  });
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.download = `historique_${new Date().toISOString().slice(0,10)}.csv`;
+  a.href = url;
+  a.click();
+  URL.revokeObjectURL(url);
 }

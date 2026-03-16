@@ -12,6 +12,14 @@ function getBraveToken() {
   return (typeof CONFIG !== 'undefined' && CONFIG.BRAVE_TOKEN ? CONFIG.BRAVE_TOKEN : '').trim();
 }
 
+function getAnthropicToken() {
+  return (
+    (typeof CONFIG !== 'undefined' && CONFIG.ANTHROPIC_TOKEN ? CONFIG.ANTHROPIC_TOKEN : '') ||
+    localStorage.getItem('cm_anthropic_token') ||
+    ''
+  ).trim();
+}
+
 // ===== MODE VEILLE =====
 let _veilleEnabled = false;
 
@@ -56,16 +64,64 @@ function buildSEOConstraints(brandKey, platform) {
   return `\nCONTRAINTES SEO/AEO :${kw ? ` mots-clés à intégrer : ${kw} |` : ''} longueur ${min}–${max} car. | inclure une question | phrases ≤20 mots.`;
 }
 
+// ===== ADN CONTEXT =====
+const _ADN_KEYS = ['entreprise','cible','ton','offres','concurrents','signature','tabous'];
+const _ADN_KEY_LABELS = {
+  entreprise:"L'entreprise", cible:"Client idéal", ton:"Ton et style",
+  offres:"Offres", concurrents:"Concurrents", signature:"Phrases signature", tabous:"À ne jamais dire"
+};
+
+async function buildADNContext(brandId) {
+  if (!brandId) return '';
+  let context = '';
+  for (const s of _ADN_KEYS) {
+    const r = await window.storage.get(`adn-${brandId}-${s}`);
+    if (r && r.value && r.value.trim()) context += `\n[${_ADN_KEY_LABELS[s]}] ${r.value.trim()}`;
+  }
+  return context ? `\n\nCONTEXTE DE MARQUE :${context}` : '';
+}
+
 // ===== CALL API CORE =====
 async function callClaude(brand, theme, variant) {
   const token = getGithubToken();
   if(!token) throw new Error("Token GitHub manquant — colle ton token dans le champ 🔑 en haut de la page.");
 
   const _customRes = await window.storage.get('prompt-' + selectedBrand + '-' + selectedPlatform);
-  const _platformPrompt = (_customRes && _customRes.value) ? _customRes.value : PLATFORM_PROMPTS[selectedPlatform](brand);
+  let _platformPrompt;
+  if (_customRes && _customRes.value) {
+    _platformPrompt = _customRes.value;
+  } else if (window._currentCustomBrand?.prompts?.[selectedPlatform]) {
+    _platformPrompt = window._currentCustomBrand.prompts[selectedPlatform];
+  } else if (typeof PLATFORM_PROMPTS !== 'undefined' && PLATFORM_PROMPTS[selectedPlatform]) {
+    _platformPrompt = PLATFORM_PROMPTS[selectedPlatform](brand);
+  } else {
+    _platformPrompt = `Génère du contenu pour ${brand.label || selectedBrand} sur ${selectedPlatform}. Prêt à publier, sans commentaire.`;
+  }
 
   const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
   const seoInject = buildSEOConstraints(selectedBrand, selectedPlatform);
+  const adnContext = await buildADNContext(selectedBrand);
+
+  // Starred posts injection
+  let _starredPostsText = '';
+  try {
+    const rStarred = await window.storage.get('posts-starred-' + selectedBrand);
+    if (rStarred && rStarred.value) {
+      const starredIds = JSON.parse(rStarred.value);
+      if (starredIds.length) {
+        const rHist = await window.storage.get('history-' + selectedBrand);
+        if (rHist && rHist.value) {
+          const hist = JSON.parse(rHist.value);
+          const starred = hist
+            .filter(h => starredIds.includes(h.id) && h.platform === selectedPlatform && h.content)
+            .slice(0, 3);
+          if (starred.length) {
+            _starredPostsText = '\n\nEXEMPLES DE POSTS RÉUSSIS (favoris) :\n' + starred.map((h,i) => `[${i+1}] Thème "${h.theme}" :\n${h.content.substring(0,400)}`).join('\n---\n');
+          }
+        }
+      }
+    }
+  } catch(e) {}
 
   const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
     method: 'POST',
@@ -79,11 +135,26 @@ async function callClaude(brand, theme, variant) {
       messages: [
         {
           role: 'system',
-          content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}${veilleInject}${seoInject}`
+          content: brand.systemPrompt
+            ? `${brand.systemPrompt}${adnContext} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}${veilleInject}${seoInject}${_starredPostsText}`
+            : `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc}${adnContext} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}${veilleInject}${seoInject}${_starredPostsText}`
         },
         {
           role: 'user',
-          content: `Thème : ${theme}\n\n${_platformPrompt}`
+          content: await (async () => {
+            let ctx = '';
+            try {
+              const keyDate = 'contexte-date-' + selectedBrand;
+              const keyCtx  = 'contexte-du-jour-' + selectedBrand;
+              const todayStr = new Date().toISOString().slice(0, 10);
+              const rDate = await window.storage.get(keyDate);
+              if (rDate && rDate.value === todayStr) {
+                const rCtx = await window.storage.get(keyCtx);
+                if (rCtx && rCtx.value && rCtx.value.trim()) ctx = 'Contexte du jour : ' + rCtx.value.trim() + '\n\n';
+              }
+            } catch(e) {}
+            return ctx + `Thème : ${theme}\n\n${_platformPrompt}`;
+          })()
         }
       ]
     })
@@ -92,6 +163,58 @@ async function callClaude(brand, theme, variant) {
   if(!resp.ok || !data.choices) {
     throw new Error(data?.error?.message || `HTTP ${resp.status} — vérifie ton token GitHub`);
   }
+  return data.choices[0].message.content.trim();
+}
+
+// ===== CALL CLAUDE VISION (Caption Visuel) =====
+async function callClaudeVision(brand, images, platform, context) {
+  const token = getGithubToken();
+  if (!token) throw new Error("Token GitHub manquant — colle ton token dans le champ 🔑 en haut de la page.");
+
+  const seoInject = buildSEOConstraints(selectedBrand, platform);
+  const adnContext = await buildADNContext(selectedBrand);
+
+  const platLabel = (typeof PLATFORMS_META !== 'undefined' && PLATFORMS_META[platform])
+    ? PLATFORMS_META[platform].label
+    : platform;
+
+  const platInstructions = `Génère une caption percutante et optimisée pour ${platLabel}, prête à publier, sans commentaire ni explication.`;
+
+  const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      max_tokens: 1000,
+      messages: [
+        {
+          role: 'system',
+          content: brand.systemPrompt
+            ? `${brand.systemPrompt}${adnContext} Génère uniquement la caption demandée, prête à publier, sans commentaire.${seoInject}`
+            : `Tu es un expert Community Manager pour ${brand.label || selectedBrand}.${adnContext} Génère uniquement la caption demandée, prête à publier, sans commentaire.${seoInject}`
+        },
+        {
+          role: 'user',
+          content: [
+            ...images.map(img => ({
+              type: 'image_url',
+              image_url: { url: img.dataUrl }
+            })),
+            {
+              type: 'text',
+              text: `${context ? 'Contexte : ' + context + '\n\n' : ''}Analyse ${images.length > 1 ? 'ces ' + images.length + ' visuels' : 'ce visuel'} et génère une caption pour ${platLabel}.\n\n${platInstructions}`
+            }
+          ]
+        }
+      ]
+    })
+  });
+
+  const data = await resp.json();
+  if (!resp.ok || !data.choices) throw new Error(data?.error?.message || `HTTP ${resp.status}`);
   return data.choices[0].message.content.trim();
 }
 
@@ -128,8 +251,9 @@ async function generateIdea() {
 
     const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
     const seoInject = buildSEOConstraints(selectedBrand, selectedPlatform);
+    const adnContext = await buildADNContext(selectedBrand);
 
-    const ideaTheme = `Choisis toi-même l'idée la plus pertinente du moment pour ${brand.label} sur ${selectedPlatform}. Lance-toi directement dans le contenu, sans préciser le thème choisi au préalable.`;
+    const ideaTheme =`Choisis toi-même l'idée la plus pertinente du moment pour ${brand.label} sur ${selectedPlatform}. Lance-toi directement dans le contenu, sans préciser le thème choisi au préalable.`;
 
     const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
       method: 'POST',
@@ -143,7 +267,9 @@ async function generateIdea() {
         messages: [
           {
             role: 'system',
-            content: `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.${veilleInject}${seoInject}`
+            content: brand.systemPrompt
+              ? `${brand.systemPrompt}${adnContext} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.${veilleInject}${seoInject}`
+              : `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc}${adnContext} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.${veilleInject}${seoInject}`
           },
           { role: 'user', content: ideaTheme }
         ]
@@ -300,7 +426,7 @@ async function optimizeContent(failedScores) {
       body: JSON.stringify({
         model: 'gpt-4o', max_tokens: 1000,
         messages: [
-          { role: 'system', content: `Tu es un expert CM pour ${brand.label}. Retourne uniquement le post réécrit, sans commentaire.` },
+          { role: 'system', content: brand.systemPrompt ? `${brand.systemPrompt} Retourne uniquement le post réécrit, sans commentaire.` : `Tu es un expert CM pour ${brand.label}. Retourne uniquement le post réécrit, sans commentaire.` },
           { role: 'user', content: fixPrompt }
         ]
       })
