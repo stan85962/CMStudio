@@ -9,7 +9,7 @@ function selectBrand(brand, el) {
   document.body.style.removeProperty('--accent');
   document.body.style.removeProperty('--accent2');
   window._currentCustomBrand = null;
-  if (typeof _filterStudioPlatforms === 'function') _filterStudioPlatforms(null);
+  if (typeof _filterStudioPlatforms === 'function') _filterStudioPlatforms(selectedBrand);
   document.title = (brand === 'intelixa' ? 'INTELIXA' : brand === 'doudelio' ? 'Doudelio' : brand) + ' · Studio CM';
 
   // --- MODE STAN ---
@@ -88,6 +88,373 @@ function selectPlatform(p, el) {
   document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderTemplates();
+}
+
+// ===== PLATFORM MANAGEMENT =====
+
+async function _getHiddenPlatforms(brandId) {
+  const key = `platforms-hidden-${brandId}`;
+  const raw = await window.storage.get(key);
+  if (raw === null) {
+    const defaults = (typeof PLATFORM_DEFAULTS_HIDDEN !== 'undefined' && PLATFORM_DEFAULTS_HIDDEN[brandId]) || [];
+    await window.storage.set(key, JSON.stringify(defaults));
+    return defaults;
+  }
+  try { return JSON.parse(raw.value) || []; } catch { return []; }
+}
+async function _setHiddenPlatforms(brandId, arr) {
+  await window.storage.set(`platforms-hidden-${brandId}`, JSON.stringify(arr));
+}
+async function _getCustomPlatforms(brandId) {
+  const raw = await window.storage.get(`custom-platforms-${brandId}`);
+  if (!raw) return [];
+  try { return JSON.parse(raw.value) || []; } catch { return []; }
+}
+async function _setCustomPlatforms(brandId, arr) {
+  await window.storage.set(`custom-platforms-${brandId}`, JSON.stringify(arr));
+}
+
+// Fix 2: robust brand check — excludes stan and custom brands (which use a fixed platform list)
+function _isManageableBrand(brand) {
+  if (!brand) return false;
+  if (brand === 'stan') return false;
+  // Custom brands set window._currentCustomBrand; they manage their platform list via onboarding
+  if (window._currentCustomBrand && window._currentCustomBrand.id === brand) return false;
+  return true;
+}
+
+// Helper: reset the grid to its neutral state (all native buttons visible, no injected elements)
+function _resetGridToNeutral(grid) {
+  grid.classList.remove('platforms-grid--dynamic');
+  grid.querySelectorAll('.platform-btn:not(.platform-btn--add):not(.platform-btn--custom)').forEach(btn => {
+    btn.style.display = '';
+    const x = btn.querySelector('.plat-hide-btn');
+    if (x) x.remove();
+  });
+  grid.querySelectorAll('.platform-btn--custom').forEach(b => b.remove());
+  const oldPlus = grid.querySelector('.platform-btn--add');
+  if (oldPlus) oldPlus.remove();
+}
+
+async function _filterStudioPlatforms(arg) {
+  // arg: brand ID string, array of platform IDs (custom brand), or null
+  const isExplicitList = Array.isArray(arg);
+  const brand = isExplicitList ? selectedBrand : (arg || selectedBrand);
+  const grid = document.querySelector('#page-studio .platforms-grid');
+  if (!grid) return;
+
+  // Fix 1: always sync manage-link visibility
+  let manageLink = document.getElementById('managePlatformsLink');
+
+  // --- Custom brand: use explicit platform list, no manage link ---
+  if (isExplicitList) {
+    grid.classList.add('platforms-grid--dynamic');
+    const allowedIds = arg;
+    grid.querySelectorAll('.platform-btn:not(.platform-btn--add):not(.platform-btn--custom)').forEach(btn => {
+      if (!btn.dataset.platform) {
+        const m = (btn.getAttribute('onclick') || '').match(/selectPlatform\('([^']+)'/);
+        if (m) btn.dataset.platform = m[1];
+      }
+      const pid = btn.dataset.platform;
+      if (pid) btn.style.display = allowedIds.includes(pid) ? '' : 'none';
+    });
+    grid.querySelectorAll('.platform-btn--custom').forEach(b => b.remove());
+    const oldPlus = grid.querySelector('.platform-btn--add');
+    if (oldPlus) oldPlus.remove();
+    if (manageLink) manageLink.style.display = 'none';
+    return;
+  }
+
+  // --- Not a manageable brand (stan, null, unrecognised) ---
+  if (!_isManageableBrand(brand)) {
+    _resetGridToNeutral(grid);
+    if (manageLink) manageLink.style.display = 'none';
+    return;
+  }
+
+  // --- Manageable brand: apply stored hidden list ---
+  const hidden  = await _getHiddenPlatforms(brand);
+  const customs = await _getCustomPlatforms(brand);
+
+  grid.classList.add('platforms-grid--dynamic');
+
+  // 1. Process native static buttons
+  grid.querySelectorAll('.platform-btn:not(.platform-btn--add):not(.platform-btn--custom)').forEach(btn => {
+    if (!btn.dataset.platform) {
+      const m = (btn.getAttribute('onclick') || '').match(/selectPlatform\('([^']+)'/);
+      if (m) btn.dataset.platform = m[1];
+    }
+    const pid = btn.dataset.platform;
+    if (!pid) return;
+    if (hidden.includes(pid)) {
+      btn.style.display = 'none';
+    } else {
+      btn.style.display = '';
+      if (!btn.querySelector('.plat-hide-btn')) {
+        const x = document.createElement('button');
+        x.className = 'plat-hide-btn';
+        x.title = 'Masquer cette plateforme';
+        x.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        x.addEventListener('click', (e) => { e.stopPropagation(); _hidePlatform(pid); });
+        btn.appendChild(x);
+      }
+    }
+  });
+
+  // 2. Remove old custom/add buttons
+  grid.querySelectorAll('.platform-btn--custom').forEach(b => b.remove());
+  const oldPlus = grid.querySelector('.platform-btn--add');
+  if (oldPlus) oldPlus.remove();
+
+  // 3. Add visible custom platform buttons
+  customs.forEach(cp => {
+    if (!hidden.includes(cp.id)) grid.appendChild(_makeCustomPlatformBtn(cp, brand));
+  });
+
+  // 4. Add "+" button
+  const plusBtn = document.createElement('button');
+  plusBtn.className = 'platform-btn platform-btn--add';
+  plusBtn.title = 'Ajouter une plateforme';
+  plusBtn.addEventListener('click', () => _openAddPlatformModal(brand));
+  plusBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg><div class="platform-label">Ajouter</div>`;
+  grid.appendChild(plusBtn);
+
+  // 5. Ensure "Gérer les plateformes" link (Fix 1: always show for manageable brands)
+  if (!manageLink) {
+    manageLink = document.createElement('div');
+    manageLink.id = 'managePlatformsLink';
+    manageLink.className = 'manage-platforms-link';
+    manageLink.innerHTML = `<button onclick="_openManagePlatformsModal()">Gérer les plateformes</button>`;
+    grid.insertAdjacentElement('afterend', manageLink);
+  }
+  manageLink.style.display = '';
+}
+
+function _makeCustomPlatformBtn(cp, brand) {
+  const btn = document.createElement('button');
+  btn.className = 'platform-btn platform-btn--custom';
+  btn.dataset.platform = cp.id;
+  btn.addEventListener('click', function() { selectPlatform(cp.id, this); });
+  const iconHtml = cp.icon
+    ? `<img src="${cp.icon}" class="plat-custom-img" alt="">`
+    : `<div class="plat-custom-avatar">${cp.label.substring(0, 2).toUpperCase()}</div>`;
+  const labelSafe = cp.label.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  btn.innerHTML = iconHtml + `<div class="platform-label">${labelSafe}</div>`;
+  // × delete button (confirm-on-second-click)
+  const x = document.createElement('button');
+  x.className = 'plat-hide-btn plat-delete-btn';
+  x.title = 'Supprimer (cliquer 2× pour confirmer)';
+  x.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+  x.addEventListener('click', (e) => { e.stopPropagation(); _deleteCustomPlatform(cp.id, brand, x); });
+  btn.appendChild(x);
+  return btn;
+}
+
+async function _hidePlatform(pid) {
+  if (!_isManageableBrand(selectedBrand)) return;
+  const hidden = await _getHiddenPlatforms(selectedBrand);
+  if (!hidden.includes(pid)) {
+    hidden.push(pid);
+    await _setHiddenPlatforms(selectedBrand, hidden);
+  }
+  if (selectedPlatform === pid) selectedPlatform = null;
+  _filterStudioPlatforms(selectedBrand);
+}
+
+async function _deleteCustomPlatform(pid, brand, btnEl) {
+  if (btnEl._confirmDelete) {
+    const customs = await _getCustomPlatforms(brand);
+    await _setCustomPlatforms(brand, customs.filter(c => c.id !== pid));
+    if (selectedPlatform === pid) selectedPlatform = null;
+    _filterStudioPlatforms(brand);
+    return;
+  }
+  btnEl._confirmDelete = true;
+  btnEl.style.cssText = 'background:#e53935;opacity:1;';
+  setTimeout(() => {
+    if (btnEl._confirmDelete) {
+      btnEl._confirmDelete = false;
+      btnEl.style.cssText = '';
+    }
+  }, 2500);
+}
+
+// ===== ADD PLATFORM MODAL =====
+let _newPlatIconBase64 = null;
+
+function _openAddPlatformModal(brand) {
+  let modal = document.getElementById('addPlatformModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'addPlatformModal';
+    modal.className = 'plat-modal-overlay';
+    modal.innerHTML = `
+      <div class="plat-modal">
+        <div class="plat-modal-header">
+          <span>Nouvelle plateforme</span>
+          <button class="plat-modal-close" onclick="_closeAddPlatformModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+        <div class="plat-modal-body">
+          <label class="plat-modal-label">Nom de la plateforme</label>
+          <input type="text" id="newPlatName" class="plat-modal-input" placeholder="ex: Threads" maxlength="30" onkeydown="if(event.key==='Enter')_confirmAddPlatform()">
+          <label class="plat-modal-label" style="margin-top:14px">Icône (optionnel)</label>
+          <div class="plat-icon-upload-area">
+            <input type="file" id="newPlatIconFile" accept="image/*" style="display:none" onchange="_previewPlatIcon(this)">
+            <label for="newPlatIconFile" class="plat-icon-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Choisir une image
+            </label>
+            <div id="platIconPreview" class="plat-icon-preview"></div>
+          </div>
+          <div class="plat-modal-footer">
+            <button class="plat-modal-cancel" onclick="_closeAddPlatformModal()">Annuler</button>
+            <button class="plat-modal-confirm" onclick="_confirmAddPlatform()">Ajouter</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) _closeAddPlatformModal(); });
+  }
+  modal.style.display = 'flex';
+  modal.dataset.brand = brand;
+  _newPlatIconBase64 = null;
+  const nameInput = document.getElementById('newPlatName');
+  if (nameInput) { nameInput.value = ''; setTimeout(() => nameInput.focus(), 80); }
+  const iconFile = document.getElementById('newPlatIconFile');
+  if (iconFile) iconFile.value = '';
+  const preview = document.getElementById('platIconPreview');
+  if (preview) preview.innerHTML = '';
+}
+
+function _closeAddPlatformModal() {
+  const modal = document.getElementById('addPlatformModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function _previewPlatIcon(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    _newPlatIconBase64 = e.target.result;
+    const preview = document.getElementById('platIconPreview');
+    if (preview) preview.innerHTML = `<img src="${e.target.result}" style="width:32px;height:32px;object-fit:contain;border-radius:6px;">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+async function _confirmAddPlatform() {
+  const modal = document.getElementById('addPlatformModal');
+  const brand = modal?.dataset?.brand || selectedBrand;
+  const nameInput = document.getElementById('newPlatName');
+  const name = nameInput ? nameInput.value.trim() : '';
+  if (!name) { nameInput?.focus(); return; }
+  const customs = await _getCustomPlatforms(brand);
+  customs.push({ id: 'custom_' + Date.now(), label: name, icon: _newPlatIconBase64 || null });
+  await _setCustomPlatforms(brand, customs);
+  _closeAddPlatformModal();
+  _filterStudioPlatforms(brand);
+}
+
+// ===== MANAGE PLATFORMS MODAL =====
+async function _openManagePlatformsModal() {
+  const brand = selectedBrand;
+  // Fix 3: show message if no brand selected instead of silent return
+  if (!brand) {
+    if (typeof _showPreviewToast === 'function') _showPreviewToast('Sélectionne une marque d\'abord');
+    return;
+  }
+  // Fix 2: use proper brand check
+  if (!_isManageableBrand(brand)) return;
+  const hidden  = await _getHiddenPlatforms(brand);
+  const customs = await _getCustomPlatforms(brand);
+  const allNative = typeof PLATFORMS_META !== 'undefined' ? Object.keys(PLATFORMS_META) : [];
+
+  const svgX   = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+  const svgEye = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+
+  function nativeRow(pid, isActive) {
+    const meta = typeof PLATFORMS_META !== 'undefined' ? PLATFORMS_META[pid] : null;
+    const label = (meta?.label || pid).split(' — ')[0];
+    const icon  = meta?.icon || '';
+    if (isActive) {
+      return `<div class="mpl-row"><span class="mpl-row-icon">${icon}</span><span class="mpl-row-label">${label}</span><button class="mpl-toggle-btn mpl-hide-it" onclick="_mplToggle('${pid}',false)">${svgX} Masquer</button></div>`;
+    } else {
+      return `<div class="mpl-row mpl-row--hidden"><span class="mpl-row-icon">${icon}</span><span class="mpl-row-label">${label}</span><button class="mpl-toggle-btn mpl-show-it" onclick="_mplToggle('${pid}',true)">${svgEye} Réafficher</button></div>`;
+    }
+  }
+
+  function customRow(cp, isActive) {
+    const iconHtml = cp.icon
+      ? `<img src="${cp.icon}" style="width:22px;height:22px;object-fit:contain;">`
+      : `<div class="plat-custom-avatar" style="width:22px;height:22px;font-size:9px">${cp.label.substring(0,2).toUpperCase()}</div>`;
+    const labelSafe = cp.label.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if (isActive) {
+      return `<div class="mpl-row"><span class="mpl-row-icon">${iconHtml}</span><span class="mpl-row-label">${labelSafe}</span><button class="mpl-toggle-btn mpl-hide-it" onclick="_mplToggle('${cp.id}',false)">${svgX} Masquer</button></div>`;
+    } else {
+      return `<div class="mpl-row mpl-row--hidden"><span class="mpl-row-icon">${iconHtml}</span><span class="mpl-row-label">${labelSafe}</span><button class="mpl-toggle-btn mpl-show-it" onclick="_mplToggle('${cp.id}',true)">${svgEye} Réafficher</button></div>`;
+    }
+  }
+
+  const activeNative = allNative.filter(p => !hidden.includes(p));
+  const hiddenNative = allNative.filter(p =>  hidden.includes(p));
+  const activeCustom = customs.filter(c => !hidden.includes(c.id));
+  const hiddenCustom = customs.filter(c =>  hidden.includes(c.id));
+
+  const activeRows = [...activeNative.map(p => nativeRow(p, true)), ...activeCustom.map(c => customRow(c, true))].join('');
+  const hiddenRows = [...hiddenNative.map(p => nativeRow(p, false)), ...hiddenCustom.map(c => customRow(c, false))].join('');
+  const hasHidden  = (hiddenNative.length + hiddenCustom.length) > 0;
+
+  let modal = document.getElementById('managePlatformsModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'managePlatformsModal';
+    modal.className = 'plat-modal-overlay';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) _closeManagePlatformsModal(); });
+  }
+  modal.innerHTML = `
+    <div class="plat-modal plat-modal--manage">
+      <div class="plat-modal-header">
+        <span>Gérer les plateformes</span>
+        <button class="plat-modal-close" onclick="_closeManagePlatformsModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+      </div>
+      <div class="plat-modal-body">
+        <div class="mpl-section">
+          <div class="mpl-section-title">Plateformes actives</div>
+          <div class="mpl-list">${activeRows || '<div class="mpl-empty">Aucune plateforme active</div>'}</div>
+        </div>
+        ${hasHidden ? `<div class="mpl-section">
+          <div class="mpl-section-title mpl-section-title--hidden">Plateformes masquées</div>
+          <div class="mpl-list">${hiddenRows}</div>
+        </div>` : ''}
+        <div class="mpl-footer">
+          <button class="mpl-reset-btn" onclick="_resetAllPlatforms()">Réinitialiser toutes les plateformes</button>
+        </div>
+      </div>
+    </div>`;
+  modal.style.display = 'flex';
+}
+
+function _closeManagePlatformsModal() {
+  const modal = document.getElementById('managePlatformsModal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function _mplToggle(pid, makeVisible) {
+  if (!_isManageableBrand(selectedBrand)) return;
+  const hidden = await _getHiddenPlatforms(selectedBrand);
+  const updated = makeVisible ? hidden.filter(h => h !== pid) : (hidden.includes(pid) ? hidden : [...hidden, pid]);
+  if (!makeVisible && selectedPlatform === pid) selectedPlatform = null;
+  await _setHiddenPlatforms(selectedBrand, updated);
+  _filterStudioPlatforms(selectedBrand);
+  _openManagePlatformsModal(); // refresh modal
+}
+
+async function _resetAllPlatforms() {
+  if (!selectedBrand || selectedBrand === 'stan') return;
+  localStorage.removeItem(`platforms-hidden-${selectedBrand}`);
+  _closeManagePlatformsModal();
+  await _filterStudioPlatforms(selectedBrand);
 }
 
 // ===== AB MODE =====
