@@ -1,3 +1,6 @@
+// ===== RÈGLES DE STYLE GLOBALES =====
+const _STYLE_RULES = ` Règles de style impératives : n'utilise jamais d'astérisques, jamais d'émojis, jamais de tirets em (—) ni de tirets en milieu de phrase pour lister des idées (utilise des points ou des retours à la ligne à la place), vouvoie toujours le lecteur, n'utilise jamais "je" à la première personne.`;
+
 // ===== API =====
 function getGithubToken() {
   // Priorité : config.js → localStorage (fallback compatibilité)
@@ -136,8 +139,8 @@ async function callClaude(brand, theme, variant) {
         {
           role: 'system',
           content: brand.systemPrompt
-            ? `${brand.systemPrompt}${adnContext} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}${veilleInject}${seoInject}${_starredPostsText}`
-            : `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc}${adnContext} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}${veilleInject}${seoInject}${_starredPostsText}`
+            ? `${brand.systemPrompt}${adnContext} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}${veilleInject}${seoInject}${_starredPostsText}${_STYLE_RULES}`
+            : `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc}${adnContext} Génère uniquement le contenu demandé, prêt à publier, sans commentaire ni explication.${variant ? ' ' + variant + '.' : ''}${veilleInject}${seoInject}${_starredPostsText}${_STYLE_RULES}`
         },
         {
           role: 'user',
@@ -193,8 +196,8 @@ async function callClaudeVision(brand, images, platform, context) {
         {
           role: 'system',
           content: brand.systemPrompt
-            ? `${brand.systemPrompt}${adnContext} Génère uniquement la caption demandée, prête à publier, sans commentaire.${seoInject}`
-            : `Tu es un expert Community Manager pour ${brand.label || selectedBrand}.${adnContext} Génère uniquement la caption demandée, prête à publier, sans commentaire.${seoInject}`
+            ? `${brand.systemPrompt}${adnContext} Génère uniquement la caption demandée, prête à publier, sans commentaire.${seoInject}${_STYLE_RULES}`
+            : `Tu es un expert Community Manager pour ${brand.label || selectedBrand}.${adnContext} Génère uniquement la caption demandée, prête à publier, sans commentaire.${seoInject}${_STYLE_RULES}`
         },
         {
           role: 'user',
@@ -268,8 +271,8 @@ async function generateIdea() {
           {
             role: 'system',
             content: brand.systemPrompt
-              ? `${brand.systemPrompt}${adnContext} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.${veilleInject}${seoInject}`
-              : `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc}${adnContext} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.${veilleInject}${seoInject}`
+              ? `${brand.systemPrompt}${adnContext} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.${veilleInject}${seoInject}${_STYLE_RULES}`
+              : `Tu es un expert Community Manager pour ${brand.label}. ${brand.desc}${adnContext} Tu choisis toi-même l'angle le plus pertinent et tu génères le contenu prêt à publier pour ${selectedPlatform}, sans commentaire ni explication.${veilleInject}${seoInject}${_STYLE_RULES}`
           },
           { role: 'user', content: ideaTheme }
         ]
@@ -426,7 +429,7 @@ async function optimizeContent(failedScores) {
       body: JSON.stringify({
         model: 'gpt-4o', max_tokens: 1000,
         messages: [
-          { role: 'system', content: brand.systemPrompt ? `${brand.systemPrompt} Retourne uniquement le post réécrit, sans commentaire.` : `Tu es un expert CM pour ${brand.label}. Retourne uniquement le post réécrit, sans commentaire.` },
+          { role: 'system', content: brand.systemPrompt ? `${brand.systemPrompt} Retourne uniquement le post réécrit, sans commentaire.${_STYLE_RULES}` : `Tu es un expert CM pour ${brand.label}. Retourne uniquement le post réécrit, sans commentaire.${_STYLE_RULES}` },
           { role: 'user', content: fixPrompt }
         ]
       })
