@@ -35,7 +35,7 @@ async function toggleHistStar(id) {
   await _saveStarred(selectedBrand);
   // Re-render just the star button
   const btn = document.querySelector(`.hist-star-btn[data-id="${id}"]`);
-  if (btn) btn.textContent = _histStarred.includes(id) ? '★' : '☆';
+  if (btn) btn.innerHTML = _histStarred.includes(id) ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>' : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>';
   // Update nav badge
   _renderStarNavBadge();
 }
@@ -130,7 +130,7 @@ function _renderHistFilters(allItems) {
     return `<button class="hist-filter-btn${on?' active':''}" onclick="toggleHistPlatform('${p}')"><span class="hist-filter-plat-icon">${_platIcon(p)}</span>${_platLabel(p)}</button>`;
   }).join('');
 
-  const favBtnHtml = `<button class="hist-filter-btn${_histShowFavoris?' active':''}" onclick="toggleHistFavoris()">⭐ Favoris${_histStarred.length ? ' ('+_histStarred.length+')' : ''}</button>`;
+  const favBtnHtml = `<button class="hist-filter-btn${_histShowFavoris?' active':''}" onclick="toggleHistFavoris()"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> Favoris${_histStarred.length ? ' ('+_histStarred.length+')' : ''}</button>`;
 
   el.innerHTML = `
   <div class="hist-filters-row">
@@ -140,7 +140,7 @@ function _renderHistFilters(allItems) {
     ${platforms.length ? '<span class="hist-filter-sep"></span>' : ''}
     ${platBtns}
     ${hasFilter ? `<button class="hist-filter-reset" onclick="resetHistFilters()">${icon('x',12)} Tout afficher</button>` : ''}
-    <button class="hist-export-btn" onclick="exportHistoriqueCSV()" title="Exporter en CSV">📥 Export CSV</button>
+    <button class="hist-export-btn" onclick="exportHistoriqueCSV()" title="Exporter en CSV"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export CSV</button>
   </div>`;
 }
 
