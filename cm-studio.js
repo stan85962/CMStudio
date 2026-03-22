@@ -1365,7 +1365,7 @@ function initCaptionVisuel() {
            ondragover="event.preventDefault();this.classList.add('cv-drop-hover')"
            ondragleave="this.classList.remove('cv-drop-hover')"
            ondrop="_cvHandleDrop(event)">
-        <div class="cv-drop-icon">🖼</div>
+        <div class="cv-drop-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
         <div class="cv-drop-label">Glisse tes visuels ici ou clique pour sélectionner</div>
         <div class="cv-drop-hint" id="cvDropHint">PNG, JPG, WebP — max 4 images</div>
         <input type="file" id="cvFileInput" accept="image/*" multiple style="display:none">
@@ -1378,7 +1378,7 @@ function initCaptionVisuel() {
                placeholder="Contexte optionnel (ex : lancement produit, promo d'été…)">
       </div>
       <button class="cv-gen-btn" id="cvGenBtn" onclick="generateCaptions()" disabled>
-        🖼 Générer les captions
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg> Générer les captions
       </button>
       <div id="cvError" class="cv-error-msg" style="display:none"></div>
       <div id="cvResults" class="cv-results"></div>
@@ -1541,7 +1541,7 @@ async function generateCaptions() {
   }));
 
   btn.disabled    = false;
-  btn.textContent = '🖼 Générer les captions';
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg> Générer les captions';
 }
 
 async function _cvCopyCaption(platform) {
