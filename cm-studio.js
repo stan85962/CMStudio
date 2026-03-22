@@ -40,7 +40,7 @@ function selectBrand(brand, el) {
   const dashTitle = document.getElementById('dashTitle');
   const dashSub = document.getElementById('dashSubtitle');
   if(dashTitle) {
-    dashTitle.textContent = brand==='intelixa' ? 'INTELIXA STUDIO' : 'Bienvenue Doudelio 🌱';
+    dashTitle.textContent = brand==='intelixa' ? 'INTELIXA STUDIO' : 'Bienvenue Doudelio';
     dashTitle.style.fontFamily = brand==='intelixa' ? "'Orbitron',monospace" : "'Nunito',sans-serif";
   }
   if(dashSub) {
