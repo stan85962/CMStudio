@@ -4017,3 +4017,67 @@ body.theme-doudelio .plat-modal { font-family: 'Nunito', sans-serif; }
   .plat-modal--manage { max-height: 90vh; }
   .mpl-toggle-btn { font-size: 10px; padding: 4px 8px; }
 }
+
+/* ===== DARK MODE ===== */
+body.dark {
+  --bg: #111318;
+  --surface: #1c1f28;
+  --surface2: #252830;
+  --border: #2e3240;
+  --text: #e0e4f0;
+  --muted: #8090a8;
+  --shadow: rgba(0,0,0,.4);
+  background: var(--bg);
+  color: var(--text);
+}
+body.dark.theme-intelixa {
+  --bg: #090d1a;
+  --surface: #0e1628;
+  --surface2: #131e38;
+  --border: #1e2e50;
+  --text: #dde6ff;
+  --muted: #6b7a99;
+  --shadow: rgba(0,0,0,.5);
+  background: var(--bg);
+}
+body.dark.theme-doudelio {
+  --bg: #0f0e0c;
+  --surface: #1a1814;
+  --surface2: #22201c;
+  --border: #32302a;
+  --text: #e4dfd8;
+  --muted: #7a7068;
+  background: var(--bg);
+}
+
+/* Nav dark: override hardcoded backgrounds */
+body.dark .top-nav { background: var(--surface) !important; border-color: var(--border); }
+body.dark .nav-tabs { background: transparent; border-color: var(--border); }
+body.dark textarea { background: var(--surface2); color: var(--text); border-color: var(--border); }
+body.dark .result-box { border: 1px solid var(--border); }
+body.dark .result-header { background: var(--surface2); border-color: var(--border); }
+body.dark .result-content { background: var(--surface); color: var(--text); }
+body.dark .ab-version { background: var(--surface2); border-color: var(--border); }
+body.dark .postit { filter: brightness(.85) saturate(.85); }
+body.dark .plat-modal-overlay { background: rgba(0,0,0,.7); }
+body.dark .plat-modal { background: var(--surface); border-color: var(--border); color: var(--text); }
+body.dark .plat-modal-header { background: var(--surface2); border-color: var(--border); }
+body.dark .plat-modal input { background: var(--surface2); color: var(--text); border-color: var(--border); }
+body.dark .mpl-row { border-color: var(--border); }
+body.dark .struct-header { background: var(--surface2); }
+body.dark .struct-body { background: var(--surface); color: var(--text); }
+body.dark .hist-item { border-color: var(--border); }
+body.dark .wcal-modal-inner { background: var(--surface); border-color: var(--border); }
+body.dark .res-drawer { background: var(--surface); color: var(--text); }
+body.dark .chat-window { background: var(--surface); border-color: var(--border); }
+
+/* Dark mode toggle button */
+.dark-toggle-btn {
+  width: 32px; height: 32px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); transition: all .15s;
+  flex-shrink: 0;
+}
+.dark-toggle-btn:hover { background: var(--surface2); color: var(--text); }

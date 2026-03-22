@@ -502,3 +502,29 @@ const TACHES_RECURRENTES = {
     { text: "Newsletter mensuelle",            platforms: ["brevo"] }
   ]
 };
+
+// ===== DARK MODE =====
+function toggleDark() {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('cm_dark', isDark ? '1' : '0');
+  _updateDarkBtn(isDark);
+}
+
+function _updateDarkBtn(isDark) {
+  const btn = document.getElementById('darkToggleBtn');
+  if (!btn) return;
+  const moon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+  const sun  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>`;
+  btn.innerHTML = isDark ? sun : moon;
+  btn.title = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+// Init dark mode on load
+(function() {
+  if (localStorage.getItem('cm_dark') === '1') {
+    document.body.classList.add('dark');
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    _updateDarkBtn(document.body.classList.contains('dark'));
+  });
+})();
