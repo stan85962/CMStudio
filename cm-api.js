@@ -1,5 +1,14 @@
 // ===== RÈGLES DE STYLE GLOBALES =====
-const _STYLE_RULES = ` Règles de style impératives : n'utilise jamais d'astérisques, jamais d'émojis, jamais de tirets em (—) ni de tirets en milieu de phrase pour lister des idées (utilise des points ou des retours à la ligne à la place), vouvoie toujours le lecteur, n'utilise jamais "je" à la première personne.`;
+const _STYLE_RULES = ` Règles de style impératives : n'utilise jamais d'astérisques (*, **), jamais d'émojis, jamais de tirets em (—) ni de tirets en milieu de phrase pour lister des idées (utilise des points ou des retours à la ligne à la place), vouvoie toujours le lecteur, n'utilise jamais "je" à la première personne.`;
+
+function _cleanOutput(text) {
+  return text
+    .replace(/\*\*/g, '')   // retire les **gras**
+    .replace(/\*/g, '')      // retire les *italique*
+    .replace(/^—\s*/gm, '')  // retire les tirets em en début de ligne
+    .replace(/\s—\s/g, ' ') // retire les tirets em inline
+    .trim();
+}
 
 // ===== API =====
 function getGithubToken() {
@@ -166,7 +175,7 @@ async function callClaude(brand, theme, variant) {
   if(!resp.ok || !data.choices) {
     throw new Error(data?.error?.message || `HTTP ${resp.status} — vérifie ton token GitHub`);
   }
-  return data.choices[0].message.content.trim();
+  return _cleanOutput(data.choices[0].message.content.trim());
 }
 
 // ===== CALL CLAUDE VISION (Caption Visuel) =====
@@ -218,7 +227,7 @@ async function callClaudeVision(brand, images, platform, context) {
 
   const data = await resp.json();
   if (!resp.ok || !data.choices) throw new Error(data?.error?.message || `HTTP ${resp.status}`);
-  return data.choices[0].message.content.trim();
+  return _cleanOutput(data.choices[0].message.content.trim());
 }
 
 // ===== GENERATE IDEA ("J'ai pas d'idée") =====
@@ -282,7 +291,7 @@ async function generateIdea() {
     if(!resp.ok || !data.choices) {
       throw new Error(data?.error?.message || `HTTP ${resp.status} — vérifie ton token GitHub`);
     }
-    const postContent = data.choices[0].message.content.trim();
+    const postContent = _cleanOutput(data.choices[0].message.content.trim());
 
     // Extraire la 1re phrase non-vide comme label d'idée pour le badge + textarea
     const firstLine = postContent.split('\n').find(l => l.trim().length > 0) || '';
@@ -436,7 +445,7 @@ async function optimizeContent(failedScores) {
     });
     const data = await resp.json();
     if(!resp.ok || !data.choices) throw new Error(data?.error?.message || `HTTP ${resp.status}`);
-    const result = data.choices[0].message.content.trim();
+    const result = _cleanOutput(data.choices[0].message.content.trim());
     resultEl.textContent = result;
     saveToHistory(document.getElementById('theme')?.value || 'Optimisé', result, 'OPT');
     renderSEOPanel(result, selectedBrand);
