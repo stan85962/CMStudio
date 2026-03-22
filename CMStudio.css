@@ -4024,8 +4024,8 @@ body.dark {
   --surface: #1c1f28;
   --surface2: #252830;
   --border: #2e3240;
-  --text: #e0e4f0;
-  --muted: #8090a8;
+  --text: #ffffff;
+  --muted: #c8d4e8;
   --shadow: rgba(0,0,0,.4);
   background: var(--bg);
   color: var(--text);
@@ -4035,8 +4035,8 @@ body.dark.theme-intelixa {
   --surface: #0e1628;
   --surface2: #131e38;
   --border: #1e2e50;
-  --text: #dde6ff;
-  --muted: #6b7a99;
+  --text: #ffffff;
+  --muted: #c0cfe8;
   --shadow: rgba(0,0,0,.5);
   background: var(--bg);
 }
@@ -4045,8 +4045,8 @@ body.dark.theme-doudelio {
   --surface: #1a1814;
   --surface2: #22201c;
   --border: #32302a;
-  --text: #e4dfd8;
-  --muted: #7a7068;
+  --text: #ffffff;
+  --muted: #ccc5be;
   background: var(--bg);
 }
 
