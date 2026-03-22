@@ -445,61 +445,62 @@ Contraintes SEO : intégrer naturellement les mots-clés crèche, auxiliaire de 
 // ===== PLANNING HEBDOMADAIRE =====
 // 0=Lundi … 6=Dimanche
 const PLANNING_HEBDO = {
+  // 0 = Lundi
   0: [
-    "Publication Meta — 19h",
-    "Google My Business Intelixa",
-    "50 actions LinkedIn",
-    "TikTok Doudelio — 1/jour"
+    { text: "Google My Business",          platforms: ["gmb"],                   hour: 8,  minute: 0  },
+    { text: "TikTok Doudelio",             platforms: ["tiktok"],                hour: 10, minute: 0  },
+    { text: "Pinterest Doudelio",          platforms: ["pinterest"],             hour: 13, minute: 0  },
+    { text: "Groupe Facebook Intelixa",    platforms: ["facebook"],              hour: 15, minute: 0  },
+    { text: "Publication META",            platforms: ["instagram","facebook"],  hour: 19, minute: 0  }
   ],
+  // 1 = Mardi
   1: [
-    "Story Meta (portrait formatrice ou prochaine session avec lien site)",
-    "Publication LinkedIn — 11h30",
-    "Google My Business Doudelio",
-    "50 actions LinkedIn",
-    "TikTok Doudelio — 1/jour"
+    { text: "Story META",                  platforms: ["instagram","facebook"],  hour: 10, minute: 0  },
+    { text: "Publication LinkedIn",        platforms: ["linkedin"],              hour: 11, minute: 30 }
   ],
+  // 2 = Mercredi
   2: [
-    "Publication Meta — soir",
-    "Publication LinkedIn",
-    "50 actions LinkedIn",
-    "TikTok Doudelio — 1/jour",
-    "Pinterest — 3x/semaine"
+    { text: "Pinterest Doudelio",          platforms: ["pinterest"],             hour: 13, minute: 0  },
+    { text: "Groupe Facebook Intelixa",    platforms: ["facebook"],              hour: 15, minute: 0  },
+    { text: "Publication META",            platforms: ["instagram","facebook"],  hour: 18, minute: 0  }
   ],
+  // 3 = Jeudi
   3: [
-    "Story Meta",
-    "Publication LinkedIn — 11h30",
-    "50 actions LinkedIn",
-    "TikTok Doudelio — 1/jour"
+    { text: "Story META",                  platforms: ["instagram","facebook"],  hour: 10, minute: 0  },
+    { text: "Publication LinkedIn",        platforms: ["linkedin"],              hour: 11, minute: 30 }
   ],
+  // 4 = Vendredi
   4: [
-    "Publication Meta — matin ou midi",
-    "50 actions LinkedIn",
-    "TikTok Doudelio — 1/jour",
-    "Pinterest — 3x/semaine"
+    { text: "Publication META",            platforms: ["instagram","facebook"],  hour: 8,  minute: 0  },
+    { text: "Pinterest Doudelio",          platforms: ["pinterest"],             hour: 13, minute: 0  },
+    { text: "Groupe Facebook Intelixa",    platforms: ["facebook"],              hour: 15, minute: 0  }
   ],
+  // 5 = Samedi
   5: [],
+  // 6 = Dimanche
   6: [
-    "Newsletter (1x/mois)",
-    "YouTube / Podcast (1x/semaine)",
-    "Webinaire (1x/mois — dimanche/lundi soir)"
+    { text: "Webinaire (dernier dim. du mois)", platforms: ["calendar"],        hour: 19, minute: 0  }
   ]
 };
 
 // ===== TÂCHES RÉCURRENTES =====
 const TACHES_RECURRENTES = {
   quotidien: [
-    { text: "50 interactions LinkedIn",       platforms: ["linkedin"] },
-    { text: "TikTok Doudelio — 1 vidéo/jour", platforms: ["tiktok"] }
+    { text: "50 interactions LinkedIn",        platforms: ["linkedin"] },
+    { text: "TikTok Doudelio — 1 vidéo/jour",  platforms: ["tiktok"] }
   ],
   hebdomadaire: [
-    { text: "Changer la pub Facebook/Instagram", platforms: ["facebook", "instagram"] },
-    { text: "Pinterest — 3 posts/semaine",        platforms: ["pinterest"] },
-    { text: "Google My Business — 1 post/semaine",platforms: ["gmb"] }
+    { text: "Publication META ×3 (Lun/Mer/Ven)", platforms: ["instagram","facebook"] },
+    { text: "Story META ×2 (Mar/Jeu)",           platforms: ["instagram","facebook"] },
+    { text: "LinkedIn ×2 (Mar/Jeu)",             platforms: ["linkedin"] },
+    { text: "Pinterest Doudelio ×3",             platforms: ["pinterest"] },
+    { text: "Google My Business (Lun)",          platforms: ["gmb"] },
+    { text: "Groupe Facebook Intelixa ×3",       platforms: ["facebook"] }
   ],
   ponctuel: [
-    { text: "Programmer un webinaire",         platforms: ["calendar"] },
-    { text: "Enregistrer YouTube / Podcast",   platforms: ["youtube"] },
-    { text: "Newsletter mensuelle",            platforms: ["brevo"] }
+    { text: "Webinaire (dernier dim. du mois)",  platforms: ["calendar"] },
+    { text: "Enregistrer YouTube / Podcast",     platforms: ["youtube"] },
+    { text: "Newsletter mensuelle",              platforms: ["brevo"] }
   ]
 };
 
