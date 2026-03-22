@@ -675,13 +675,16 @@ async function _wcalDuplicateCard(event, planDow, globalIdx) {
   const src = tasks[globalIdx];
   // Flash vert sur la card source avant le re-rendu
   event.target.closest('.wcal-card')?.classList.add('flash-dup');
-  // Copie sans horaire
-  tasks.push({ text: src.text, platforms: src.platforms, hour: null, minute: null });
-  window.storage.set('planning-custom-' + planDow, JSON.stringify(tasks));
+  // Copie au jour suivant, même heure
+  const nextDow = (planDow + 1) % 7;
+  const nextRaw = await _getPlanTasks(nextDow);
+  const nextTasks = nextRaw.map(_normalizeTask);
+  nextTasks.push({ text: src.text, platforms: src.platforms, hour: src.hour, minute: src.minute });
+  window.storage.set('planning-custom-' + nextDow, JSON.stringify(nextTasks));
   await renderPlanningView();
-  // Animer le dernier chip apparu dans la colonne cible
-  const cell = document.querySelector(`.wcal-allday-cell[data-plan-dow="${planDow}"]`);
-  cell?.querySelector('.wcal-allday-chip:last-child')?.classList.add('wcal-chip-new');
+  // Animer la card apparue dans la colonne cible
+  const cell = document.querySelector(`.wcal-col[data-plan-dow="${nextDow}"]`);
+  cell?.querySelector('.wcal-card:last-child')?.classList.add('wcal-chip-new');
 }
 
 // Modal : ouvrir
