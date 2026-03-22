@@ -47,9 +47,15 @@ function _resRenderBody() {
 
   let html = '';
   for (const brand of ['intelixa', 'doudelio']) {
-    html += `<div class="res-brand-section"><div class="res-brand-header">${_RES_BRAND_LABELS[brand]}</div>`;
+    const resHidden = _resGetHidden(brand);
+    html += `<div class="res-brand-section">
+      <div class="res-brand-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>${_RES_BRAND_LABELS[brand]}</span>
+        <button onclick="_resOpenManage('${brand}')" style="font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:0;">Gérer</button>
+      </div>`;
 
     for (const plat of Object.keys(PLATFORMS_META)) {
+      if (resHidden.includes(plat)) continue;
       const hasCustom = _resHasCustom(brand, plat);
       const isActive  = _resActiveBrand === brand && _resActivePlatform === plat;
       const stored    = localStorage.getItem('prompt-' + brand + '-' + plat);
@@ -119,6 +125,66 @@ function resetCustomPrompt(brand, platform) {
   localStorage.removeItem('prompt-' + brand + '-' + platform);
   _resActiveBrand = null; _resActivePlatform = null;
   _resRenderBody();
+}
+
+// ---- Gestion plateformes visibles par marque ----
+function _resGetHidden(brand) {
+  try { return JSON.parse(localStorage.getItem('res-hidden-' + brand) || '[]'); } catch { return []; }
+}
+function _resSetHidden(brand, arr) {
+  localStorage.setItem('res-hidden-' + brand, JSON.stringify(arr));
+}
+
+function _resOpenManage(brand) {
+  const hidden = _resGetHidden(brand);
+  const allPlats = typeof PLATFORMS_META !== 'undefined' ? Object.keys(PLATFORMS_META) : [];
+  const svgX   = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+  const svgEye = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+
+  const rows = allPlats.map(pid => {
+    const meta = PLATFORMS_META[pid];
+    const label = (meta?.label || pid).split(' — ')[0];
+    const icon = meta?.icon || '';
+    const isHidden = hidden.includes(pid);
+    return isHidden
+      ? `<div class="mpl-row mpl-row--hidden"><span class="mpl-row-icon">${icon}</span><span class="mpl-row-label">${label}</span><button class="mpl-toggle-btn mpl-show-it" onclick="_resTogglePlat('${brand}','${pid}',true)">${svgEye} Réafficher</button></div>`
+      : `<div class="mpl-row"><span class="mpl-row-icon">${icon}</span><span class="mpl-row-label">${label}</span><button class="mpl-toggle-btn mpl-hide-it" onclick="_resTogglePlat('${brand}','${pid}',false)">${svgX} Masquer</button></div>`;
+  }).join('');
+
+  const brandLabel = brand === 'intelixa' ? 'Intelixa' : 'Doudelio';
+  let modal = document.getElementById('resManageModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'resManageModal';
+    modal.className = 'plat-modal-overlay';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) _resCloseManage(); });
+  }
+  modal.innerHTML = `
+    <div class="plat-modal plat-modal--manage">
+      <div class="plat-modal-header">
+        <span>Ressources — ${brandLabel}</span>
+        <button class="plat-modal-close" onclick="_resCloseManage()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+      </div>
+      <div class="mpl-list">${rows}</div>
+    </div>`;
+  modal.style.display = 'flex';
+  modal.dataset.brand = brand;
+}
+
+function _resCloseManage() {
+  const modal = document.getElementById('resManageModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function _resTogglePlat(brand, pid, show) {
+  const hidden = _resGetHidden(brand);
+  const idx = hidden.indexOf(pid);
+  if (show && idx !== -1) hidden.splice(idx, 1);
+  else if (!show && idx === -1) hidden.push(pid);
+  _resSetHidden(brand, hidden);
+  _resOpenManage(brand); // re-render modal
+  _resRenderBody();      // re-render drawer
 }
 
 
