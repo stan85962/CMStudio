@@ -514,8 +514,8 @@ async function renderPlanningView() {
         <button class="wcal-nav-today" onclick="_wcalGoToday()">Aujourd'hui</button>
         <button class="wcal-nav-btn" onclick="_wcalNextWeek()" title="Semaine suivante">›</button>
         <span class="wcal-nav-label">${weekLabel}</span>
-        <button class="wcal-export-btn" onclick="exportWeekCSV()" title="Exporter en CSV">📥 CSV</button>
-        <button class="wcal-export-btn wcal-export-pdf" onclick="exportWeekPDF()" title="Imprimer/PDF">🖨️ PDF</button>
+        <button class="wcal-export-btn" onclick="exportWeekCSV()" title="Exporter en CSV"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> CSV</button>
+        <button class="wcal-export-btn wcal-export-pdf" onclick="exportWeekPDF()" title="Imprimer/PDF"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14" rx="1"/></svg> PDF</button>
       </div>
       <div class="wcal-grid">
         <div class="wcal-headers">
