@@ -1285,7 +1285,7 @@ async function initContexteDuJour() {
   const isActive = text.trim().length > 0;
   block.innerHTML = `
     <div class="cj-header" onclick="_cjToggle()">
-      <span class="cj-label">📋 Contexte du jour</span>
+      <span class="cj-label"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>Contexte du jour</span>
       ${isActive ? '<span class="cj-badge">actif</span>' : ''}
       <span class="cj-chevron" id="cjChevron">▾</span>
     </div>
