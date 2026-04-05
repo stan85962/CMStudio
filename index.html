@@ -23,8 +23,7 @@
     </label>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="switchPage('accueil',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg> Accueil</button>
-    <button class="nav-tab" onclick="switchPage('dashboard',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</button>
+    <button class="nav-tab active" onclick="switchPage('dashboard',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</button>
     <button class="nav-tab" onclick="switchPage('studio',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg> Studio</button>
     <button class="nav-tab" onclick="switchPage('historique',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Historique</button>
     <button class="nav-tab" onclick="switchPage('notes',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg> Notes</button>
@@ -66,89 +65,8 @@
 
 <div id="statusBanner" class="status-banner" style="display:none;"></div>
 
-<!-- ===== PAGE : ACCUEIL ===== -->
-<div id="page-accueil" class="page active">
-  <div class="accueil-header">
-    <h2 class="accueil-title">Que voulez-vous créer ?</h2>
-    <p class="accueil-subtitle">Cliquez sur un bloc pour injecter le prompt et lancer la génération</p>
-  </div>
-  <div class="accueil-panels">
-
-    <!-- INTELIXA -->
-    <div class="accueil-panel accueil-panel--intelixa">
-      <div class="accueil-panel-header">
-        <span class="accueil-panel-name">Intelixa</span>
-        <span class="accueil-panel-tag">IA · Automatisation · Pro</span>
-      </div>
-      <div class="accueil-blocs">
-        <div class="accueil-bloc accueil-bloc--intelixa" onclick="_accueilLaunchPrompt('intelixa','Génère un post Facebook Intelixa pain-first, ton professionnel, sans hashtags, sans tirets em, CTA intelixa.fr ou 09.88.57.66.76')">
-          <span class="accueil-bloc-cat">Posts Facebook</span>
-          <span class="accueil-bloc-desc">Post pain-first · CTA intelixa.fr</span>
-        </div>
-        <div class="accueil-bloc accueil-bloc--intelixa" onclick="_accueilLaunchPrompt('intelixa','Écris un post Instagram Intelixa avec accroche forte, une seule idée par post')">
-          <span class="accueil-bloc-cat">Posts Instagram</span>
-          <span class="accueil-bloc-desc">Accroche forte · 1 idée par post</span>
-        </div>
-        <div class="accueil-bloc accueil-bloc--intelixa" onclick="_accueilLaunchPrompt('intelixa','Crée un visuel copy Meta Ads Intelixa, pain-first, avec formulaire lead')">
-          <span class="accueil-bloc-cat">Meta Ads</span>
-          <span class="accueil-bloc-desc">Copy pain-first · formulaire lead</span>
-        </div>
-        <div class="accueil-bloc accueil-bloc--intelixa" onclick="_accueilLaunchPrompt('intelixa','Optimise ce contenu Intelixa pour le SEO et l\'AEO, cible freelances et TPE/PME')">
-          <span class="accueil-bloc-cat">SEO / AEO</span>
-          <span class="accueil-bloc-desc">Cible freelances et TPE/PME</span>
-        </div>
-        <div class="accueil-bloc accueil-bloc--intelixa" onclick="_accueilLaunchPrompt('intelixa','Améliore l\'Intelixa Assistant Chrome Extension Manifest V3')">
-          <span class="accueil-bloc-cat">Extension Chrome</span>
-          <span class="accueil-bloc-desc">Manifest V3 · Intelixa Assistant</span>
-        </div>
-        <div class="accueil-bloc accueil-bloc--intelixa" onclick="_accueilLaunchPrompt('intelixa','Crée un lead magnet PDF Intelixa sur l\'automatisation IA pour TPE/PME')">
-          <span class="accueil-bloc-cat">Lead Magnet</span>
-          <span class="accueil-bloc-desc">PDF automatisation IA · TPE/PME</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="accueil-divider"></div>
-
-    <!-- DOUDELIO -->
-    <div class="accueil-panel accueil-panel--doudelio">
-      <div class="accueil-panel-header">
-        <span class="accueil-panel-name">Doudelio</span>
-        <span class="accueil-panel-tag">Petite enfance · Terrain</span>
-      </div>
-      <div class="accueil-blocs">
-        <div class="accueil-bloc accueil-bloc--doudelio" onclick="_accueilLaunchPrompt('doudelio','Génère un carrousel Doudelio 6 slides arc douleur → CTA pour directrices de crèche')">
-          <span class="accueil-bloc-cat">Carrousel Instagram</span>
-          <span class="accueil-bloc-desc">6 slides · arc douleur → CTA</span>
-        </div>
-        <div class="accueil-bloc accueil-bloc--doudelio" onclick="_accueilLaunchPrompt('doudelio','Crée une série de stories Instagram Doudelio sur [sujet petite enfance]')">
-          <span class="accueil-bloc-cat">Stories</span>
-          <span class="accueil-bloc-desc">Série stories petite enfance</span>
-        </div>
-        <div class="accueil-bloc accueil-bloc--doudelio" onclick="_accueilLaunchPrompt('doudelio','Génère une fiche pédagogique Doudelio sur l\'accueil d\'enfants à besoins spécifiques')">
-          <span class="accueil-bloc-cat">Fiche péda</span>
-          <span class="accueil-bloc-desc">Accueil enfants besoins spécifiques</span>
-        </div>
-        <div class="accueil-bloc accueil-bloc--doudelio" onclick="_accueilLaunchPrompt('doudelio','Écris une séquence email Doudelio pour les leads crèche via MailerLite')">
-          <span class="accueil-bloc-cat">Email marketing</span>
-          <span class="accueil-bloc-desc">Séquence leads crèche · MailerLite</span>
-        </div>
-        <div class="accueil-bloc accueil-bloc--doudelio" onclick="_accueilLaunchPrompt('doudelio','Aide-moi à documenter une action corrective Qualiopi pour Doudelio')">
-          <span class="accueil-bloc-cat">Qualiopi</span>
-          <span class="accueil-bloc-desc">Documentation action corrective</span>
-        </div>
-        <div class="accueil-bloc accueil-bloc--doudelio" onclick="_accueilLaunchPrompt('doudelio','Rédige un brief clair pour Lucie sur la prochaine campagne Doudelio')">
-          <span class="accueil-bloc-cat">Brief équipe</span>
-          <span class="accueil-bloc-desc">Brief Lucie · prochaine campagne</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
 <!-- ===== PAGE : DASHBOARD ===== -->
-<div id="page-dashboard" class="page">
+<div id="page-dashboard" class="page active">
 
   <div class="dash-hero">
     <h1 id="dashTitle">Bonjour !</h1>
@@ -305,6 +223,7 @@
       <button class="cal-quick-btn" onclick="openPreview()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Aperçu</button>
       <button class="cal-quick-btn" onclick="quickAddToCalendar()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg> Calendrier</button>
       <button class="save-accroche-btn" id="saveAccrocheBtn" onclick="saveAccroche()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> Accroche</button>
+      <button class="cal-quick-btn" id="publishBtn" onclick="sendToPublisher()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg> Publier</button>
     </div>
   </div>
 
