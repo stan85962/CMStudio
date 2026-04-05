@@ -78,6 +78,9 @@ function switchPage(page, el) {
   if (page === 'historique')  loadHistorique();
   if (page === 'dashboard')   { updateStats(); loadRecentDashboard(); renderPerfRecap(); }
   if (page === 'adn')         loadADNPage();
+  // Mascotte uniquement visible sur Studio
+  const mw = document.getElementById('mascotteWidget');
+  if (mw) { mw.style.display = page === 'studio' ? '' : 'none'; mw.style.opacity = '0'; }
 }
 
 // ===== INIT =====

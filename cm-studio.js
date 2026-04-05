@@ -118,10 +118,13 @@ function _mascotteGoTo(targetEl, platform) {
   bubble.classList.remove('visible');
 
   const rect = targetEl.getBoundingClientRect();
-  // Positionner la mascotte juste sous le bouton, centrée
+  // Centré horizontalement sur le bouton, positionné AU-DESSUS
   const newLeft   = Math.max(8, rect.left + rect.width / 2 - 27);
-  const newBottom = Math.max(8, window.innerHeight - rect.bottom - 60);
+  const newBottom = Math.max(8, window.innerHeight - rect.top + 8);
 
+  // Rendre visible et animer
+  widget.style.display = '';
+  widget.style.opacity = '1';
   img.src = _MASCOTTE_IMGS.walking;
   widget.classList.add('walking');
   widget.style.left   = newLeft + 'px';
@@ -134,7 +137,10 @@ function _mascotteGoTo(targetEl, platform) {
     const phrase = _MASCOTTE_PHRASES[platform] || "C'est parti !";
     bubble.textContent = phrase;
     bubble.classList.add('visible');
-    _mascotteTimer = setTimeout(() => bubble.classList.remove('visible'), 3000);
+    _mascotteTimer = setTimeout(() => {
+      bubble.classList.remove('visible');
+      widget.style.opacity = '0';
+    }, 3000);
   }, 600);
 }
 
