@@ -329,8 +329,9 @@ body.theme-intelixa .preview-modal{position:fixed;z-index:1000;}
 body.theme-intelixa .res-drawer{position:fixed;z-index:300;}
 body.theme-intelixa .plat-modal-overlay{position:fixed;z-index:2100;}
 body.theme-intelixa .res-overlay{position:fixed;z-index:299;}
-body.theme-intelixa .chat-fab{position:fixed;}
-body.theme-intelixa .chat-window{position:fixed;}
+body.theme-intelixa .chat-fab{position:fixed;z-index:290;}
+body.theme-intelixa .chat-window{position:fixed;z-index:291;}
+body.theme-intelixa .mascotte-widget{position:fixed;z-index:280;}
 .nav-logo{
   font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;
   color:var(--accent);letter-spacing:-0.5px;
