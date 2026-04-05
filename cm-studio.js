@@ -88,6 +88,57 @@ function selectPlatform(p, el) {
   document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderTemplates();
+  _mascotteGoTo(el, p);
+}
+
+// ===== MASCOTTE ANIMÉE =====
+const _MASCOTTE_PHRASES = {
+  facebook:  "On va chauffer la communauté !",
+  instagram: "Ça va scroller fort !",
+  tiktok:    "Let's go viral 🔥",
+  linkedin:  "Mode pro activé !",
+  gmb:       "Google va adorer ça !",
+  youtube:   "Caméra, action !",
+  pinterest: "Pin it !",
+  brevo:     "L'email qui convertit !",
+  spotify:   "On passe en playlist !",
+};
+const _MASCOTTE_IMGS = {
+  default: 'mascotte/heureux.png',
+  walking: 'mascotte/Wave.png',
+};
+let _mascotteTimer = null;
+
+function _mascotteGoTo(targetEl, platform) {
+  const widget = document.getElementById('mascotteWidget');
+  const img    = document.getElementById('mascotteImg');
+  const bubble = document.getElementById('mascotteBubble');
+  if (!widget || !img || !bubble) return;
+
+  // Cacher la bulle
+  bubble.classList.remove('visible');
+
+  // Calcul position cible (centre du bouton plateforme)
+  const rect   = targetEl.getBoundingClientRect();
+  const targetX = rect.left + rect.width / 2 - 27; // centré sur la mascotte (54/2)
+  const targetY = window.innerHeight - rect.bottom - 10;
+
+  // Anim marche
+  img.src = _MASCOTTE_IMGS.walking;
+  widget.classList.add('walking');
+  widget.style.transform = `translate(${targetX - 24}px, -${targetY - 100}px)`;
+
+  clearTimeout(_mascotteTimer);
+  _mascotteTimer = setTimeout(() => {
+    widget.classList.remove('walking');
+    img.src = _MASCOTTE_IMGS.default;
+    // Afficher bulle
+    const phrase = _MASCOTTE_PHRASES[platform] || "C'est parti !";
+    bubble.textContent = phrase;
+    bubble.classList.add('visible');
+    // Cacher la bulle après 3s
+    _mascotteTimer = setTimeout(() => bubble.classList.remove('visible'), 3000);
+  }, 650);
 }
 
 // ===== PLATFORM MANAGEMENT =====
@@ -720,6 +771,40 @@ function copyAB(v) {
 }
 
 // ===== SAVE ACCROCHE =====
+async function sendToPublisher() {
+  const text = abMode
+    ? (document.getElementById('abTextA').textContent || '')
+    : (document.getElementById('resultContent').textContent || '');
+
+  if (!text.trim() || text === '—') {
+    alert('Génère un post avant de publier.');
+    return;
+  }
+
+  const btn = document.getElementById('publishBtn');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.textContent = '…';
+
+  try {
+    const res = await fetch('http://localhost:5001/add-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: text.trim(),
+        brand: selectedBrand || 'intelixa',
+        platform: selectedPlatform || 'gmb',
+      }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    btn.textContent = '✓ Envoyé !';
+    setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 2500);
+  } catch {
+    btn.textContent = '✗ Serveur hors ligne';
+    setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 3000);
+  }
+}
+
 async function saveAccroche() {
   if (!selectedBrand || !selectedPlatform) {
     alert("Choisis une marque et une plateforme pour sauvegarder l'accroche !");
