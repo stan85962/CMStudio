@@ -80,6 +80,22 @@ function switchPage(page, el) {
   if (page === 'adn')         loadADNPage();
 }
 
+// ===== ACCUEIL — LAUNCH PROMPT =====
+function _accueilLaunchPrompt(brand, prompt) {
+  // 1. Switcher la marque
+  selectBrand(brand, null);
+  // 2. Aller sur Studio
+  const studioTab = document.querySelector('.nav-tab[onclick*="\'studio\'"]');
+  if (studioTab) switchPage('studio', studioTab);
+  // 3. Injecter le prompt et focus
+  const textarea = document.getElementById('theme');
+  if (textarea) {
+    textarea.value = prompt;
+    textarea.focus();
+    textarea.dispatchEvent(new Event('input'));
+  }
+}
+
 // ===== INIT =====
 if (!_hasToken()) _showTokenSetup();
 renderCustomBrandCards();
