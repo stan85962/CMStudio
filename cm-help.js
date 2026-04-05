@@ -272,7 +272,7 @@ function helpResetChat() {
 }
 
 function _helpWelcomeHTML() {
-  return `<div class="help-msg help-msg-ai"><div class="help-msg-bubble">Bonjour\u00a0! Je suis l'assistant CMStudio. Pose-moi une question sur l'outil.</div></div>`;
+  return `<div class="help-msg help-msg-ai"><img src="mascotte/Wave.png" class="help-msg-avatar" alt=""><div class="help-msg-bubble">Bonjour\u00a0! Je suis l'assistant Intelixa. Pose-moi une question sur l'outil 😊</div></div>`;
 }
 
 // ---- Envoi ----
@@ -325,6 +325,13 @@ function _helpAppendMsg(role, text) {
   if (!msgs) return;
   const div = document.createElement('div');
   div.className = 'help-msg ' + (role === 'user' ? 'help-msg-user' : 'help-msg-ai');
+  if (role === 'ai') {
+    const avatar = document.createElement('img');
+    avatar.src = 'mascotte/heureux.png';
+    avatar.className = 'help-msg-avatar';
+    avatar.alt = '';
+    div.appendChild(avatar);
+  }
   const bubble = document.createElement('div');
   bubble.className = 'help-msg-bubble';
   bubble.innerHTML = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
@@ -339,7 +346,15 @@ function _helpAppendLoading(id) {
   const div = document.createElement('div');
   div.id = id;
   div.className = 'help-msg help-msg-ai';
-  div.innerHTML = '<div class="help-msg-bubble help-dots"><span></span><span></span><span></span></div>';
+  const avatar = document.createElement('img');
+  avatar.src = 'mascotte/Perplexe.png';
+  avatar.className = 'help-msg-avatar';
+  avatar.alt = '';
+  div.appendChild(avatar);
+  const bubble = document.createElement('div');
+  bubble.className = 'help-msg-bubble help-dots';
+  bubble.innerHTML = '<span></span><span></span><span></span>';
+  div.appendChild(bubble);
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
