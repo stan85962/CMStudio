@@ -2938,7 +2938,7 @@ body.theme-intelixa .res-drawer { background: var(--surface); }
   flex-direction: column;
   align-items: center;
   pointer-events: none;
-  transition: transform .6s cubic-bezier(.4,0,.2,1);
+  transition: left .55s cubic-bezier(.4,0,.2,1), bottom .55s cubic-bezier(.4,0,.2,1);
 }
 .mascotte-img {
   width: 54px;
@@ -3152,7 +3152,7 @@ body.theme-doudelio .mascotte-bubble {
 .help-send-btn:hover { background: var(--accent-hover, #444); transform: scale(1.06); }
 
 /* Intelixa overrides — chatbot */
-body.theme-intelixa .chat-fab { background: #1a56ff; }
+body.theme-intelixa .chat-fab { background: #fff; border-color: rgba(26,86,255,.2); }
 body.theme-intelixa .chat-window { background: var(--surface); }
 body.theme-intelixa .help-msg-ai .help-msg-bubble { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.06); }
 body.theme-intelixa .help-send-btn { background: #1a56ff; }

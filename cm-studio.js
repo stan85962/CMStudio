@@ -115,30 +115,27 @@ function _mascotteGoTo(targetEl, platform) {
   const bubble = document.getElementById('mascotteBubble');
   if (!widget || !img || !bubble) return;
 
-  // Cacher la bulle
   bubble.classList.remove('visible');
 
-  // Calcul position cible (centre du bouton plateforme)
-  const rect   = targetEl.getBoundingClientRect();
-  const targetX = rect.left + rect.width / 2 - 27; // centré sur la mascotte (54/2)
-  const targetY = window.innerHeight - rect.bottom - 10;
+  const rect = targetEl.getBoundingClientRect();
+  // Positionner la mascotte juste sous le bouton, centrée
+  const newLeft   = Math.max(8, rect.left + rect.width / 2 - 27);
+  const newBottom = Math.max(8, window.innerHeight - rect.bottom - 60);
 
-  // Anim marche
   img.src = _MASCOTTE_IMGS.walking;
   widget.classList.add('walking');
-  widget.style.transform = `translate(${targetX - 24}px, -${targetY - 100}px)`;
+  widget.style.left   = newLeft + 'px';
+  widget.style.bottom = newBottom + 'px';
 
   clearTimeout(_mascotteTimer);
   _mascotteTimer = setTimeout(() => {
     widget.classList.remove('walking');
     img.src = _MASCOTTE_IMGS.default;
-    // Afficher bulle
     const phrase = _MASCOTTE_PHRASES[platform] || "C'est parti !";
     bubble.textContent = phrase;
     bubble.classList.add('visible');
-    // Cacher la bulle après 3s
     _mascotteTimer = setTimeout(() => bubble.classList.remove('visible'), 3000);
-  }, 650);
+  }, 600);
 }
 
 // ===== PLATFORM MANAGEMENT =====
