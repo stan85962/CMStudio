@@ -457,13 +457,13 @@ async function generateImage() {
 
     block.innerHTML = `
       <div class="img-result">
-        <img src="${url}" alt="Visuel généré" class="img-result-img" crossorigin="anonymous">
+        <img src="${url}" alt="Visuel généré" class="img-result-img">
         <div class="img-result-meta">
           <span class="img-result-size">${size} · DALL-E 3</span>
           <div class="img-result-actions">
-            <a href="${url}" download="intelixa-${selectedPlatform}.png" class="img-dl-btn" target="_blank">
+            <a href="${url}" class="img-dl-btn" target="_blank">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-              Télécharger
+              Ouvrir &amp; sauvegarder
             </a>
             <button class="img-regen-btn" onclick="generateImage()">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
