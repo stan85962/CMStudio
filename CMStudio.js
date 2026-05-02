@@ -14,7 +14,7 @@ window.storage = {
 // ===== STATE =====
 let selectedBrand = null;
 let selectedPlatform = null;
-let abMode = true;
+let abMode = false;
 
 // ===== DATA =====
 const TEMPLATES = {
@@ -128,12 +128,6 @@ function selectPlatform(p, el) {
   renderTemplates();
 }
 
-// ===== AB MODE =====
-function setABMode(mode, el) {
-  abMode = mode;
-  document.querySelectorAll('.ab-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-}
 
 // ===== TEMPLATES =====
 function renderTemplates() {
@@ -254,52 +248,22 @@ async function generate() {
   const meta = PLATFORMS_META[selectedPlatform];
   document.getElementById('resultHeader').innerHTML = meta.icon + `<div class="result-platform">${meta.label}</div>`;
 
-  if(abMode) {
-    document.getElementById('resultSingle').style.display='none';
-    document.getElementById('resultAB').style.display='block';
-    document.getElementById('copyBtn').style.display='none';
-    document.getElementById('abTextA').innerHTML='<span class="cursor"></span>';
-    document.getElementById('abTextB').innerHTML='<span class="cursor"></span>';
-  } else {
-    document.getElementById('resultSingle').style.display='block';
-    document.getElementById('resultAB').style.display='none';
-    document.getElementById('copyBtn').style.display='flex';
-    document.getElementById('resultContent').innerHTML='<span class="cursor"></span>';
-  }
+  document.getElementById('resultSingle').style.display='block';
+  document.getElementById('copyBtn').style.display='flex';
+  document.getElementById('resultContent').innerHTML='<span class="cursor"></span>';
 
   try {
     const brand = BRAND_CONTEXT[selectedBrand];
-    if(abMode) {
-      const [rA, rB] = await Promise.all([
-        callClaude(brand, theme, 'Version A - premier angle'),
-        callClaude(brand, theme, 'Version B - angle completement different, style different')
-      ]);
-      document.getElementById('abTextA').textContent = rA;
-      document.getElementById('abTextB').textContent = rB;
-      saveToHistory(theme, rA, 'A/B');
-      // Vérification divergence A/B
-      const abSim = similarity(rA, rB);
-      if(abSim > 0.60) {
-        document.getElementById('errorMsg').innerHTML =
-          `<div class="warn-msg">⚠️ Versions A et B trop similaires (${Math.round(abSim*100)}% mots communs) — relancer pour plus de divergence.</div>`;
-      }
-    } else {
-      const result = await callClaude(brand, theme, '');
-      document.getElementById('resultContent').textContent = result;
-      saveToHistory(theme, result, '');
-    }
+    const result = await callClaude(brand, theme, '');
+    document.getElementById('resultContent').textContent = result;
+    saveToHistory(theme, result, '');
     updateStats();
     loadRecentDashboard();
     // Validation longueur post-génération
     checkPostGenLength(textForSEO, selectedPlatform);
   } catch(err) {
     document.getElementById('errorMsg').innerHTML = `<div class="error-msg">❌ ${err.message}</div>`;
-    if(abMode) {
-      document.getElementById('abTextA').textContent = '—';
-      document.getElementById('abTextB').textContent = '—';
-    } else {
-      document.getElementById('resultContent').textContent = '—';
-    }
+    document.getElementById('resultContent').textContent = '—';
   }
 
   btn.disabled = false;
@@ -350,9 +314,6 @@ function copyResult() {
     btn.textContent='✅ Copié !'; btn.classList.add('copied');
     setTimeout(()=>{btn.textContent='📋 Copier';btn.classList.remove('copied');},2000);
   });
-}
-function copyAB(v) {
-  navigator.clipboard.writeText(document.getElementById('abText'+v).innerText);
 }
 
 // ===== HISTORIQUE =====
@@ -1139,9 +1100,7 @@ function formatPreviewText(text, maxLen=400) {
 function openPreview() {
   const modal = document.getElementById('previewModal');
   if(!modal) return;
-  const text = abMode
-    ? (document.getElementById('abTextA').textContent || '')
-    : (document.getElementById('resultContent').textContent || '');
+  const text = document.getElementById('resultContent').textContent || '';
   if(!text || text.length < 5) return;
 
   // Set tabs
@@ -1158,9 +1117,7 @@ function openPreview() {
 function switchPreview(platform, el) {
   document.querySelectorAll('.prev-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  const text = abMode
-    ? (document.getElementById('abTextA').textContent || '')
-    : (document.getElementById('resultContent').textContent || '');
+  const text = document.getElementById('resultContent').textContent || '';
   renderPreviewFor(platform, text);
 }
 

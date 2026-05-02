@@ -279,7 +279,6 @@ async function generateIdea() {
   resultBox.classList.add('visible');
   document.getElementById('resultHeader').innerHTML = meta.icon + `<div class="result-platform">${meta.label}</div>` + _veilleHeaderBadge();
   document.getElementById('resultSingle').style.display = 'block';
-  document.getElementById('resultAB').style.display = 'none';
   document.getElementById('copyBtn').style.display = 'flex';
   document.getElementById('resultContent').innerHTML = '<span class="cursor"></span>';
 
@@ -367,51 +366,21 @@ async function generate() {
   const meta = PLATFORMS_META[selectedPlatform];
   document.getElementById('resultHeader').innerHTML = meta.icon + `<div class="result-platform">${meta.label}</div>` + _veilleHeaderBadge();
 
-  if(abMode) {
-    document.getElementById('resultSingle').style.display='none';
-    document.getElementById('resultAB').style.display='block';
-    document.getElementById('copyBtn').style.display='none';
-    document.getElementById('abTextA').innerHTML='<span class="cursor"></span>';
-    document.getElementById('abTextB').innerHTML='<span class="cursor"></span>';
-  } else {
-    document.getElementById('resultSingle').style.display='block';
-    document.getElementById('resultAB').style.display='none';
-    document.getElementById('copyBtn').style.display='flex';
-    document.getElementById('resultContent').innerHTML='<span class="cursor"></span>';
-  }
+  document.getElementById('resultSingle').style.display='block';
+  document.getElementById('copyBtn').style.display='flex';
+  document.getElementById('resultContent').innerHTML='<span class="cursor"></span>';
 
   try {
     const brand = BRAND_CONTEXT[selectedBrand];
-    if(abMode) {
-      const [rA, rB] = await Promise.all([
-        callClaude(brand, theme, 'Version A - premier angle'),
-        callClaude(brand, theme, 'Version B - angle completement different, style different')
-      ]);
-      document.getElementById('abTextA').textContent = rA;
-      document.getElementById('abTextB').textContent = rB;
-      saveToHistory(theme, rA, 'A/B');
-      // Vérification divergence A/B
-      const abSim = similarity(rA, rB);
-      if(abSim > 0.60) {
-        document.getElementById('errorMsg').innerHTML =
-          `<div class="warn-msg">⚠️ Versions A et B trop similaires (${Math.round(abSim*100)}% mots communs) — relancer pour plus de divergence.</div>`;
-      }
-    } else {
-      const result = await callClaude(brand, theme, '');
-      document.getElementById('resultContent').textContent = result;
-      saveToHistory(theme, result, '');
-    }
+    const result = await callClaude(brand, theme, '');
+    document.getElementById('resultContent').textContent = result;
+    saveToHistory(theme, result, '');
     updateStats();
     loadRecentDashboard();
     checkPostGenLength(textForSEO, selectedPlatform);
   } catch(err) {
     document.getElementById('errorMsg').innerHTML = `<div class="error-msg">❌ ${err.message}</div>`;
-    if(abMode) {
-      document.getElementById('abTextA').textContent = '—';
-      document.getElementById('abTextB').textContent = '—';
-    } else {
-      document.getElementById('resultContent').textContent = '—';
-    }
+    document.getElementById('resultContent').textContent = '—';
   }
 
   btn.disabled = false;
@@ -421,9 +390,7 @@ async function generate() {
 
 // ===== GÉNÉRATION D'IMAGE DALL-E 3 =====
 async function generateImage() {
-  const text = (typeof abMode !== 'undefined' && abMode)
-    ? (document.getElementById('abTextA')?.textContent || '')
-    : (document.getElementById('resultContent')?.textContent || '');
+  const text = document.getElementById('resultContent')?.textContent || '';
 
   if (!text || text === '—' || text.length < 10) {
     alert('Génère d\'abord un post !');

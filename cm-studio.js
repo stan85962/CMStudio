@@ -457,12 +457,6 @@ async function _resetAllPlatforms() {
   await _filterStudioPlatforms(selectedBrand);
 }
 
-// ===== AB MODE =====
-function setABMode(mode, el) {
-  abMode = mode;
-  document.querySelectorAll('.ab-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-}
 
 // ===== TEMPLATES =====
 let _currentDisplayedTplIds = [];
@@ -714,10 +708,6 @@ function copyResult() {
     btn.textContent='✅ Copié !'; btn.classList.add('copied');
     setTimeout(()=>{btn.textContent='📋 Copier';btn.classList.remove('copied');},2000);
   });
-}
-function copyAB(v) {
-  const el = document.getElementById('abText' + v);
-  navigator.clipboard.writeText(el.dataset.rawText || el.innerText);
 }
 
 // ===== SAVE ACCROCHE =====

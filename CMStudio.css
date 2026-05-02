@@ -182,17 +182,6 @@ body.theme-intelixa textarea{font-family:'Inter',sans-serif;font-size:12px;borde
 body.theme-intelixa textarea::placeholder{color:#a8b3c8;}
 body.theme-intelixa textarea:focus{border-color:#1a56ff;box-shadow:none;}
 
-/* ===== AB TOGGLE ===== */
-.ab-toggle{display:flex;gap:8px;margin-top:12px;}
-.ab-btn{
-  padding:6px 14px;border-radius:6px;border:1px solid var(--border);
-  background:transparent;font-family:'Nunito',sans-serif;
-  font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;
-}
-.ab-btn.active{border-color:var(--accent);color:var(--accent);background:var(--surface2);}
-body.theme-intelixa .ab-btn{border-color:#dde3f0;font-family:'Inter',sans-serif;font-size:9px;}
-body.theme-intelixa .ab-btn.active{border-color:#1a56ff;color:#1a56ff;}
-
 /* ===== GENERATE BTN ===== */
 /* ===== BUTTON ROW ===== */
 .btn-row{
@@ -271,17 +260,17 @@ body.theme-intelixa .result-header{background:var(--surface2);border-color:#dde3
 body.theme-intelixa .result-platform{font-family:'Inter',sans-serif;font-size:11px;letter-spacing:2px;}
 .result-content{padding:24px;font-size:14px;line-height:1.8;color:var(--text);white-space:pre-wrap;min-height:100px;font-weight:500;outline:none;border-radius:8px;transition:box-shadow .15s;}
 .result-content:focus{box-shadow:inset 0 0 0 2px var(--accent,#1a56ff);}
-.ab-text[contenteditable]:focus{outline:2px solid var(--accent,#1a56ff);outline-offset:2px;border-radius:6px;}
+
 body.theme-intelixa .result-content{font-family:'Inter',sans-serif;font-size:13px;color:#1e3a5f;}
 
 /* ===== AB RESULTS ===== */
-.ab-results{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;}
-.ab-version{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;}
-body.theme-intelixa .ab-version{background:var(--surface2);border-color:#dde3f0;}
-.ab-label{font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
-body.theme-intelixa .ab-label{color:#1a56ff;font-family:'Inter',sans-serif;}
-.ab-text{font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;max-height:220px;overflow-y:auto;}
-body.theme-intelixa .ab-text{font-family:'Inter',sans-serif;color:#1e3a5f;}
+
+
+body.theme-intelixa 
+
+body.theme-intelixa 
+
+body.theme-intelixa 
 
 /* ===== RESULT FOOTER ===== */
 .result-footer{padding:0 24px 20px;display:flex;gap:8px;flex-wrap:wrap;}
@@ -457,7 +446,7 @@ body.theme-intelixa .dash-hero p{font-family:'Inter',sans-serif;font-size:10px;l
   .brand-row{grid-template-columns:1fr 1fr;}
   .stats-row{grid-template-columns:1fr 1fr;}
   .platforms-grid{grid-template-columns:repeat(3,1fr);}
-  .ab-results{grid-template-columns:1fr;}
+  
   .result-footer{flex-wrap:wrap;}
 }
 /* ===== REGENERATE BTN ===== */
@@ -655,7 +644,7 @@ body.theme-intelixa .prev-tab.active { background: #1a56ff; border-color: #1a56f
   color: var(--text); background: var(--surface);
 }
 /* A/B : plus de hauteur quand structuré */
-.ab-text:has(.struct-list) { max-height: 400px; }
+
 /* Intelixa overrides */
 body.theme-intelixa .struct-num { background: #1a56ff; }
 body.theme-intelixa .struct-title { font-family: 'Inter', sans-serif; color: #1a56ff; }
@@ -2856,17 +2845,10 @@ body.theme-intelixa .veille-chip:hover {
   .btn-row .generate-btn { width: 100%; margin-top: 0; padding: 16px; font-size: 15px; }
   .idea-btn { width: 100%; white-space: normal; padding: 14px 16px; flex: none; }
 
-  .ab-toggle { flex-wrap: wrap; }
-  .ab-btn    { flex: 1; text-align: center; min-height: 44px; }
 
   /* ── 8. RÉSULTAT & A/B ───────────────────────────────── */
   .result-box     { max-width: 100%; border-radius: 16px; }
   .result-content { padding: 16px; }
-  .ab-results {
-    grid-template-columns: 1fr;
-    padding: 12px;
-    gap: 12px;
-  }
   .result-footer { flex-wrap: wrap; gap: 8px; }
   .copy-btn      { min-width: unset; flex: 1; min-height: 44px; }
 
@@ -3452,7 +3434,7 @@ body.dark textarea { background: var(--surface2); color: var(--text); border-col
 body.dark .result-box { border: 1px solid var(--border); }
 body.dark .result-header { background: var(--surface2); border-color: var(--border); }
 body.dark .result-content { background: var(--surface); color: var(--text); }
-body.dark .ab-version { background: var(--surface2); border-color: var(--border); }
+
 body.dark .postit { filter: brightness(.85) saturate(.85); }
 body.dark .plat-modal-overlay { background: rgba(0,0,0,.7); }
 body.dark .plat-modal { background: var(--surface); border-color: var(--border); color: var(--text); }
