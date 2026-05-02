@@ -137,7 +137,7 @@ function renderGreeting() {
   const msg = DAILY_MESSAGES[new Date().getDate() % DAILY_MESSAGES.length];
   el.innerHTML = `
     <div class="greeting-text">
-      <h2>${word}, Stanislas !</h2>
+      <h2>${word} !</h2>
       <p>${msg}</p>
     </div>
   `;

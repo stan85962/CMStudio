@@ -92,7 +92,6 @@ setTimeout(checkReminders, 500);
 setTimeout(renderPerfRecap, 700);
 renderGreeting();
 checkConnectivity();
-setTimeout(initAutopilot, 800);
 setTimeout(initVeille, 850);
 _initMobileNav();
 document.addEventListener('click', () => {
