@@ -2987,22 +2987,22 @@ body.theme-intelixa .adn-textarea:focus { border-color:var(--accent); }
 /* × hide/delete button (visible on hover) */
 .plat-hide-btn {
   position: absolute;
-  top: 5px; right: 5px;
-  width: 18px; height: 18px;
+  top: 4px; right: 4px;
+  width: 16px; height: 16px;
   border-radius: 50%;
-  background: rgba(0,0,0,.42);
-  color: #fff;
+  background: transparent;
+  color: var(--muted);
   border: none;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   opacity: 0;
-  transition: opacity .15s, background .15s;
+  transition: opacity .15s, color .15s, background .15s;
   z-index: 2;
   padding: 0;
   line-height: 1;
 }
 .platform-btn:hover .plat-hide-btn { opacity: 1; }
-.plat-hide-btn:hover { background: #e53935 !important; }
+.plat-hide-btn:hover { background: rgba(229,57,53,.1) !important; color: #e53935 !important; }
 
 /* "+" add platform button — matches brand-add-btn style */
 .platform-btn--add {

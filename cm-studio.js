@@ -194,7 +194,7 @@ async function _filterStudioPlatforms(arg) {
         const x = document.createElement('button');
         x.className = 'plat-hide-btn';
         x.title = 'Masquer cette plateforme';
-        x.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        x.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
         x.addEventListener('click', (e) => { e.stopPropagation(); _hidePlatform(pid); });
         btn.appendChild(x);
       }
