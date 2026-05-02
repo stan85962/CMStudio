@@ -377,7 +377,7 @@ async function generate() {
     saveToHistory(theme, result, '');
     updateStats();
     loadRecentDashboard();
-    checkPostGenLength(textForSEO, selectedPlatform);
+    checkPostGenLength(document.getElementById('resultContent').textContent, selectedPlatform);
   } catch(err) {
     document.getElementById('errorMsg').innerHTML = `<div class="error-msg">❌ ${err.message}</div>`;
     document.getElementById('resultContent').textContent = '—';
