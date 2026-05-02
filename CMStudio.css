@@ -273,27 +273,55 @@ body.theme-intelixa
 body.theme-intelixa 
 
 /* ===== RESULT FOOTER ===== */
-.result-footer{padding:0 24px 20px;display:flex;gap:8px;flex-wrap:wrap;}
-.copy-btn{
-  flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);
-  background:var(--surface2);color:var(--muted);
-  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
-  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;
-  min-width:120px;
+/* ===== RESULT FOOTER ===== */
+.result-footer { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 8px; }
+.rf-primary { display: flex; gap: 8px; }
+.rf-copy {
+  flex: 1; padding: 11px 16px; border-radius: 10px;
+  border: none; background: var(--accent); color: white;
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: opacity .15s;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
 }
-.copy-btn:hover{background:var(--accent);color:white;border-color:var(--accent);}
-.copy-btn.copied{background:var(--accent);color:white;border-color:var(--accent);}
-body.theme-intelixa .copy-btn{border-color:#dde3f0;}
-body.theme-intelixa .copy-btn:hover,.copy-btn.copied{background:#1a56ff;border-color:#1a56ff;color:white;}
-.cal-quick-btn{
-  padding:10px 14px;border-radius:8px;border:1px solid var(--border);
-  background:var(--surface2);color:var(--muted);
-  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
-  cursor:pointer;transition:all .15s;white-space:nowrap;
+.rf-copy:hover { opacity: .85; }
+.rf-copy.copied { background: #27ae60; }
+body.theme-intelixa .rf-copy { background: #1a56ff; }
+body.theme-intelixa .rf-copy.copied { background: #27ae60; }
+.rf-regen {
+  padding: 11px 18px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: var(--surface2); color: var(--muted);
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; gap: 7px; white-space: nowrap;
 }
-.cal-quick-btn:hover{background:var(--accent);color:white;border-color:var(--accent);}
-body.theme-intelixa .cal-quick-btn{border-color:#dde3f0;}
-body.theme-intelixa .cal-quick-btn:hover{background:#1a56ff;border-color:#1a56ff;color:white;}
+.rf-regen:hover { border-color: var(--accent); color: var(--accent); background: var(--surface); }
+body.theme-intelixa .rf-regen { border-color: #dde3f0; }
+body.theme-intelixa .rf-regen:hover { border-color: #1a56ff; color: #1a56ff; }
+.rf-secondary { display: flex; gap: 6px; flex-wrap: wrap; }
+.rf-action {
+  flex: 1; padding: 8px 10px; border-radius: 8px;
+  border: 1.5px solid var(--border); background: var(--surface); color: var(--muted);
+  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;
+}
+.rf-action:hover { border-color: var(--accent); color: var(--text); background: var(--surface2); }
+body.theme-intelixa .rf-action { border-color: #dde3f0; }
+body.theme-intelixa .rf-action:hover { border-color: #1a56ff; color: #1a56ff; }
+.rf-accroche.saved { border-color: #4caf50; color: #27ae60; background: rgba(76,175,80,.08); }
+.rf-image { border-color: rgba(124,58,237,.4); color: #7c3aed; }
+.rf-image:hover { border-color: #7c3aed; color: #7c3aed; background: rgba(124,58,237,.06); }
+.rf-image:disabled { opacity: .45; cursor: not-allowed; }
+/* Legacy — still used in other parts of the app */
+.cal-quick-btn {
+  padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--muted);
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.cal-quick-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+body.theme-intelixa .cal-quick-btn { border-color: #dde3f0; }
+body.theme-intelixa .cal-quick-btn:hover { background: #1a56ff; border-color: #1a56ff; color: white; }
 
 /* ===== RECENT ITEMS ===== */
 .recent-list{width:100%;max-width:740px;display:flex;flex-direction:column;gap:8px;}
@@ -447,20 +475,19 @@ body.theme-intelixa .dash-hero p{font-family:'Inter',sans-serif;font-size:10px;l
   .stats-row{grid-template-columns:1fr 1fr;}
   .platforms-grid{grid-template-columns:repeat(3,1fr);}
   
-  .result-footer{flex-wrap:wrap;}
 }
-/* ===== REGENERATE BTN ===== */
+/* ===== REGENERATE BTN (legacy, used in caption visual) ===== */
 .regen-btn {
-  padding: 12px 20px; border-radius: 14px;
-  border: 2px solid var(--border); background: var(--surface2);
+  padding: 10px 16px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: var(--surface2);
   color: var(--muted); font-family: 'Nunito', sans-serif;
   font-size: 13px; font-weight: 800; cursor: pointer;
-  transition: all .2s ease; white-space: nowrap;
+  transition: all .15s; white-space: nowrap;
   display: flex; align-items: center; gap: 6px;
 }
-.regen-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
-body.theme-intelixa .regen-btn { border-color: #dde3f0; font-family: 'Inter',sans-serif; font-size: 10px; }
-body.theme-intelixa .regen-btn:hover { background: #1a56ff; border-color: #1a56ff; color: white; }
+.regen-btn:hover { border-color: var(--accent); color: var(--accent); }
+body.theme-intelixa .regen-btn { border-color: #dde3f0; }
+body.theme-intelixa .regen-btn:hover { border-color: #1a56ff; color: #1a56ff; }
 
 
 /* ===== PREVIEW MODAL ===== */
@@ -1437,33 +1464,7 @@ body.theme-intelixa .trec-col-label { font-family: 'Inter',sans-serif; font-size
 .token-setup-btn:hover { opacity: .88; }
 .token-setup-hint { font-size: 11px; color: #aaa; margin: 0; }
 
-/* ===== SAVE ACCROCHE BTN ===== */
-.save-accroche-btn {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1.5px solid #7fa882;
-  background: #f1f8e9;
-  color: #388e3c;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .2s, transform .15s;
-}
-.save-accroche-btn:hover { background: #dcedc8; transform: scale(1.04); }
-.save-accroche-btn.saved {
-  background: #c8e6c9;
-  border-color: #4caf50;
-  color: #1b5e20;
-}
-body.theme-intelixa .save-accroche-btn {
-  background: rgba(0,0,0,.04);
-  border-color: #f39c12;
-  color: #f39c12;
-  font-family: 'Inter',sans-serif;
-  font-size: 10px;
-}
-body.theme-intelixa .save-accroche-btn:hover { background: rgba(243,156,18,.12); }
-body.theme-intelixa .save-accroche-btn.saved { background: rgba(39,174,96,.15); border-color: #27ae60; color: #27ae60; }
+/* ===== SAVE ACCROCHE BTN (alias rf-action rf-accroche) ===== */
 
 /* ===== NOTES VIEW TOGGLE ===== */
 .notes-view-toggle {
@@ -2655,8 +2656,9 @@ body.theme-intelixa .veille-chip:hover {
   /* ── 8. RÉSULTAT & A/B ───────────────────────────────── */
   .result-box     { max-width: 100%; border-radius: 16px; }
   .result-content { padding: 16px; }
-  .result-footer { flex-wrap: wrap; gap: 8px; }
-  .copy-btn      { min-width: unset; flex: 1; min-height: 44px; }
+  .result-footer { padding: 0 14px 16px; }
+  .rf-copy, .rf-regen { min-height: 44px; }
+  .rf-action { min-height: 40px; font-size: 11px; padding: 7px 8px; }
 
 
   /* ── 10. DASHBOARD ───────────────────────────────────── */
@@ -2682,7 +2684,7 @@ body.theme-intelixa .veille-chip:hover {
   .veille-label-desc { display: none; }
 
   /* ── 15. REGEN / RESULT ACTIONS ─────────────────────── */
-  .regen-btn { width: 100%; justify-content: center; box-sizing: border-box; min-height: 44px; }
+  .regen-btn { min-height: 44px; }
 
   /* ── 16. RAPPELS ─────────────────────────────────────── */
   .reminders-block { max-width: 100%; }
