@@ -94,6 +94,7 @@ renderGreeting();
 checkConnectivity();
 setTimeout(initAutopilot, 800);
 setTimeout(initVeille, 850);
+_initMobileNav();
 document.addEventListener('click', () => {
   if (openMoveId !== null) { openMoveId = null; getNotes().then(renderNotes); }
 });

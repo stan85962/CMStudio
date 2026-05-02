@@ -461,11 +461,31 @@ function switchPage(page, el) {
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   el.classList.add('active');
+  _mbnSetActive(page);
   if(page==='notes') loadNotes();
   if(page==='studio') setTimeout(initDupeDetector, 100);
   if(page==='calendrier') renderCalendar();
   if(page==='historique') loadHistorique();
   if(page==='dashboard') { updateStats(); loadRecentDashboard(); }
+}
+
+function _mbnSync(el) {
+  document.querySelectorAll('.mbn-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function _mbnSetActive(page) {
+  document.querySelectorAll('.mbn-tab').forEach(t=>{
+    t.classList.toggle('active', t.dataset.page===page);
+  });
+}
+
+function _initMobileNav() {
+  const mq = window.matchMedia('(max-width: 768px)');
+  const nav = document.querySelector('.mobile-bottom-nav');
+  if (!nav) return;
+  const update = () => { nav.style.display = mq.matches ? 'flex' : 'none'; };
+  update();
+  mq.addEventListener('change', update);
 }
 
 // ===== NOTES =====
