@@ -955,7 +955,7 @@ function renderGreeting() {
   el.innerHTML = `
     <div class="greeting-emoji">${emoji}</div>
     <div class="greeting-text">
-      <h2>${word}, Stanislas !</h2>
+      <h2>${word} !</h2>
       <p>${msg}</p>
     </div>
   `;
