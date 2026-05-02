@@ -2824,12 +2824,12 @@ body.theme-intelixa .veille-chip:hover {
   .platform-btn svg { width: 26px; height: 26px; }
   .platform-label   { font-size: 11px; font-weight: 700; }
   .platform-btn--youtube {
-    grid-column: 1 / -1;
-    width: 55%;
-    justify-self: center;
-    height: 60px;
-    flex-direction: row;
-    gap: 8px;
+    grid-column: unset;
+    width: 100%;
+    justify-self: unset;
+    height: auto;
+    flex-direction: column;
+    gap: 6px;
   }
 
   /* ── 7. STUDIO — TEXTAREA / BOUTONS ─────────────────── */
@@ -3467,9 +3467,11 @@ body.dark .res-drawer { background: var(--surface); color: var(--text); }
 
   .page { padding: 12px 12px calc(68px + env(safe-area-inset-bottom, 0px)); }
 
-  .platforms-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .platform-btn   { min-height: 76px; padding: 10px 6px; }
-  .platform-btn--youtube { width: 60%; }
+  .platforms-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .platform-btn   { min-height: 72px; padding: 8px 4px; }
+  .platform-btn svg { width: 24px; height: 24px; }
+  .platform-label { font-size: 10px; }
+  .platform-btn--youtube { grid-column: unset; width: 100%; justify-self: unset; flex-direction: column; gap: 6px; height: auto; }
 
   .brand-btn { padding: 14px 10px; }
   .stat-card { padding: 14px 10px; }
