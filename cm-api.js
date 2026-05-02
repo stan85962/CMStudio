@@ -56,6 +56,12 @@ function getAnthropicToken() {
 
 // ===== MODE VEILLE =====
 let _veilleEnabled = false;
+const _veilleCache = {}; // brandKey → { ts, context }
+const _VEILLE_TTL = 30 * 60 * 1000; // 30 min
+
+const _VEILLE_SECTORS = {
+  intelixa: 'IA appliquée en entreprise, automatisation no-code, outils GPT professionnels, productivité des indépendants et TPE, formation IA, agents IA, nouvelles sorties OpenAI/Mistral/Anthropic'
+};
 
 async function initVeille() {
   try {
@@ -69,14 +75,60 @@ async function initVeille() {
 function toggleVeille(enabled) {
   _veilleEnabled = enabled;
   window.storage.set('veille-enabled', String(enabled));
+  // Vider le cache pour forcer un refresh au prochain post
+  delete _veilleCache[selectedBrand];
   if(typeof renderTemplates === 'function') renderTemplates();
 }
 
+// Fallback statique si l'API est indisponible
 function getVeillePrompt(brandKey) {
-  if (brandKey === 'intelixa') {
-    return ' Avant de générer, appuie-toi sur les tendances IA et bureautique les plus récentes que tu connais en 2025-2026. Ancre le contenu dans l\'actualité du secteur.';
+  const sector = _VEILLE_SECTORS[brandKey] || 'marketing digital et réseaux sociaux';
+  return ` Ancre le contenu dans les tendances actuelles du secteur : ${sector}.`;
+}
+
+// Vraie veille : appel GPT pour récupérer des tendances concrètes, mis en cache 30 min
+async function fetchVeilleContext(brandKey) {
+  const now = Date.now();
+  if (_veilleCache[brandKey] && (now - _veilleCache[brandKey].ts) < _VEILLE_TTL) {
+    return _veilleCache[brandKey].context;
   }
-  return ' Avant de générer, appuie-toi sur les tendances actuelles de la petite enfance, les évolutions réglementaires et les sujets qui buzzent dans le secteur crèche en 2025-2026. Ancre le contenu dans l\'actualité du secteur.';
+
+  const apiCfg = _getAPIConfig();
+  if (!apiCfg.token) return getVeillePrompt(brandKey);
+
+  const sector = _VEILLE_SECTORS[brandKey] || 'marketing digital';
+  const today = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  try {
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiCfg.token}` },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        max_tokens: 350,
+        messages: [
+          {
+            role: 'system',
+            content: 'Tu es un veilleur expert en tendances digitales. Réponds uniquement en français. Sois précis, concret, factuel — pas de généralités.'
+          },
+          {
+            role: 'user',
+            content: `Nous sommes le ${today}. Donne-moi 5 sujets d'actualité brûlants RIGHT NOW dans ce secteur : ${sector}.\n\nPour chaque sujet : une phrase courte (max 15 mots) qui nomme précisément la tendance ou l'événement.\nFormat : liste numérotée, rien d'autre.`
+          }
+        ]
+      })
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.choices) throw new Error('api');
+
+    const topics = data.choices[0].message.content.trim();
+    const context = `\n\nTENDANCES ACTUELLES DU SECTEUR (${today}) — utilise ces angles concrets :\n${topics}\n\nAncre obligatoirement le post dans une de ces tendances réelles.`;
+
+    _veilleCache[brandKey] = { ts: now, context };
+    return context;
+  } catch(e) {
+    return getVeillePrompt(brandKey); // fallback statique
+  }
 }
 
 function _veilleHeaderBadge() {
@@ -130,7 +182,7 @@ async function callClaude(brand, theme, variant) {
     _platformPrompt = `Génère du contenu pour ${brand.label || selectedBrand} sur ${selectedPlatform}. Prêt à publier, sans commentaire.`;
   }
 
-  const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
+  const veilleInject = _veilleEnabled ? await fetchVeilleContext(selectedBrand) : '';
   const seoInject = _lengthConstraint(selectedPlatform);
   const adnContext = await buildADNContext(selectedBrand);
 
@@ -286,7 +338,7 @@ async function generateIdea() {
     const apiCfg = _getAPIConfig();
     if(!apiCfg.token) throw new Error("Clé API manquante — ajoute ta clé OpenAI dans config.js.");
 
-    const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
+    const veilleInject = _veilleEnabled ? await fetchVeilleContext(selectedBrand) : '';
     const seoInject = _lengthConstraint(selectedPlatform);
     const adnContext = await buildADNContext(selectedBrand);
 

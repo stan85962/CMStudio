@@ -582,7 +582,7 @@ async function _renderVeilleTemplates() {
   if(!token) { _renderTemplatesStatic(); return; }
 
   const brand = BRAND_CONTEXT[selectedBrand];
-  const veilleContext = getVeillePrompt(selectedBrand);
+  const veilleContext = await fetchVeilleContext(selectedBrand);
 
   try {
     const _studioApiCfg = (typeof _getAPIConfig === 'function') ? _getAPIConfig() : { endpoint: 'https://api.openai.com/v1/chat/completions', token };
