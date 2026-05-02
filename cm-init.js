@@ -120,15 +120,6 @@ const _ADN_DEFAULTS = {
     signature: `L'IA n'est plus un luxe, c'est une arme. Ceux qui ignorent l'IA perdent du temps, de l'argent et des clients — chaque jour. Automatise ou reste à la traîne.`,
     tabous: `Jargon technique incompréhensible. Promesses vagues sans chiffres. Culpabilisation. Ton corporate bullshit. Présenter l'IA comme simple tendance ou gadget. Mettre le CPF en avant comme argument principal.`
   },
-  doudelio: {
-    entreprise: `Doudelio est une plateforme de formations dédiée aux professionnels de la petite enfance : auxiliaires de puéricultrice, éducatrices de jeunes enfants, directrices de crèche. Accompagnement d'équipes, formations réglementaires et pédagogiques.`,
-    cible: `Auxiliaires de puéricultrice, éducatrices de jeunes enfants, directrices de crèche. Douleurs : épuisement professionnel, burn-out, sous-effectif, manque de reconnaissance, turn-over. Aspirations : se former, progresser, trouver du soutien, améliorer les pratiques.`,
-    ton: `Humain, chaleureux, compréhensif, non moralisateur. Bienveillant et ancré dans le terrain. Jamais condescendant. Toujours positif. Vouvoiement ou tutoiement selon le contexte.`,
-    offres: `Formations en ligne et présentiel pour équipes de crèche. Catalogue : pédagogie active, réglementation EAJE, gestion d'équipe, soins et bien-être, accueil inclusif. Financement OPCO possible.`,
-    concurrents: `Organismes de formation petite enfance généralistes. Différenciation : spécialisation crèche exclusive, proximité terrain, ton bienveillant, expertise pédagogique de terrain.`,
-    signature: `Parce que les tout-petits méritent les meilleurs pros. Doudelio, c'est le terrain d'abord.`,
-    tabous: `Culpabilisation. Ton moralisateur. Promesses irréalistes. Négliger la réalité du terrain. Termes médicaux inaccessibles.`
-  }
 };
 
 function _initADN() {

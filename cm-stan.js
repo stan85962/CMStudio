@@ -317,15 +317,15 @@ async function toggleStanAISort() {
 }
 
 async function _stanCallAISort(ideas) {
-  const token = getGithubToken();
-  if (!token) throw new Error('Token GitHub manquant — colle ton token en haut de la page');
+  const _stanApiCfg = (typeof _getAPIConfig === 'function') ? _getAPIConfig() : { endpoint: 'https://api.openai.com/v1/chat/completions', token: (typeof getGithubToken === 'function' ? getGithubToken() : '') };
+  if (!_stanApiCfg.token) throw new Error('Clé API manquante — vérifie config.js');
 
   const list   = ideas.map((i, n) => `${n + 1}. ${i.text}`).join('\n');
   const prompt = `Classe ces idées de contenu social media dans ces catégories exactes : POV, Tutorial, Controverse, Question, Storytelling, Autre.\n\nIdées à classer :\n${list}\n\nRéponds UNIQUEMENT en JSON valide sans markdown avec ce format exact :\n{"POV":[],"Tutorial":[],"Controverse":[],"Question":[],"Storytelling":[],"Autre":[]}`;
 
-  const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+  const resp = await fetch(_stanApiCfg.endpoint, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_stanApiCfg.token}` },
     body: JSON.stringify({
       model: 'gpt-4o',
       max_tokens: 800,

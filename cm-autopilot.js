@@ -47,9 +47,6 @@ function renderAutopilotBlock() {
         <label class="ap-brand-radio">
           <input type="radio" name="apBrand" value="intelixa" ${brandVal === 'intelixa' ? 'checked' : ''}> INTELIXA
         </label>
-        <label class="ap-brand-radio">
-          <input type="radio" name="apBrand" value="doudelio" ${brandVal === 'doudelio' ? 'checked' : ''}> DOUDELIO
-        </label>
       </div>
 
       <div class="ap-plat-grid">
@@ -133,9 +130,11 @@ async function _apRunAll() {
 
 // ===== GENERATE FOR ONE PLATFORM =====
 async function _apGenerateForPlatform(brandKey, platform) {
-  const token = (document.getElementById('apiKeyInput')?.value
-    || localStorage.getItem('cm_github_token') || '').trim();
-  if (!token) throw new Error('Token manquant — colle ton token en haut.');
+  const apiCfg = (typeof _getAPIConfig === 'function') ? _getAPIConfig() : {
+    endpoint: 'https://api.openai.com/v1/chat/completions',
+    token: (document.getElementById('apiKeyInput')?.value || localStorage.getItem('cm_openai_token') || localStorage.getItem('cm_github_token') || '').trim()
+  };
+  if (!apiCfg.token) throw new Error('Clé API manquante — vérifie config.js');
 
   const brand = BRAND_CONTEXT[brandKey];
   if (!brand) throw new Error('Marque inconnue');
@@ -145,9 +144,9 @@ async function _apGenerateForPlatform(brandKey, platform) {
     ? _customRes.value
     : PLATFORM_PROMPTS[platform](brand);
 
-  const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+  const resp = await fetch(apiCfg.endpoint, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiCfg.token}` },
     body: JSON.stringify({
       model: 'gpt-4o',
       max_tokens: 1000,

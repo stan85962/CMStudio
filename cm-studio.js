@@ -4,13 +4,13 @@ function selectBrand(brand, el) {
   selectedBrand = brand;
   document.querySelectorAll('.brand-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.brand-btn.'+brand).forEach(b => b.classList.add('active'));
-  document.body.classList.remove('theme-intelixa','theme-doudelio','theme-stan','theme-custom');
+  document.body.classList.remove('theme-intelixa','theme-stan','theme-custom');
   document.body.classList.add('theme-'+brand);
   document.body.style.removeProperty('--accent');
   document.body.style.removeProperty('--accent2');
   window._currentCustomBrand = null;
   if (typeof _filterStudioPlatforms === 'function') _filterStudioPlatforms(selectedBrand);
-  document.title = (brand === 'intelixa' ? 'INTELIXA' : brand === 'doudelio' ? 'Doudelio' : brand) + ' · Studio CM';
+  document.title = (brand === 'intelixa' ? 'INTELIXA' : brand) + ' · Studio CM';
 
   // --- MODE STAN ---
   if (brand === 'stan') {
@@ -40,7 +40,7 @@ function selectBrand(brand, el) {
   const dashTitle = document.getElementById('dashTitle');
   const dashSub = document.getElementById('dashSubtitle');
   if(dashTitle) {
-    dashTitle.textContent = brand==='intelixa' ? 'INTELIXA STUDIO' : 'Bienvenue Doudelio';
+    dashTitle.textContent = 'INTELIXA STUDIO';
     dashTitle.style.fontFamily = brand==='intelixa' ? "'Orbitron',monospace" : "'Nunito',sans-serif";
   }
   if(dashSub) {
@@ -88,60 +88,6 @@ function selectPlatform(p, el) {
   document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderTemplates();
-  _mascotteGoTo(el, p);
-}
-
-// ===== MASCOTTE ANIMÉE =====
-const _MASCOTTE_PHRASES = {
-  facebook:  "On va chauffer la communauté !",
-  instagram: "Ça va scroller fort !",
-  tiktok:    "Let's go viral 🔥",
-  linkedin:  "Mode pro activé !",
-  gmb:       "Google va adorer ça !",
-  youtube:   "Caméra, action !",
-  pinterest: "Pin it !",
-  brevo:     "L'email qui convertit !",
-  spotify:   "On passe en playlist !",
-};
-const _MASCOTTE_IMGS = {
-  default: 'mascotte/heureux.png',
-  walking: 'mascotte/Wave.png',
-};
-let _mascotteTimer = null;
-
-function _mascotteGoTo(targetEl, platform) {
-  const widget = document.getElementById('mascotteWidget');
-  const img    = document.getElementById('mascotteImg');
-  const bubble = document.getElementById('mascotteBubble');
-  if (!widget || !img || !bubble) return;
-
-  bubble.classList.remove('visible');
-
-  const rect = targetEl.getBoundingClientRect();
-  // Centré horizontalement sur le bouton, positionné AU-DESSUS
-  const newLeft   = Math.max(8, rect.left + rect.width / 2 - 27);
-  const newBottom = Math.max(8, window.innerHeight - rect.top + 8);
-
-  // Rendre visible et animer
-  widget.style.display = '';
-  widget.style.opacity = '1';
-  img.src = _MASCOTTE_IMGS.walking;
-  widget.classList.add('walking');
-  widget.style.left   = newLeft + 'px';
-  widget.style.bottom = newBottom + 'px';
-
-  clearTimeout(_mascotteTimer);
-  _mascotteTimer = setTimeout(() => {
-    widget.classList.remove('walking');
-    img.src = _MASCOTTE_IMGS.default;
-    const phrase = _MASCOTTE_PHRASES[platform] || "C'est parti !";
-    bubble.textContent = phrase;
-    bubble.classList.add('visible');
-    _mascotteTimer = setTimeout(() => {
-      bubble.classList.remove('visible');
-      widget.style.opacity = '0';
-    }, 3000);
-  }, 600);
 }
 
 // ===== PLATFORM MANAGEMENT =====
@@ -645,9 +591,10 @@ async function _renderVeilleTemplates() {
   const veilleContext = getVeillePrompt(selectedBrand);
 
   try {
-    const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+    const _studioApiCfg = (typeof _getAPIConfig === 'function') ? _getAPIConfig() : { endpoint: 'https://api.openai.com/v1/chat/completions', token };
+    const resp = await fetch(_studioApiCfg.endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_studioApiCfg.token}` },
       body: JSON.stringify({
         model: 'gpt-4o',
         max_tokens: 200,
@@ -945,8 +892,7 @@ async function checkDuplicates() {
 
 // ===== SEO/AEO ANALYZER =====
 const SEO_KEYWORDS = {
-  intelixa: ['automatisation IA freelance','gagner du temps avec l\'IA','IA pour solopreneur','automatiser son business','productivité IA indépendant','économiser avec l\'IA','process automatisé IA','IA TPE PME 2026','formation IA entrepreneur','IA game changer business'],
-  doudelio: ['crèche','petite enfance','auxiliaire','puéricultrice','éducatrice','accueil','tout-petits','formation','pédagogie','CAP','terrain','bienveillance']
+  intelixa: ['automatisation IA freelance','gagner du temps avec l\'IA','IA pour solopreneur','automatiser son business','productivité IA indépendant','économiser avec l\'IA','process automatisé IA','IA TPE PME 2026','formation IA entrepreneur','IA game changer business']
 };
 
 const AEO_INDICATORS = ['comment','pourquoi','quand','quel','quelle','combien','qui','est-ce que','faut-il','doit-on','peut-on','vaut-il mieux'];
@@ -1093,10 +1039,8 @@ function _prevBrandData(brand) {
   const label = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1).toLowerCase();
   const initials = rawLabel.substring(0, 2).toUpperCase();
   const ig = brand === 'intelixa' ? 'intelixa_off'
-           : brand === 'doudelio' ? 'doudelio_creche'
            : brand.toLowerCase().replace(/\s+/g, '_');
   const sub1 = brand === 'intelixa' ? 'Expert IA & Automatisation · Intelixa'
-             : brand === 'doudelio' ? 'Spécialiste petite enfance · Doudelio'
              : label;
   return { label, initials, ig, sub1 };
 }
@@ -1195,7 +1139,7 @@ const PREVIEW_TEMPLATES = {
       <div class="prev-header">
         <div class="prev-avatar" style="background:#4285F4;">G</div>
         <div>
-          <div class="prev-name">${brand==='intelixa'?'Intelixa':'Doudelio'}</div>
+          <div class="prev-name">Intelixa</div>
           <div class="prev-meta">Google · Vient de publier</div>
         </div>
       </div>
@@ -1241,7 +1185,7 @@ const PREVIEW_TEMPLATES = {
       </div>
       <div class="prev-pin-body">
         <div class="prev-name" style="font-size:14px;margin-bottom:6px;">${text.substring(0,60)}${text.length>60?'...':''}</div>
-        <div class="prev-meta">${brand==='intelixa'?'intelixa.fr':'doudelio.com'}</div>
+        <div class="prev-meta">intelixa.fr</div>
       </div>
     </div>`,
 
@@ -1252,7 +1196,7 @@ const PREVIEW_TEMPLATES = {
         <div style="font-size:11px;color:${brand==='intelixa'?'#aaa':'#555'};margin-top:8px;text-align:center;">Prompt Veo</div>
       </div>
       <div class="prev-tiktok-caption">
-        <div class="prev-name">@${brand==='intelixa'?'intelixa':'doudelio'}</div>
+        <div class="prev-name">@intelixa</div>
         <div class="prev-body" style="padding:0;font-size:12px;">${formatPreviewText(text, 150)}</div>
       </div>
     </div>`,
@@ -1262,15 +1206,15 @@ const PREVIEW_TEMPLATES = {
       <div class="prev-spotify-img" style="background:${brand==='intelixa'?'linear-gradient(135deg,#1a0a0a,#2a1010)':'linear-gradient(135deg,#e8f5e4,#c8e6c9)'};">
         <span style="font-size:36px;">🎧</span>
       </div>
-      <div class="prev-name">Épisode · ${brand==='intelixa'?'Intelixa Podcast':'Doudelio Podcast'}</div>
+      <div class="prev-name">Épisode · Intelixa Podcast</div>
       <div class="prev-body">${formatPreviewText(text, 200)}</div>
     </div>`,
 
   brevo: (text, brand) => `
     <div class="preview-brevo">
-      <div class="prev-brevo-header" style="background:${brand==='intelixa'?'#1a0a0a':'#384786'};">
-        <span style="font-size:22px;">${brand==='intelixa'?'⚡':'🌱'}</span>
-        <span style="color:white;font-weight:800;font-size:14px;">${brand==='intelixa'?'INTELIXA':'DOUDELIO'}</span>
+      <div class="prev-brevo-header" style="background:#1a0a0a;">
+        <span style="font-size:22px;">⚡</span>
+        <span style="color:white;font-weight:800;font-size:14px;">INTELIXA</span>
       </div>
       <div class="prev-body" style="padding:16px;">${formatPreviewText(text, 300)}</div>
       <div class="prev-gmb-btn" style="margin:0 16px 16px;">Lire l'email complet</div>
@@ -1284,7 +1228,7 @@ const PREVIEW_TEMPLATES = {
       </div>
       <div class="prev-yt-info">
         <div class="prev-yt-title">${text.substring(0,80)}${text.length>80?'...':''}</div>
-        <div class="prev-meta">${brand==='intelixa'?'Intelixa':'Doudelio'} · 0 vue · À l'instant</div>
+        <div class="prev-meta">Intelixa · 0 vue · À l'instant</div>
         <div class="prev-body" style="padding:0;margin-top:8px;">${formatPreviewText(text, 250)}</div>
       </div>
     </div>`

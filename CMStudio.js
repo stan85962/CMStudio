@@ -28,16 +28,6 @@ const TEMPLATES = {
     spotify:   ['Episode : IA pour les nuls en entreprise','Témoignage : 10h gagnées par semaine','Formation CPF : par où commencer ?','Automatisation sans coder : cest possible'],
     brevo:     ['Newsletter : outils IA du mois','Email : nouvelle formation disponible','Campagne : CPF avant fin dannée','Recap : astuces productivité semaine']
   },
-  doudelio: {
-    tiktok:    ['Journée type auxiliaire de puéricultrice','Geste qui calme un enfant qui pleure','Activité motricité 18 mois facile','Quand un tout-petit refuse de dormir'],
-    linkedin:  ['Burn-out en crèche : parlons-en vraiment','Recrutement auxiliaire en 2026 : galère ?','Formation continue en petite enfance','Management bienveillant en structure daccueil'],
-    instagram: ['Carousel activité éveil 0-3 ans','Idée déco coin lecture crèche','Routine accueil matin en crèche','Tenue Doudelio pour les pros du terrain'],
-    gmb:       ['Crèche bienveillante et pédagogie active','Formation auxiliaire petite enfance','Accompagnement équipe de crèche','Réglementation accueil collectif 2026'],
-    facebook:  ['Question aux parents : ce que vous appréciez','Conseil du jour pour les pros de crèche','Partage expérience terrain auxiliaire','Événement formation petite enfance'],
-    pinterest: ['Idées activités sensorielles bébé','Aménagement espace de vie crèche','Planning semaine type structure','Fiche technique soin nouveau-né'],
-    spotify:   ['Episode : épuisement professionnel en crèche','Témoignage : auxiliaire depuis 10 ans','Pédagogie Montessori en collectif','Accueil enfant handicapé en crèche'],
-    brevo:     ['Newsletter : nouveautés réglementation','Email : formation disponible en ligne','Campagne : journée portes ouvertes','Recap : conseils terrain de la semaine']
-  }
 };
 
 const PLATFORM_EMO = {
@@ -62,63 +52,14 @@ const BRAND_CONTEXT = {
     desc: "IA appliquée, automatisation, performance professionnelle. Cible : dirigeants, RH, indépendants, formateurs. Ton : expert, pragmatique, démystificateur, accessible, sans bullshit.",
     tiktok_context: "scène dans un bureau ou environnement professionnel montrant l'IA en action"
   },
-  doudelio: {
-    label: 'DOUDELIO',
-    desc: "Petite enfance, pédagogie, terrain en crèche. Cible : professionnelles de crèche, auxiliaires, éducatrices. Ton : humain, chaleureux, compréhensif, non moralisateur.",
-    tiktok_context: 'scène dans une crèche'
-  }
 };
 
 const PLATFORM_PROMPTS = {
-  tiktok: (b) => {
-    if (b.label === 'DOUDELIO') {
-      return `Génère un prompt pour Veo en respectant ces règles exactes.
-
-Thème de la scène : ${b.tiktok_context} — basé sur ce thème : ` + document.getElementById('theme').value + `
-
-La description de la scène doit être en anglais, centrée uniquement sur l'action et l'ambiance sonore, sans détails inutiles.
-
-Les dialogues doivent suivre ces règles précises :
-- Dialogues uniquement en français
-- Utiliser Child say ou Worker say
-- Chaque dialogue doit être écrit sur une nouvelle ligne
-- Ne pas utiliser ! ? ... ni de parenthèses
-- Terminer par la phrase : Dialogues must stay in French
-
-Le contenu doit respecter les règles de confidentialité et de sécurité de Veo.`;
-    } else {
-      return 'Le prompt TikTok pour Intelixa est en cours de création. Reviens bientôt ! 🌱';
-    }
-  },
+  tiktok: () => 'Le prompt TikTok pour Intelixa est en cours de création. Reviens bientôt ! 🌱',
   linkedin: () => `Génère un post LinkedIn professionnel de 150-250 mots :\n- 1ère ligne = accroche forte pour stopper le scroll\n- Structure : accroche / développement / enseignement / CTA\n- 5 hashtags pertinents à la fin`,
-  instagram: (b) => {
-    if (b.label === 'DOUDELIO') {
-      return `Tu es créateur de contenu Instagram spécialisé dans la petite enfance pour la marque Doudelio.
-
-Quand je te donne un sujet + un nombre de slides, tu produis automatiquement un carrousel Instagram.
-
-POUR CHAQUE SLIDE :
-A) Deux phrases courtes — simple, percutante, adaptée aux parents et pros de la petite enfance. Ton bienveillant, positif et accessible.
-B) DESCRIPTION VISUELLE (obligatoire) selon le style Doudelio :
-
-STYLE GRAPHIQUE : Flat design minimaliste pastel. Aplats de couleurs douces, sans contours. Formes arrondies, ambiance chaleureuse. Personnages stylisés, simples, expressifs, en posture de crèche. Aucun texte sur l'image.
-
-IDENTITÉ DOUDELIO : Chaque éducateur porte un tee-shirt Doudelio bleu #384786 avec "Doudelio" écrit en blanc. Enfants + adultes (crèche). Petites touches #DF6163 dans accessoires/détails (jamais couleur dominante).
-
-MISE EN PAGE : Fond principal azur très clair #f5f7f8. Format carré 1080x1080 px (compatible Canva). Style cohérent sur toutes les slides.
-
-CONTRAINTES PÉDAGOGIQUES : Ton positif, jamais culpabilisant. Messages simples, digestes, utiles. Le dernier panneau doit OBLIGATOIREMENT se terminer par une phrase engageante + une question ouverte pour encourager les commentaires.
-
-CONTRAINTES GRAPHIQUES : Style 2D minimaliste (pas Pixar détaillé, pas 3D). Fond uni #f5f7f8. Aucun texte. Tee-shirt Doudelio sur les éducateurs. Cadrage carré. Illustrations adaptées pour Instagram.
-
-RÈGLE AUTOMATIQUE : Tu génères directement la liste complète des slides (texte + description visuelle). Tu attends mon GO avant de générer les images.`;
-    } else {
-      return `Génère une légende Instagram complète pour Intelixa :\n- Accroche percutante en 1ère ligne\n- Storytelling court orienté performance\n- Question pour engager\n- 15 hashtags à la fin`;
-    }
-  },
-  gmb: (b) => {
-    if (b.label === 'INTELIXA') {
-      return `Tu génères un post Google Business pour Intelixa.
+  instagram: () => `Génère une légende Instagram complète pour Intelixa :\n- Accroche percutante en 1ère ligne\n- Storytelling court orienté performance\n- Question pour engager\n- 15 hashtags à la fin`,
+  gmb: () => {
+    return `Tu génères un post Google Business pour Intelixa.
 Tu choisis toi-même le sujet stratégique parmi les thématiques IA et bureautique appliquées aux métiers : RH, comptabilité, gestion commerciale, direction, administratif, pilotage, marketing, automatisation Excel, structuration d'entreprise, conformité fiscale, digitalisation TPE.
 Tu ne dois jamais te répéter. Ni angle. Ni chiffres. Ni structure. Ni promesse. Ni vocabulaire dominant. Chaque post doit être différent des précédents.
 
@@ -141,50 +82,9 @@ SEO et AEO : Intégrer de manière fluide et naturelle des mots-clés comme : fo
 À fournir :
 1. Un prompt d'image professionnel, réaliste, moderne, sans texte sur l'image
 2. Le post Google Business optimisé référencement France`;
-    } else {
-      return `Génère un post Google My Business de 100-150 mots pour Doudelio :\n- Informatif, humain, ancré dans le quotidien de la petite enfance\n- 1 CTA simple à la fin`;
-    }
   },
   facebook: () => `Génère un post Facebook engageant de 100-200 mots :\n- Ton accessible et chaleureux\n- Invite au commentaire ou partage\n- 1 question ou CTA à la fin`,
-  pinterest: (b) => {
-    if (b.label === 'DOUDELIO') {
-      return `Tu es un expert en stratégie Pinterest, SEO et AEO. Tu travailles pour Doudelio, plateforme dédiée aux professionnels de la petite enfance.
-
-Site de référence obligatoire : https://doudelio.com
-Toutes les idées doivent impérativement être reliées à une page réelle du site.
-Exception : Ne jamais utiliser ni se référencer à la page https://doudelio.com/actualite-petite-enfance/
-
-OBJECTIF : Générer de la visibilité qualifiée via le SEO Pinterest, se positionner sur des requêtes conversationnelles (AEO), générer des clics sortants vers le site, renforcer le positionnement expert auprès des directions et équipes de crèche.
-
-STRUCTURE OBLIGATOIRE POUR CHAQUE PROPOSITION :
-1. Pilier utilisé
-2. Page ciblée exacte du site (hors page actualité)
-3. Intention SEO
-4. Intention AEO (question réelle d'un professionnel)
-5. Angle terrain précis
-6. Titre Pinterest
-7. Promesse claire
-8. Mots-clés SEO + AEO (sans virgules, séparés uniquement par des espaces)
-9. Objectif (Visibilité ou Clic)
-10. Description précise de la scène illustrée (sans texte intégré dans l'image)
-
-PILIERS AUTORISÉS : Formations du catalogue, Obligations réglementaires liées à la formation continue, Solution Doudelio (plateforme, organisation, fonctionnement), Gestion et management d'équipe en crèche (si relié à une page du site), Offres et accompagnement proposés.
-
-STYLE GRAPHIQUE : Flat design minimaliste pastel. Aplats de couleurs douces, sans contours. Formes arrondies, ambiance chaleureuse. Personnages stylisés, simples, expressifs, en posture de crèche. Aucun texte sur l'image.
-
-IDENTITÉ DOUDELIO : Chaque éducateur porte un tee-shirt Doudelio bleu #384786 avec "Doudelio" écrit en blanc. Enfants + adultes (crèche). Petites touches #DF6163 dans accessoires/détails (jamais couleur dominante). Fond principal azur très clair #f5f7f8. Format carré 1080x1080 px.
-
-CONTRAINTES : Ton positif, jamais culpabilisant. Messages simples, digestes, utiles. Style 2D minimaliste (pas Pixar détaillé, pas 3D). Fond uni #f5f7f8. Aucun texte. Uniquement une illustration sur l'image.
-
-POSITIONNEMENT : Chaque épingle doit résoudre un problème métier concret, être applicable en crèche, montrer une compréhension du terrain, suggérer plutôt qu'expliquer visuellement, donner envie de cliquer via la légende.
-
-À LA FIN, toujours demander :
-A) Souhaitez-vous créer l'image ?
-B) Souhaitez-vous ajuster un élément stratégique (angle, titre, SEO, promesse) ?`;
-    } else {
-      return `Génère une description d'épingle Pinterest de 100-150 mots pour Intelixa :\n- Inspirant et utile\n- Mots-clés SEO intégrés\n- 5 hashtags à la fin`;
-    }
-  },
+  pinterest: () => `Génère une description d'épingle Pinterest de 100-150 mots pour Intelixa :\n- Inspirant et utile\n- Mots-clés SEO intégrés\n- 5 hashtags à la fin`,
   brevo: (b) => `Génère un email marketing pour ${b.label} :\n- Objet percutant (max 50 caractères)\n- Préheader accrocheur\n- Corps de l'email : introduction chaleureuse, contenu principal, CTA clair\n- Ton adapté à la marque\n- Longueur : 150-250 mots`,
   spotify: () => `Génère une description d'épisode podcast Spotify de 150-250 mots :\n- Accroche forte dès la 1ère phrase\n- Résumé du thème\n- Ce que l'auditeur va apprendre\n- CTA : s'abonner, laisser un avis`
 };
@@ -194,13 +94,13 @@ function selectBrand(brand, el) {
   selectedBrand = brand;
   document.querySelectorAll('.brand-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.brand-btn.'+brand).forEach(b => b.classList.add('active'));
-  document.body.classList.remove('theme-intelixa','theme-doudelio');
+  document.body.classList.remove('theme-intelixa');
   document.body.classList.add('theme-'+brand);
 
   const dashTitle = document.getElementById('dashTitle');
   const dashSub = document.getElementById('dashSubtitle');
   if(dashTitle) {
-    dashTitle.textContent = brand==='intelixa' ? 'INTELIXA STUDIO' : 'Bienvenue Doudelio 🌱';
+    dashTitle.textContent = 'INTELIXA STUDIO';
     dashTitle.style.fontFamily = brand==='intelixa' ? "'Orbitron',monospace" : "'Nunito',sans-serif";
   }
   if(dashSub) {
@@ -277,16 +177,16 @@ async function generateIdea() {
   document.getElementById('resultContent').innerHTML = '<span class="cursor"></span>';
 
   try {
-    const token = getGithubToken();
-    if(!token) throw new Error("Token GitHub manquant — colle ton token dans le champ 🔑 en haut de la page.");
+    const _ideaApiCfg = (typeof _getAPIConfig === 'function') ? _getAPIConfig() : { endpoint: 'https://api.openai.com/v1/chat/completions', token: getGithubToken() };
+    if(!_ideaApiCfg.token) throw new Error("Clé API manquante — vérifie config.js");
 
     const ideaTheme = `Choisis toi-même l'idée la plus pertinente du moment pour ${brand.label} sur ${selectedPlatform}. Lance-toi directement dans le contenu, sans préciser le thème choisi au préalable.`;
 
-    const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+    const resp = await fetch(_ideaApiCfg.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${_ideaApiCfg.token}`
       },
       body: JSON.stringify({
         model: 'gpt-4o',
@@ -411,18 +311,20 @@ async function generate() {
 }
 
 function getGithubToken() {
-  return (document.getElementById('apiKeyInput')?.value || localStorage.getItem('cm_github_token') || '').trim();
+  if (typeof _getAPIConfig === 'function') return _getAPIConfig().token;
+  return (typeof CONFIG !== 'undefined' && CONFIG.OPENAI_TOKEN ? CONFIG.OPENAI_TOKEN : '') ||
+    (document.getElementById('apiKeyInput')?.value || localStorage.getItem('cm_openai_token') || localStorage.getItem('cm_github_token') || '').trim();
 }
 
 async function callClaude(brand, theme, variant) {
-  const token = getGithubToken();
-  if(!token) throw new Error("Token GitHub manquant — colle ton token dans le champ 🔑 en haut de la page.");
+  const apiCfg = (typeof _getAPIConfig === 'function') ? _getAPIConfig() : { endpoint: 'https://api.openai.com/v1/chat/completions', token: getGithubToken() };
+  if(!apiCfg.token) throw new Error("Clé API manquante — vérifie config.js");
 
-  const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+  const resp = await fetch(apiCfg.endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${apiCfg.token}`
     },
     body: JSON.stringify({
       model: 'gpt-4o',
@@ -478,7 +380,7 @@ async function loadHistorique() {
   let hist = [];
   try { const r=await window.storage.get(key); if(r) hist=JSON.parse(r.value); } catch(e){}
   const label = document.getElementById('histLabel');
-  if(label) label.textContent = selectedBrand ? `Historique — ${selectedBrand==='intelixa'?'⚡ Intelixa':'🌱 Doudelio'}` : 'Historique';
+  if(label) label.textContent = selectedBrand ? 'Historique — ⚡ Intelixa' : 'Historique';
   const list = document.getElementById('historiqueList');
   if(!hist.length) { list.innerHTML='<div class="empty-state">Aucune génération pour linstant ✨</div>'; return; }
   list.innerHTML = hist.map(h=>`
@@ -516,7 +418,7 @@ async function loadRecentDashboard() {
 
 async function updateStats() {
   let total=0, notes=0, calPosts=0;
-  for(const b of ['intelixa','doudelio']) {
+  for(const b of ['intelixa']) {
     try { const r=await window.storage.get('history-'+b); if(r) total+=JSON.parse(r.value).length; } catch(e){}
     try { const r=await window.storage.get('notes-'+b); if(r) notes+=JSON.parse(r.value).length; } catch(e){}
   }
@@ -650,7 +552,7 @@ async function loadNotes() {
     document.getElementById('notesCatTabs').innerHTML='';
     return;
   }
-  if(h) h.textContent='Notes — '+(selectedBrand==='intelixa'?'⚡ Intelixa':'🌱 Doudelio');
+  if(h) h.textContent='Notes — ⚡ Intelixa';
   const notes = await getNotes();
   renderCatTabs(notes);
   renderNotes(notes);
@@ -1093,7 +995,6 @@ async function regenerate() {
 // ===== SEO/AEO ANALYZER =====
 const SEO_KEYWORDS = {
   intelixa: ['IA','automatisation','TPE','formation','CPF','Excel','productivité','digitalisation','performance','PME','entrepreneur','comptabilité','RH','dirigeant'],
-  doudelio: ['crèche','petite enfance','auxiliaire','puéricultrice','éducatrice','accueil','tout-petits','formation','pédagogie','CAP','terrain','bienveillance']
 };
 
 const AEO_INDICATORS = ['comment','pourquoi','quand','quel','quelle','combien','qui','est-ce que','faut-il','doit-on','peut-on','vaut-il mieux'];
@@ -1227,7 +1128,7 @@ const PREVIEW_TEMPLATES = {
       <div class="prev-header">
         <div class="prev-avatar" style="background:${brand==='intelixa'?'#c0392b':'#384786'};">${brand==='intelixa'?'I':'D'}</div>
         <div>
-          <div class="prev-name">${brand==='intelixa'?'Intelixa':'Doudelio'}</div>
+          <div class="prev-name">Intelixa</div>
           <div class="prev-meta">Page entreprise · Maintenant · 🌐</div>
         </div>
       </div>
@@ -1241,7 +1142,7 @@ const PREVIEW_TEMPLATES = {
     <div class="preview-instagram">
       <div class="prev-header">
         <div class="prev-avatar ig-avatar" style="background:${brand==='intelixa'?'#c0392b':'#384786'};">${brand==='intelixa'?'I':'D'}</div>
-        <div class="prev-name">${brand==='intelixa'?'intelixa_officiel':'doudelio_creche'}</div>
+        <div class="prev-name">intelixa_officiel</div>
         <div class="prev-dots" style="margin-left:auto;">•••</div>
       </div>
       <div class="prev-ig-image" style="background:${brand==='intelixa'?'linear-gradient(135deg,#1a0a0a,#3a1515)':'linear-gradient(135deg,#e8f5e4,#c8e6c9)'};">
@@ -1256,7 +1157,7 @@ const PREVIEW_TEMPLATES = {
       <div class="prev-header">
         <div class="prev-avatar" style="background:#4285F4;">G</div>
         <div>
-          <div class="prev-name">${brand==='intelixa'?'Intelixa':'Doudelio'}</div>
+          <div class="prev-name">Intelixa</div>
           <div class="prev-meta">Google · Vient de publier</div>
         </div>
       </div>
@@ -1269,7 +1170,7 @@ const PREVIEW_TEMPLATES = {
       <div class="prev-header">
         <div class="prev-avatar" style="background:${brand==='intelixa'?'#c0392b':'#384786'};">${brand==='intelixa'?'I':'D'}</div>
         <div>
-          <div class="prev-name">${brand==='intelixa'?'Intelixa':'Doudelio'}</div>
+          <div class="prev-name">Intelixa</div>
           <div class="prev-meta">Maintenant · 🌐</div>
         </div>
       </div>
@@ -1286,7 +1187,7 @@ const PREVIEW_TEMPLATES = {
       </div>
       <div class="prev-pin-body">
         <div class="prev-name" style="font-size:14px;margin-bottom:6px;">${text.substring(0,60)}${text.length>60?'...':''}</div>
-        <div class="prev-meta">${brand==='intelixa'?'intelixa.fr':'doudelio.com'}</div>
+        <div class="prev-meta">intelixa.fr</div>
       </div>
     </div>`,
 
@@ -1297,7 +1198,7 @@ const PREVIEW_TEMPLATES = {
         <div style="font-size:11px;color:${brand==='intelixa'?'#aaa':'#555'};margin-top:8px;text-align:center;">Prompt Veo</div>
       </div>
       <div class="prev-tiktok-caption">
-        <div class="prev-name">@${brand==='intelixa'?'intelixa':'doudelio'}</div>
+        <div class="prev-name">@intelixa</div>
         <div class="prev-body" style="padding:0;font-size:12px;">${formatPreviewText(text, 150)}</div>
       </div>
     </div>`,
@@ -1307,7 +1208,7 @@ const PREVIEW_TEMPLATES = {
       <div class="prev-spotify-img" style="background:${brand==='intelixa'?'linear-gradient(135deg,#1a0a0a,#2a1010)':'linear-gradient(135deg,#e8f5e4,#c8e6c9)'};">
         <span style="font-size:36px;">🎧</span>
       </div>
-      <div class="prev-name">Épisode · ${brand==='intelixa'?'Intelixa Podcast':'Doudelio Podcast'}</div>
+      <div class="prev-name">Épisode · Intelixa Podcast</div>
       <div class="prev-body">${formatPreviewText(text, 200)}</div>
     </div>`,
 
@@ -1315,7 +1216,7 @@ const PREVIEW_TEMPLATES = {
     <div class="preview-brevo">
       <div class="prev-brevo-header" style="background:${brand==='intelixa'?'#1a0a0a':'#384786'};">
         <span style="font-size:22px;">${brand==='intelixa'?'⚡':'🌱'}</span>
-        <span style="color:white;font-weight:800;font-size:14px;">${brand==='intelixa'?'INTELIXA':'DOUDELIO'}</span>
+        <span style="color:white;font-weight:800;font-size:14px;">INTELIXA</span>
       </div>
       <div class="prev-body" style="padding:16px;">${formatPreviewText(text, 300)}</div>
       <div class="prev-gmb-btn" style="margin:0 16px 16px;">Lire l'email complet</div>
@@ -1375,7 +1276,7 @@ async function checkReminders() {
   const remindersEl = document.getElementById('remindersBlock');
   if(!remindersEl) return;
 
-  const brands = selectedBrand ? [selectedBrand] : ['intelixa','doudelio'];
+  const brands = selectedBrand ? [selectedBrand] : ['intelixa'];
   const alerts = [];
   const now = Date.now();
 
@@ -1384,7 +1285,7 @@ async function checkReminders() {
       const r = await window.storage.get('history-'+b);
       if(!r) {
         // Never posted
-        alerts.push({brand:b, platform:'Studio', days:null, msg:`Aucune génération pour ${b==='intelixa'?'⚡ Intelixa':'🌱 Doudelio'} — commence maintenant !`});
+        alerts.push({brand:b, platform:'Studio', days:null, msg:`Aucune génération pour ⚡ Intelixa — commence maintenant !`});
         continue;
       }
       const hist = JSON.parse(r.value);

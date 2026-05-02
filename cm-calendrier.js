@@ -166,7 +166,7 @@ async function getCalendarAlerts() {
               const dayLabel = isToday
                 ? "aujourd'hui"
                 : `le ${postDate.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'})}`;
-              const brandIcon = p.brand === 'intelixa' ? icon('zap',13) : p.brand === 'doudelio' ? icon('leaf',13) : '';
+              const brandIcon = p.brand === 'intelixa' ? icon('zap',13) : '';
               alerts.push({
                 msg: `${icon('alertTriangle',14)} Post ${_platIcon(p.platform) || ''} ${p.platform} ${brandIcon} prévu ${dayLabel} — as-tu publié ?`,
                 actionFn: `markPostPublished(${y},${m},${day},${idx})`,
@@ -209,7 +209,7 @@ async function getPerformanceReviewAlerts() {
         if (p.status === 'publie' && !p.rating && !seenKeys.has(uniqKey)) {
           seenKeys.add(uniqKey);
           const dateStr = target.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-          const brandIcon = p.brand === 'intelixa' ? icon('zap',13) : p.brand === 'doudelio' ? icon('leaf',13) : '';
+          const brandIcon = p.brand === 'intelixa' ? icon('zap',13) : '';
           alerts.push({
             year: y, month: m, day: d, postIndex: idx,
             brand: p.brand, platform: p.platform, dateStr,

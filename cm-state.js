@@ -92,161 +92,6 @@ const TEMPLATES = {
       {id:6, text:"Business sans IA en 2026 : une erreur fatale ?"}
     ]
   },
-  doudelio: {
-    tiktok: [
-      {id:1,  text:"Journée type auxiliaire de puéricultrice"},
-      {id:2,  text:"Geste qui calme un enfant qui pleure"},
-      {id:3,  text:"Activité motricité 18 mois facile"},
-      {id:4,  text:"Quand un tout-petit refuse de dormir"},
-      {id:5,  text:"POV : ma première semaine en crèche"},
-      {id:6,  text:"Coulisses : l'accueil du matin en crèche"},
-      {id:7,  text:"Geste doux pour le change d'un bébé"},
-      {id:8,  text:"Ton moment le plus difficile en crèche ?"},
-      {id:9,  text:"1 éducatrice pour 5 bébés : la réalité"},
-      {id:10, text:"Montessori en crèche : pour ou contre ?"},
-      {id:11, text:"Ce jour qui m'a fait aimer ce métier"},
-      {id:12, text:"Témoignage après formation Doudelio"},
-      {id:13, text:"Activité sensorielle avec matériaux simples"},
-      {id:14, text:"Découvrir les formations Doudelio"},
-      {id:15, text:"Avant/après : coin lecture crèche transformé"}
-    ],
-    linkedin: [
-      {id:1,  text:"Burn-out en crèche : parlons-en vraiment"},
-      {id:2,  text:"Recrutement auxiliaire en 2026 : la galère"},
-      {id:3,  text:"Formation continue en petite enfance"},
-      {id:4,  text:"Management bienveillant en structure d'accueil"},
-      {id:5,  text:"60% des équipes de crèche en sous-effectif"},
-      {id:6,  text:"Diriger une crèche en 2026"},
-      {id:7,  text:"Le CAP PE suffit-il vraiment sur le terrain ?"},
-      {id:8,  text:"Comment gérez-vous le turn-over en crèche ?"},
-      {id:9,  text:"POV directrice : 1 an après la réorganisation"},
-      {id:10, text:"3 crèches formées, 0 rupture contractuelle"},
-      {id:11, text:"Différence entre éducatrice et auxiliaire"},
-      {id:12, text:"Diagnostic gratuit équipe de crèche"},
-      {id:13, text:"Comment Doudelio forme les équipes"},
-      {id:14, text:"Coût réel d'un recrutement raté en crèche"},
-      {id:15, text:"La vraie cause du burn-out en crèche"}
-    ],
-    instagram: [
-      {id:1,  text:"Carousel activité éveil 0-3 ans"},
-      {id:2,  text:"Idée déco coin lecture crèche"},
-      {id:3,  text:"Routine accueil matin en crèche"},
-      {id:4,  text:"Tenue Doudelio pour les pros du terrain"},
-      {id:5,  text:"5 activités sensorielles à moins de 5€"},
-      {id:6,  text:"Le sourire qui efface tout"},
-      {id:7,  text:"Votre activité préférée avec les tout-petits ?"},
-      {id:8,  text:"Les couleurs d'une crèche Doudelio"},
-      {id:9,  text:"3 000 auxiliaires formées par Doudelio"},
-      {id:10, text:"Avant/après formation d'équipe"},
-      {id:11, text:"Ma journée en crèche en images"},
-      {id:12, text:"Télécharger notre guide activités gratuites"},
-      {id:13, text:"Développement du langage 0-2 ans"},
-      {id:14, text:"Faut-il tolérer les écrans en crèche ?"},
-      {id:15, text:"Les petits moments de vrai bonheur en crèche"}
-    ],
-    gmb: [
-      {id:1,  text:"Crèche bienveillante et pédagogie active"},
-      {id:2,  text:"Formation auxiliaire petite enfance"},
-      {id:3,  text:"Accompagnement équipe de crèche"},
-      {id:4,  text:"Réglementation accueil collectif 2026"},
-      {id:5,  text:"Formation obligatoire EAJE 2026"},
-      {id:6,  text:"Gestion équipe crèche multi-sites"},
-      {id:7,  text:"Pédagogie Montessori en crèche collective"},
-      {id:8,  text:"Formation premiers secours petite enfance"},
-      {id:9,  text:"Recrutement auxiliaire et fidélisation"},
-      {id:10, text:"Accueil enfant en situation de handicap"},
-      {id:11, text:"Formation continue auxiliaire puéricultrice"},
-      {id:12, text:"Prévention burn-out équipe crèche"},
-      {id:13, text:"Management bienveillant structure d'accueil"},
-      {id:14, text:"Aménagement espace de vie crèche"},
-      {id:15, text:"Formation CAP PE remise à niveau"}
-    ],
-    facebook: [
-      {id:1,  text:"Question aux parents : ce que vous appréciez"},
-      {id:2,  text:"Conseil du jour pour les pros de crèche"},
-      {id:3,  text:"Partage expérience terrain auxiliaire"},
-      {id:4,  text:"Événement formation petite enfance"},
-      {id:5,  text:"Sondage : votre plus grande difficulté ?"},
-      {id:6,  text:"Astuce du lundi pour les équipes"},
-      {id:7,  text:"Une journée en crèche de l'intérieur"},
-      {id:8,  text:"Comment gérez-vous les transitions difficiles ?"},
-      {id:9,  text:"Nos formations en ligne disponibles maintenant"},
-      {id:10, text:"Avant/après formation d'équipe"},
-      {id:11, text:"Les parents en crèche : quelle place ?"},
-      {id:12, text:"Les étapes du développement 0-3 ans"},
-      {id:13, text:"Une session de formation Doudelio"},
-      {id:14, text:"1 auxiliaire sur 3 sans formation depuis 3 ans"},
-      {id:15, text:"Retour d'équipe après accompagnement Doudelio"}
-    ],
-    pinterest: [
-      {id:1,  text:"Idées activités sensorielles bébé"},
-      {id:2,  text:"Aménagement espace de vie crèche"},
-      {id:3,  text:"Planning semaine type structure"},
-      {id:4,  text:"Fiche technique soin nouveau-né"},
-      {id:5,  text:"Activités motrices 6-18 mois"},
-      {id:6,  text:"Aménager un coin lecture crèche"},
-      {id:7,  text:"Checklist réglementation EAJE 2026"},
-      {id:8,  text:"Développement langagier 0-3 ans"},
-      {id:9,  text:"Gestes premiers secours nourrisson"},
-      {id:10, text:"Guide formation continue auxiliaire"},
-      {id:11, text:"Pédagogie bienveillante en crèche"},
-      {id:12, text:"Checklist accueil enfant handicapé"},
-      {id:13, text:"Schéma routine soin nouveau-né"},
-      {id:14, text:"Signes de mal-être au travail en crèche"},
-      {id:15, text:"Aménager une salle de motricité"}
-    ],
-    spotify: [
-      {id:1,  text:"Épuisement professionnel en crèche"},
-      {id:2,  text:"Témoignage : auxiliaire depuis 10 ans"},
-      {id:3,  text:"Pédagogie Montessori en collectif"},
-      {id:4,  text:"Accueil enfant handicapé en crèche"},
-      {id:5,  text:"Directrice qui a transformé son équipe"},
-      {id:6,  text:"Les erreurs qu'on fait tous en crèche"},
-      {id:7,  text:"Montessori vs pédagogie classique en collectif"},
-      {id:8,  text:"Burn-out : comment j'en suis sortie"},
-      {id:9,  text:"Coulisses : conception d'une formation Doudelio"},
-      {id:10, text:"Une auxiliaire qui a créé sa micro-crèche"},
-      {id:11, text:"Réglementation crèche : on décrypte tout"},
-      {id:12, text:"Ce qui m'a redonné envie ce matin"},
-      {id:13, text:"Les outils qu'on garde pour nous en crèche"},
-      {id:14, text:"Formation en ligne vs présentiel pour auxis"},
-      {id:15, text:"Un pédiatre parle du quotidien en crèche"}
-    ],
-    brevo: [
-      {id:1,  text:"Newsletter : nouveautés réglementation"},
-      {id:2,  text:"Email : formation disponible en ligne"},
-      {id:3,  text:"Campagne : journée portes ouvertes"},
-      {id:4,  text:"Recap : conseils terrain de la semaine"},
-      {id:5,  text:"Prête pour votre prochaine formation ?"},
-      {id:6,  text:"Newsletter : retour terrain auxiliaire"},
-      {id:7,  text:"Offre duo directrice et équipe"},
-      {id:8,  text:"Email : guide activités gratuites en cadeau"},
-      {id:9,  text:"Réactivation : 6 mois sans formation"},
-      {id:10, text:"Newsletter : nouveauté pédagogique du trimestre"},
-      {id:11, text:"Email bienvenue : votre parcours Doudelio"},
-      {id:12, text:"Formation obligatoire EAJE avant l'été"},
-      {id:13, text:"Email post-formation : vos prochaines étapes"},
-      {id:14, text:"Newsletter : cas terrain du mois"},
-      {id:15, text:"Checklist réglementation 2026 offerte"}
-    ],
-    youtube: [
-      {id:1,  text:"Tuto : créer une routine CPF en crèche"},
-      {id:2,  text:"Pourquoi la formation continue sauve des équipes"},
-      {id:3,  text:"Interview directrice de crèche terrain"},
-      {id:4,  text:"Replay webinaire : réglementation 2026"},
-      {id:5,  text:"Aménager un espace motricité en crèche"},
-      {id:6,  text:"Auxiliaire qui a créé sa propre crèche"},
-      {id:7,  text:"Formations en ligne vs présentiel pour auxis"},
-      {id:8,  text:"Live Q&A : questions réglementation EAJE"},
-      {id:9,  text:"Peut-on vraiment appliquer Montessori en collectif ?"},
-      {id:10, text:"Gestes premiers secours nourrisson"},
-      {id:11, text:"Transformation d'une équipe en 3 mois"},
-      {id:12, text:"Créer un planning semaine en crèche"},
-      {id:13, text:"Une infirmière puéricultrice parle du terrain"},
-      {id:14, text:"1 semaine dans une crèche Doudelio"},
-      {id:15, text:"Animer une réunion d'équipe bienveillante"}
-    ]
-  }
 };
 
 const PLATFORM_EMO = {
@@ -268,8 +113,7 @@ const PLATFORMS_META = {
 
 // ===== PLATFORM DEFAULTS PER BRAND (first load only) =====
 const PLATFORM_DEFAULTS_HIDDEN = {
-  intelixa: ['tiktok', 'pinterest', 'spotify'],
-  doudelio:  ['linkedin', 'gmb', 'spotify']
+  intelixa: ['tiktok', 'pinterest', 'spotify']
 };
 
 const BRAND_CONTEXT = {
@@ -278,63 +122,14 @@ const BRAND_CONTEXT = {
     desc: `Intelixa aide les freelances, solopreneurs, indépendants et TPE/PME à automatiser leurs process grâce à l'IA. Message central : l'IA n'est plus un luxe, c'est une arme. Ceux qui l'utilisent écrasent la concurrence. Ceux qui ignorent l'IA perdent du temps, de l'argent et des clients — chaque jour. Cible : freelance, solopreneur, indépendant, dirigeant TPE/PME. Angle : toujours partir de la douleur client (temps perdu, argent gaspillé, surcharge mentale, retard sur la concurrence), montrer la transformation concrète avec l'IA, chiffrer quand possible. Ton : direct, cash, provocateur mais jamais agressif. Comme un ami qui te dit ce que les autres n'osent pas. Pas de langue de bois. Pas de jargon inutile. Des faits, des chiffres, des transformations réelles. CPF : levier de financement secondaire, pas l'argument principal.`,
     tiktok_context: "scène dans un bureau ou environnement professionnel montrant l'IA en action"
   },
-  doudelio: {
-    label: 'DOUDELIO',
-    desc: "Petite enfance, pédagogie, terrain en crèche. Cible : professionnelles de crèche, auxiliaires, éducatrices. Ton : humain, chaleureux, compréhensif, non moralisateur.",
-    tiktok_context: 'scène dans une crèche'
-  }
 };
 
 const PLATFORM_PROMPTS = {
-  tiktok: (b) => {
-    if (b.label === 'DOUDELIO') {
-      return `Génère un prompt pour Veo en respectant ces règles exactes.
-
-Thème de la scène : ${b.tiktok_context} — basé sur ce thème : ` + document.getElementById('theme').value + `
-
-La description de la scène doit être en anglais, centrée uniquement sur l'action et l'ambiance sonore, sans détails inutiles.
-
-Les dialogues doivent suivre ces règles précises :
-- Dialogues uniquement en français
-- Utiliser Child say ou Worker say
-- Chaque dialogue doit être écrit sur une nouvelle ligne
-- Ne pas utiliser ! ? ... ni de parenthèses
-- Terminer par la phrase : Dialogues must stay in French
-
-Le contenu doit respecter les règles de confidentialité et de sécurité de Veo.`;
-    } else {
-      return 'Le prompt TikTok pour Intelixa est en cours de création. Reviens bientôt ! 🌱';
-    }
-  },
+  tiktok: () => 'Le prompt TikTok pour Intelixa est en cours de création. Reviens bientôt ! 🌱',
   linkedin: () => `Génère un post LinkedIn professionnel de 150-250 mots :\n- 1ère ligne = accroche forte pour stopper le scroll\n- Structure : accroche / développement / enseignement / CTA\n- 5 hashtags pertinents à la fin`,
-  instagram: (b) => {
-    if (b.label === 'DOUDELIO') {
-      return `Tu es créateur de contenu Instagram spécialisé dans la petite enfance pour la marque Doudelio.
-
-Quand je te donne un sujet + un nombre de slides, tu produis automatiquement un carrousel Instagram.
-
-POUR CHAQUE SLIDE :
-A) Deux phrases courtes — simple, percutante, adaptée aux parents et pros de la petite enfance. Ton bienveillant, positif et accessible.
-B) DESCRIPTION VISUELLE (obligatoire) selon le style Doudelio :
-
-STYLE GRAPHIQUE : Flat design minimaliste pastel. Aplats de couleurs douces, sans contours. Formes arrondies, ambiance chaleureuse. Personnages stylisés, simples, expressifs, en posture de crèche. Aucun texte sur l'image.
-
-IDENTITÉ DOUDELIO : Chaque éducateur porte un tee-shirt Doudelio bleu #384786 avec "Doudelio" écrit en blanc. Enfants + adultes (crèche). Petites touches #DF6163 dans accessoires/détails (jamais couleur dominante).
-
-MISE EN PAGE : Fond principal azur très clair #f5f7f8. Format carré 1080x1080 px (compatible Canva). Style cohérent sur toutes les slides.
-
-CONTRAINTES PÉDAGOGIQUES : Ton positif, jamais culpabilisant. Messages simples, digestes, utiles. Le dernier panneau doit OBLIGATOIREMENT se terminer par une phrase engageante + une question ouverte pour encourager les commentaires.
-
-CONTRAINTES GRAPHIQUES : Style 2D minimaliste (pas Pixar détaillé, pas 3D). Fond uni #f5f7f8. Aucun texte. Tee-shirt Doudelio sur les éducateurs. Cadrage carré. Illustrations adaptées pour Instagram.
-
-RÈGLE AUTOMATIQUE : Tu génères directement la liste complète des slides (texte + description visuelle). Tu attends mon GO avant de générer les images.`;
-    } else {
-      return `Génère une légende Instagram complète pour Intelixa :\n- Accroche percutante en 1ère ligne\n- Storytelling court orienté performance\n- Question pour engager\n- 15 hashtags à la fin`;
-    }
-  },
-  gmb: (b) => {
-    if (b.label === 'INTELIXA') {
-      return `Tu génères un post Google Business pour Intelixa.
+  instagram: () => `Génère une légende Instagram complète pour Intelixa :\n- Accroche percutante en 1ère ligne\n- Storytelling court orienté performance\n- Question pour engager\n- 15 hashtags à la fin`,
+  gmb: () => {
+    return `Tu génères un post Google Business pour Intelixa.
 Tu choisis toi-même le sujet stratégique parmi les thématiques IA et bureautique appliquées aux métiers : RH, comptabilité, gestion commerciale, direction, administratif, pilotage, marketing, automatisation Excel, structuration d'entreprise, conformité fiscale, digitalisation TPE.
 Tu ne dois jamais te répéter. Ni angle. Ni chiffres. Ni structure. Ni promesse. Ni vocabulaire dominant. Chaque post doit être différent des précédents.
 
@@ -357,55 +152,12 @@ SEO et AEO : Intégrer de manière fluide et naturelle des mots-clés comme : fo
 À fournir :
 1. Un prompt d'image professionnel, réaliste, moderne, sans texte sur l'image
 2. Le post Google Business optimisé référencement France`;
-    } else {
-      return `Génère un post Google My Business de 100-150 mots pour Doudelio :\n- Informatif, humain, ancré dans le quotidien de la petite enfance\n- 1 CTA simple à la fin`;
-    }
   },
   facebook: () => `Génère un post Facebook engageant de 100-200 mots :\n- Ton accessible et chaleureux\n- Invite au commentaire ou partage\n- 1 question ou CTA à la fin`,
-  pinterest: (b) => {
-    if (b.label === 'DOUDELIO') {
-      return `Tu es un expert en stratégie Pinterest, SEO et AEO. Tu travailles pour Doudelio, plateforme dédiée aux professionnels de la petite enfance.
-
-Site de référence obligatoire : https://doudelio.com
-Toutes les idées doivent impérativement être reliées à une page réelle du site.
-Exception : Ne jamais utiliser ni se référencer à la page https://doudelio.com/actualite-petite-enfance/
-
-OBJECTIF : Générer de la visibilité qualifiée via le SEO Pinterest, se positionner sur des requêtes conversationnelles (AEO), générer des clics sortants vers le site, renforcer le positionnement expert auprès des directions et équipes de crèche.
-
-STRUCTURE OBLIGATOIRE POUR CHAQUE PROPOSITION :
-1. Pilier utilisé
-2. Page ciblée exacte du site (hors page actualité)
-3. Intention SEO
-4. Intention AEO (question réelle d'un professionnel)
-5. Angle terrain précis
-6. Titre Pinterest
-7. Promesse claire
-8. Mots-clés SEO + AEO (sans virgules, séparés uniquement par des espaces)
-9. Objectif (Visibilité ou Clic)
-10. Description précise de la scène illustrée (sans texte intégré dans l'image)
-
-PILIERS AUTORISÉS : Formations du catalogue, Obligations réglementaires liées à la formation continue, Solution Doudelio (plateforme, organisation, fonctionnement), Gestion et management d'équipe en crèche (si relié à une page du site), Offres et accompagnement proposés.
-
-STYLE GRAPHIQUE : Flat design minimaliste pastel. Aplats de couleurs douces, sans contours. Formes arrondies, ambiance chaleureuse. Personnages stylisés, simples, expressifs, en posture de crèche. Aucun texte sur l'image.
-
-IDENTITÉ DOUDELIO : Chaque éducateur porte un tee-shirt Doudelio bleu #384786 avec "Doudelio" écrit en blanc. Enfants + adultes (crèche). Petites touches #DF6163 dans accessoires/détails (jamais couleur dominante). Fond principal azur très clair #f5f7f8. Format carré 1080x1080 px.
-
-CONTRAINTES : Ton positif, jamais culpabilisant. Messages simples, digestes, utiles. Style 2D minimaliste (pas Pixar détaillé, pas 3D). Fond uni #f5f7f8. Aucun texte. Uniquement une illustration sur l'image.
-
-POSITIONNEMENT : Chaque épingle doit résoudre un problème métier concret, être applicable en crèche, montrer une compréhension du terrain, suggérer plutôt qu'expliquer visuellement, donner envie de cliquer via la légende.
-
-À LA FIN, toujours demander :
-A) Souhaitez-vous créer l'image ?
-B) Souhaitez-vous ajuster un élément stratégique (angle, titre, SEO, promesse) ?`;
-    } else {
-      return `Génère une description d'épingle Pinterest de 100-150 mots pour Intelixa :\n- Inspirant et utile\n- Mots-clés SEO intégrés\n- 5 hashtags à la fin`;
-    }
-  },
+  pinterest: () => `Génère une description d'épingle Pinterest de 100-150 mots pour Intelixa :\n- Inspirant et utile\n- Mots-clés SEO intégrés\n- 5 hashtags à la fin`,
   brevo: (b) => `Génère un email marketing pour ${b.label} :\n- Objet percutant (max 50 caractères)\n- Préheader accrocheur\n- Corps de l'email : introduction chaleureuse, contenu principal, CTA clair\n- Ton adapté à la marque\n- Longueur : 150-250 mots`,
   spotify: () => `Génère une description d'épisode podcast Spotify de 150-250 mots :\n- Accroche forte dès la 1ère phrase\n- Résumé du thème\n- Ce que l'auditeur va apprendre\n- CTA : s'abonner, laisser un avis`,
-  youtube: (b) => {
-    if (b.label === 'INTELIXA') {
-      return `Génère une description YouTube complète et optimisée SEO pour Intelixa sur le thème fourni.
+  youtube: () => `Génère une description YouTube complète et optimisée SEO pour Intelixa sur le thème fourni.
 
 Format vidéo cible : 8 à 15 minutes, ton expert et accessible, sur l'IA appliquée et la bureautique professionnelle.
 
@@ -420,26 +172,7 @@ Format vidéo cible : 8 à 15 minutes, ton expert et accessible, sur l'IA appliq
 4. TAGS YouTube (15-20 tags séparés par des virgules, mélange court et longue traîne)
 5. HASHTAGS (5 hashtags)
 
-Contraintes SEO : intégrer naturellement les mots-clés formation IA, bureautique professionnelle, automatisation, productivité, TPE, CPF. Titre et description doivent donner envie de cliquer.`;
-    } else {
-      return `Génère une description YouTube complète et optimisée SEO pour Doudelio sur le thème fourni.
-
-Format vidéo cible : 8 à 15 minutes, ton humain et bienveillant, sur la petite enfance et les professionnels de crèche.
-
-À fournir :
-1. TITRE YOUTUBE accrocheur (60-70 caractères max), orienté terrain, avec mot-clé principal
-2. DESCRIPTION YOUTUBE (500-800 mots) :
-   - Paragraphe d'intro chaleureux, ancré dans le quotidien en crèche
-   - Corps principal : ce que la vidéo apporte aux pros, points clés
-   - Liens et ressources (placeholder : [LIEN])
-   - CTA : s'abonner, commenter, partager avec un collègue
-3. CHAPITRES SUGGÉRÉS (format 00:00 - Titre, au moins 5 chapitres)
-4. TAGS YouTube (15-20 tags séparés par des virgules, mélange court et longue traîne)
-5. HASHTAGS (5 hashtags)
-
-Contraintes SEO : intégrer naturellement les mots-clés crèche, auxiliaire de puéricultrice, petite enfance, formation professionnelle, pédagogie. Ton positif, jamais culpabilisant.`;
-    }
-  }
+Contraintes SEO : intégrer naturellement les mots-clés formation IA, bureautique professionnelle, automatisation, productivité, TPE, CPF. Titre et description doivent donner envie de cliquer.`
 };
 
 // ===== PLANNING HEBDOMADAIRE =====
@@ -448,8 +181,6 @@ const PLANNING_HEBDO = {
   // 0 = Lundi
   0: [
     { text: "Google My Business",          platforms: ["gmb"],                   hour: 8,  minute: 0  },
-    { text: "TikTok Doudelio",             platforms: ["tiktok"],                hour: 10, minute: 0  },
-    { text: "Pinterest Doudelio",          platforms: ["pinterest"],             hour: 13, minute: 0  },
     { text: "Groupe Facebook Intelixa",    platforms: ["facebook"],              hour: 15, minute: 0  },
     { text: "Publication META",            platforms: ["instagram","facebook"],  hour: 19, minute: 0  }
   ],
@@ -460,7 +191,6 @@ const PLANNING_HEBDO = {
   ],
   // 2 = Mercredi
   2: [
-    { text: "Pinterest Doudelio",          platforms: ["pinterest"],             hour: 13, minute: 0  },
     { text: "Groupe Facebook Intelixa",    platforms: ["facebook"],              hour: 15, minute: 0  },
     { text: "Publication META",            platforms: ["instagram","facebook"],  hour: 18, minute: 0  }
   ],
@@ -472,7 +202,6 @@ const PLANNING_HEBDO = {
   // 4 = Vendredi
   4: [
     { text: "Publication META",            platforms: ["instagram","facebook"],  hour: 8,  minute: 0  },
-    { text: "Pinterest Doudelio",          platforms: ["pinterest"],             hour: 13, minute: 0  },
     { text: "Groupe Facebook Intelixa",    platforms: ["facebook"],              hour: 15, minute: 0  }
   ],
   // 5 = Samedi
@@ -486,14 +215,12 @@ const PLANNING_HEBDO = {
 // ===== TÂCHES RÉCURRENTES =====
 const TACHES_RECURRENTES = {
   quotidien: [
-    { text: "50 interactions LinkedIn",        platforms: ["linkedin"] },
-    { text: "TikTok Doudelio — 1 vidéo/jour",  platforms: ["tiktok"] }
+    { text: "50 interactions LinkedIn",        platforms: ["linkedin"] }
   ],
   hebdomadaire: [
     { text: "Publication META ×3 (Lun/Mer/Ven)", platforms: ["instagram","facebook"] },
     { text: "Story META ×2 (Mar/Jeu)",           platforms: ["instagram","facebook"] },
     { text: "LinkedIn ×2 (Mar/Jeu)",             platforms: ["linkedin"] },
-    { text: "Pinterest Doudelio ×3",             platforms: ["pinterest"] },
     { text: "Google My Business (Lun)",          platforms: ["gmb"] },
     { text: "Groupe Facebook Intelixa ×3",       platforms: ["facebook"] }
   ],

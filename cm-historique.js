@@ -79,7 +79,7 @@ async function saveToHistory(theme, content, type) {
 async function loadHistorique() {
   // Charger les deux marques + legacy history-all
   const allItems = [];
-  for (const b of ['intelixa','doudelio']) {
+  for (const b of ['intelixa']) {
     try {
       const r = await window.storage.get('history-'+b);
       if(r) allItems.push(...JSON.parse(r.value));
@@ -98,7 +98,7 @@ async function loadHistorique() {
 
   const label = document.getElementById('histLabel');
   if(label) label.innerHTML = selectedBrand
-    ? 'Historique — '+(selectedBrand==='intelixa'?icon('zap',14)+' Intelixa':icon('leaf',14)+' Doudelio')
+    ? 'Historique — '+icon('zap',14)+' Intelixa'
     : 'Historique';
 
   _renderHistFilters(allItems);
@@ -120,9 +120,9 @@ function _renderHistFilters(allItems) {
   const platforms = [...new Set(allItems.map(h=>h.platform).filter(Boolean))];
   const hasFilter = activeHistBrands.length || activeHistPlatforms.length;
 
-  const brandBtns = ['intelixa','doudelio'].map(b => {
+  const brandBtns = ['intelixa'].map(b => {
     const on = activeHistBrands.includes(b);
-    return `<button class="hist-filter-btn${on?' active':''}" onclick="toggleHistBrand('${b}')">${b==='intelixa'?icon('zap',13)+' Intelixa':icon('leaf',13)+' Doudelio'}</button>`;
+    return `<button class="hist-filter-btn${on?' active':''}" onclick="toggleHistBrand('${b}')">${icon('zap',13)+' Intelixa'}</button>`;
   }).join('');
 
   const platBtns = platforms.map(p => {

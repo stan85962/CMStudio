@@ -20,12 +20,12 @@ const notesKey = () => 'notes-global';
 async function _migrateNotesToGlobal() {
   if(_migrationDone) return;
   _migrationDone = true;
-  const hasOld = ['intelixa','doudelio'].some(b => localStorage.getItem('notes-'+b) !== null);
+  const hasOld = ['intelixa'].some(b => localStorage.getItem('notes-'+b) !== null);
   if(!hasOld) return;
   let merged = [];
   try { const r = await window.storage.get('notes-global'); if(r) merged = JSON.parse(r.value); } catch(e){}
   const existingIds = new Set(merged.map(n => n.id));
-  for(const b of ['intelixa','doudelio']) {
+  for(const b of ['intelixa']) {
     try {
       const r = await window.storage.get('notes-'+b);
       if(!r) continue;
@@ -183,8 +183,7 @@ function renderNotes(notes) {
       </div>`;
     }
 
-    const brandBadge = n.brand === 'intelixa' ? `<span style="font-size:10px;opacity:.45;margin-left:4px;">${icon('zap',10)}</span>`
-      : n.brand === 'doudelio' ? `<span style="font-size:10px;opacity:.45;margin-left:4px;">${icon('leaf',10)}</span>` : '';
+    const brandBadge = n.brand === 'intelixa' ? `<span style="font-size:10px;opacity:.45;margin-left:4px;">${icon('zap',10)}</span>` : '';
     return `<div class="postit" style="background:${bgColor};">
       <div class="postit-cat-badge">${icon(catInfo.iconName, 12)} ${catInfo.label}</div>
       <div class="postit-text">${n.text.replace(/\n/g,'<br>')}</div>

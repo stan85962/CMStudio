@@ -7,7 +7,7 @@
 let _resActiveBrand    = null;
 let _resActivePlatform = null;
 
-const _RES_BRAND_LABELS = { intelixa: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg> INTELIXA', doudelio: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg> DOUDELIO' };
+const _RES_BRAND_LABELS = { intelixa: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg> INTELIXA' };
 
 // ---- Ouvrir / fermer ----
 function openResourcesDrawer() {
@@ -46,7 +46,7 @@ function _resRenderBody() {
   const chevron = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
 
   let html = '';
-  for (const brand of ['intelixa', 'doudelio']) {
+  for (const brand of ['intelixa']) {
     const resHidden = _resGetHidden(brand);
     html += `<div class="res-brand-section">
       <div class="res-brand-header" style="display:flex;align-items:center;justify-content:space-between;">
@@ -151,7 +151,7 @@ function _resOpenManage(brand) {
       : `<div class="mpl-row"><span class="mpl-row-icon">${icon}</span><span class="mpl-row-label">${label}</span><button class="mpl-toggle-btn mpl-hide-it" onclick="_resTogglePlat('${brand}','${pid}',false)">${svgX} Masquer</button></div>`;
   }).join('');
 
-  const brandLabel = brand === 'intelixa' ? 'Intelixa' : 'Doudelio';
+  const brandLabel = 'Intelixa';
   let modal = document.getElementById('resManageModal');
   if (!modal) {
     modal = document.createElement('div');
@@ -194,7 +194,7 @@ function _resTogglePlat(brand, pid, show) {
 
 const _helpMessages = []; // {role, content} — session uniquement
 
-const _HELP_SYSTEM = `Tu es l'assistant intégré de CMStudio, un outil de Community Management pour les marques Intelixa et Doudelio.
+const _HELP_SYSTEM = `Tu es l'assistant intégré de CMStudio, un outil de Community Management pour la marque Intelixa.
 Tu réponds UNIQUEMENT aux questions sur CMStudio. Si la question est hors sujet, redirige poliment.
 Ton : direct, concis, utile — pas de blabla. Réponds en français.
 
@@ -208,7 +208,7 @@ DASHBOARD (page d'accueil)
 - Récents : liste des dernières générations
 
 STUDIO (génération de contenu)
-- Sélection de la marque (Intelixa ou Doudelio) et de la plateforme (LinkedIn, Instagram, Twitter/X, TikTok, Facebook, Blog)
+- Sélection de la plateforme (LinkedIn, Instagram, Twitter/X, TikTok, Facebook, Blog)
 - Champ thème libre + bouton "Idée IA" pour suggestions de thèmes
 - Mode A/B : génère deux versions simultanées pour comparer
 - Templates : structures pré-définies par plateforme (hook-valeur-CTA, storytelling, liste, etc.)
@@ -240,7 +240,7 @@ AUTOPILOT
 
 RESSOURCES & PROMPTS (panneau ☰)
 - Accès via le bouton ☰ dans la navigation
-- Éditeur de prompts par marque (Intelixa / Doudelio) et par plateforme (8 plateformes)
+- Éditeur de prompts par plateforme (8 plateformes)
 - Sauvegarder un prompt personnalisé → utilisé à la place du prompt par défaut lors des générations
 - Badge coloré sur les plateformes dont le prompt a été personnalisé
 - Réinitialiser supprime la personnalisation et revient au prompt par défaut
@@ -251,7 +251,6 @@ STAN CHEZ INTELIXA (espace perso)
 - Détection de doublons, tri IA, suivi de performance (rating 7j), édition inline
 
 THÈMES
-- Doudelio : vert (thème par défaut)
 - Intelixa : sombre/rouge (theme-intelixa)
 - Stan : gris neutre (theme-stan)`;
 
@@ -291,12 +290,12 @@ async function helpSend() {
   _helpAppendLoading(loadingId);
 
   try {
-    const token = getGithubToken();
-    if (!token) throw new Error('Token GitHub manquant — colle ton token dans le champ \uD83D\uDD11 en haut de la page.');
+    const _helpApiCfg = (typeof _getAPIConfig === 'function') ? _getAPIConfig() : { endpoint: 'https://api.openai.com/v1/chat/completions', token: '' };
+    if (!_helpApiCfg.token) throw new Error('Clé API manquante — vérifie config.js');
 
-    const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+    const resp = await fetch(_helpApiCfg.endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_helpApiCfg.token}` },
       body: JSON.stringify({
         model: 'gpt-4o',
         max_tokens: 500,

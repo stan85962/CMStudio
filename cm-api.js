@@ -11,13 +11,35 @@ function _cleanOutput(text) {
 }
 
 // ===== API =====
-function getGithubToken() {
-  // Priorité : config.js → localStorage (fallback compatibilité)
+function getOpenAIToken() {
   return (
+    (typeof CONFIG !== 'undefined' && CONFIG.OPENAI_TOKEN ? CONFIG.OPENAI_TOKEN : '') ||
+    localStorage.getItem('cm_openai_token') ||
+    ''
+  ).trim();
+}
+
+function getGithubToken() {
+  // Priorité : clé OpenAI → config.js GitHub → localStorage (fallback)
+  return getOpenAIToken() || (
     (typeof CONFIG !== 'undefined' && CONFIG.GITHUB_TOKEN ? CONFIG.GITHUB_TOKEN : '') ||
     localStorage.getItem('cm_github_token') ||
     ''
   ).trim();
+}
+
+function _getAPIConfig() {
+  const openaiToken = getOpenAIToken();
+  if (openaiToken) {
+    return {
+      endpoint: 'https://api.openai.com/v1/chat/completions',
+      token: openaiToken
+    };
+  }
+  return {
+    endpoint: 'https://models.inference.ai.azure.com/chat/completions',
+    token: getGithubToken()
+  };
 }
 
 function getBraveToken() {
@@ -135,11 +157,14 @@ async function callClaude(brand, theme, variant) {
     }
   } catch(e) {}
 
-  const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+  const apiCfg = _getAPIConfig();
+  if(!apiCfg.token) throw new Error("Clé API manquante — ajoute ta clé OpenAI dans config.js.");
+
+  const resp = await fetch(apiCfg.endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${apiCfg.token}`
     },
     body: JSON.stringify({
       model: 'gpt-4o',
@@ -173,7 +198,7 @@ async function callClaude(brand, theme, variant) {
   });
   const data = await resp.json();
   if(!resp.ok || !data.choices) {
-    throw new Error(data?.error?.message || `HTTP ${resp.status} — vérifie ton token GitHub`);
+    throw new Error(data?.error?.message || `HTTP ${resp.status} — vérifie ta clé API`);
   }
   return _cleanOutput(data.choices[0].message.content.trim());
 }
@@ -192,11 +217,14 @@ async function callClaudeVision(brand, images, platform, context) {
 
   const platInstructions = `Génère une caption percutante et optimisée pour ${platLabel}, prête à publier, sans commentaire ni explication.`;
 
-  const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+  const apiCfg = _getAPIConfig();
+  if (!apiCfg.token) throw new Error("Clé API manquante — ajoute ta clé OpenAI dans config.js.");
+
+  const resp = await fetch(apiCfg.endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${apiCfg.token}`
     },
     body: JSON.stringify({
       model: 'gpt-4o',
@@ -258,8 +286,8 @@ async function generateIdea() {
   document.getElementById('resultContent').innerHTML = '<span class="cursor"></span>';
 
   try {
-    const token = getGithubToken();
-    if(!token) throw new Error("Token GitHub manquant — colle ton token dans le champ 🔑 en haut de la page.");
+    const apiCfg = _getAPIConfig();
+    if(!apiCfg.token) throw new Error("Clé API manquante — ajoute ta clé OpenAI dans config.js.");
 
     const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
     const seoInject = buildSEOConstraints(selectedBrand, selectedPlatform);
@@ -267,11 +295,11 @@ async function generateIdea() {
 
     const ideaTheme =`Choisis toi-même l'idée la plus pertinente du moment pour ${brand.label} sur ${selectedPlatform}. Lance-toi directement dans le contenu, sans préciser le thème choisi au préalable.`;
 
-    const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+    const resp = await fetch(apiCfg.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${apiCfg.token}`
       },
       body: JSON.stringify({
         model: 'gpt-4o',
@@ -289,7 +317,7 @@ async function generateIdea() {
     });
     const data = await resp.json();
     if(!resp.ok || !data.choices) {
-      throw new Error(data?.error?.message || `HTTP ${resp.status} — vérifie ton token GitHub`);
+      throw new Error(data?.error?.message || `HTTP ${resp.status} — vérifie ta clé API`);
     }
     const postContent = _cleanOutput(data.choices[0].message.content.trim());
 
@@ -403,8 +431,8 @@ async function optimizeContent(failedScores) {
   const currentText = resultEl?.textContent?.trim();
   if(!currentText || currentText === '—') return;
 
-  const token = getGithubToken();
-  if(!token) { alert('Token manquant'); return; }
+  const apiCfg = _getAPIConfig();
+  if(!apiCfg.token) { alert('Clé API manquante — vérifie config.js'); return; }
 
   const btn = document.querySelector('.seo-optimize-btn');
   if(btn) { btn.disabled = true; btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:tplSpin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Optimisation…'; }
@@ -432,9 +460,9 @@ async function optimizeContent(failedScores) {
   const fixPrompt = `Réécris ce post en améliorant uniquement ces points, sans changer le fond :\n${fixes.join('\n')}\n\nPost original :\n${currentText}`;
 
   try {
-    const resp = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+    const resp = await fetch(apiCfg.endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiCfg.token}` },
       body: JSON.stringify({
         model: 'gpt-4o', max_tokens: 1000,
         messages: [

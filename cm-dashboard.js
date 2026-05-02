@@ -49,9 +49,6 @@ function _buildTodayCardHtml(today, events) {
           <button class="today-card-btn intelixa" onclick="_goStudioWithEvent('intelixa','${safeLabel}')">
             ${icon('zap',13)} Idée Intelixa →
           </button>
-          <button class="today-card-btn doudelio" onclick="_goStudioWithEvent('doudelio','${safeLabel}')">
-            ${icon('leaf',13)} Idée Doudelio →
-          </button>
         </div>
       </div>`;
   }).join('');
@@ -81,7 +78,7 @@ function _goStudioWithEvent(brand, eventLabel) {
 // ===== STATS =====
 async function updateStats() {
   let total=0, notes=0, calPosts=0;
-  for(const b of ['intelixa','doudelio']) {
+  for(const b of ['intelixa']) {
     try { const r=await window.storage.get('history-'+b); if(r) total+=JSON.parse(r.value).length; } catch(e){}
   }
   try { const r=await window.storage.get('notes-global'); if(r) notes=JSON.parse(r.value).length; } catch(e){}
@@ -173,7 +170,7 @@ async function checkReminders() {
   } catch(e) {}
 
   // --- Rappels fréquence de publication ---
-  const brands = selectedBrand ? [selectedBrand] : ['intelixa','doudelio'];
+  const brands = selectedBrand ? [selectedBrand] : ['intelixa'];
   const alerts = [];
   const now = Date.now();
 
@@ -181,7 +178,7 @@ async function checkReminders() {
     try {
       const r = await window.storage.get('history-'+b);
       if(!r) {
-        alerts.push({brand:b, platform:'Studio', days:null, msg:`Aucune génération pour ${b==='intelixa'?icon('zap',13)+' Intelixa':icon('leaf',13)+' Doudelio'} — commence maintenant !`});
+        alerts.push({brand:b, platform:'Studio', days:null, msg:`Aucune génération pour ${icon('zap',13)+' Intelixa'} — commence maintenant !`});
         continue;
       }
       const hist = JSON.parse(r.value);
@@ -279,7 +276,7 @@ async function renderPerfRecap() {
     .map(g => {
       const avg = g.ratings.reduce((s, v) => s + v, 0) / g.ratings.length;
       const dominant = SCORE_ICON[Math.max(1, Math.min(4, Math.round(avg)))] || '•';
-      const brandIcon = g.brand === 'intelixa' ? icon('zap',13) : g.brand === 'doudelio' ? icon('leaf',13) : '';
+      const brandIcon = g.brand === 'intelixa' ? icon('zap',13) : '';
       const platIcon = _platIcon(g.platform);
       return `
         <div class="perf-row">
@@ -322,7 +319,7 @@ async function renderObjectifMensuel() {
 
   // Compter posts générés ce mois (historique)
   let generated = 0;
-  for (const b of ['intelixa','doudelio']) {
+  for (const b of ['intelixa']) {
     try {
       const r = await window.storage.get('history-'+b);
       if (r) {
@@ -667,7 +664,7 @@ async function renderCustomBrandCards() {
   const dashContainer = document.getElementById('customBrandsContainer');
   if (dashContainer) dashContainer.innerHTML = cardsHTML + addBtnHTML;
 
-  // Studio brand-row: inject after the native Intelixa/Doudelio buttons
+  // Studio brand-row: inject after the native Intelixa button
   const studioRow = document.querySelector('#page-studio .brand-row');
   if (studioRow) {
     studioRow.querySelectorAll('.brand-custom, .brand-add-btn').forEach(el => el.remove());
@@ -844,7 +841,7 @@ function _renderObStep1() {
     </div>
     <div>
       <div class="ob-section-title">Nom de la marque <span style="color:#e53935">*</span></div>
-      <input id="_obName" class="ob-input" type="text" placeholder="Ex : Intelixa, Doudelio…" value="${name}" autocomplete="off">
+      <input id="_obName" class="ob-input" type="text" placeholder="Ex : MaMarque…" value="${name}" autocomplete="off">
     </div>
     <div>
       <div class="ob-section-title">Slogan ou accroche courte <span style="font-weight:400;color:var(--muted);font-size:10px">(optionnel)</span></div>
@@ -1263,7 +1260,7 @@ async function renderADNBadges() {
   const total = sections.length;
 
   // Marques fixes
-  for (const brandId of ['intelixa', 'doudelio']) {
+  for (const brandId of ['intelixa']) {
     let filled = 0;
     for (const s of sections) {
       const r = await window.storage.get(`adn-${brandId}-${s}`);
