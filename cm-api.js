@@ -418,3 +418,98 @@ async function generate() {
   btn.textContent = selectedBrand==='intelixa' ? '[ GENERER ]' : '✨ Générer';
 }
 
+
+// ===== GÉNÉRATION D'IMAGE DALL-E 3 =====
+async function generateImage() {
+  const text = (typeof abMode !== 'undefined' && abMode)
+    ? (document.getElementById('abTextA')?.textContent || '')
+    : (document.getElementById('resultContent')?.textContent || '');
+
+  if (!text || text === '—' || text.length < 10) {
+    alert('Génère d\'abord un post !');
+    return;
+  }
+
+  const apiCfg = _getAPIConfig();
+  if (!apiCfg.token) { alert('Clé API OpenAI manquante — vérifie config.js'); return; }
+
+  const btn = document.getElementById('genImgBtn');
+  const block = document.getElementById('imageBlock');
+
+  const sizeMap = {
+    instagram: '1024x1024', facebook: '1024x1024', gmb: '1024x1024',
+    tiktok: '1024x1792', pinterest: '1024x1792',
+    linkedin: '1792x1024', youtube: '1792x1024',
+    spotify: '1024x1024', brevo: '1024x1024'
+  };
+  const size = sizeMap[selectedPlatform] || '1024x1024';
+  const brand = (typeof BRAND_CONTEXT !== 'undefined' && BRAND_CONTEXT[selectedBrand]) || {};
+  const platLabel = (typeof PLATFORMS_META !== 'undefined' && PLATFORMS_META[selectedPlatform])
+    ? PLATFORMS_META[selectedPlatform].label : selectedPlatform;
+
+  btn.disabled = true;
+  btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:tplSpin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Génération…`;
+  block.style.display = 'block';
+  block.innerHTML = `<div class="img-loading"><div class="img-loading-spinner"></div><span>DALL-E 3 génère ton visuel…</span></div>`;
+
+  try {
+    // Étape 1 : GPT génère le prompt DALL-E en anglais
+    const promptResp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiCfg.token}` },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        max_tokens: 200,
+        messages: [
+          { role: 'system', content: 'You write concise DALL-E 3 image prompts in English for professional social media visuals. Reply ONLY with the prompt, no explanation. No text in the image. Style: clean, modern, professional photography or flat design.' },
+          { role: 'user', content: `Write a DALL-E 3 prompt for a ${platLabel} visual for the brand "${brand.label || 'Intelixa'}". Based on this post:\n\n${text.substring(0, 600)}` }
+        ]
+      })
+    });
+    const promptData = await promptResp.json();
+    if (!promptResp.ok) throw new Error(promptData?.error?.message || `HTTP ${promptResp.status}`);
+    const imgPrompt = promptData.choices[0].message.content.trim();
+
+    // Étape 2 : DALL-E 3 génère l'image
+    const imgResp = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiCfg.token}` },
+      body: JSON.stringify({
+        model: 'dall-e-3',
+        prompt: imgPrompt,
+        n: 1,
+        size,
+        quality: 'standard'
+      })
+    });
+    const imgData = await imgResp.json();
+    if (!imgResp.ok) throw new Error(imgData?.error?.message || `HTTP ${imgResp.status}`);
+
+    const url = imgData.data[0].url;
+    const revisedPrompt = imgData.data[0].revised_prompt || imgPrompt;
+
+    block.innerHTML = `
+      <div class="img-result">
+        <img src="${url}" alt="Visuel généré" class="img-result-img" crossorigin="anonymous">
+        <div class="img-result-meta">
+          <span class="img-result-size">${size} · DALL-E 3</span>
+          <div class="img-result-actions">
+            <a href="${url}" download="intelixa-${selectedPlatform}.png" class="img-dl-btn" target="_blank">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              Télécharger
+            </a>
+            <button class="img-regen-btn" onclick="generateImage()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+              Regénérer
+            </button>
+          </div>
+          <p class="img-prompt-text">${revisedPrompt.substring(0, 150)}…</p>
+        </div>
+      </div>`;
+  } catch(e) {
+    block.innerHTML = `<div class="img-error">❌ ${e.message}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg> Image IA`;
+}
