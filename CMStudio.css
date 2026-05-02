@@ -473,30 +473,6 @@ body.theme-intelixa .dash-hero p{font-family:'Inter',sans-serif;font-size:10px;l
 body.theme-intelixa .regen-btn { border-color: #dde3f0; font-family: 'Inter',sans-serif; font-size: 10px; }
 body.theme-intelixa .regen-btn:hover { background: #1a56ff; border-color: #1a56ff; color: white; }
 
-/* ===== SEO PANEL ===== */
-.seo-panel {
-  width: 100%; max-width: 740px; margin-top: 12px;
-  display: none; animation: popIn .3s ease both;
-}
-.seo-panel-inner {
-  background: var(--surface); border: 2px solid var(--border);
-  border-radius: 20px; padding: 20px;
-  box-shadow: 0 4px 16px var(--shadow);
-}
-body.theme-intelixa .seo-panel-inner { border-color: #dde3f0; }
-.seo-title {
-  font-size: 12px; font-weight: 900; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
-}
-body.theme-intelixa .seo-title { font-family: 'Inter',sans-serif; color: #1a56ff; }
-.seo-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
-}
-@media(max-width:480px) { .seo-grid { grid-template-columns: 1fr; } }
-.seo-item { }
-.seo-item-label { font-size: 12px; font-weight: 700; color: var(--text); }
-.seo-item-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
-body.theme-intelixa .seo-item-label { color: var(--text); }
 
 /* ===== PREVIEW MODAL ===== */
 .preview-modal {
@@ -2733,40 +2709,6 @@ body.theme-intelixa .veille-chip:hover {
   to { transform: rotate(360deg); }
 }
 
-/* ===== BOUTON OPTIMISER SEO/AEO ===== */
-.seo-optimize-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 12px;
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1.5px solid #ff9800;
-  background: rgba(255,152,0,.08);
-  color: #ff9800;
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: background .15s, transform .1s;
-  letter-spacing: .3px;
-}
-.seo-optimize-btn:hover {
-  background: rgba(255,152,0,.18);
-  transform: scale(1.03);
-}
-.seo-optimize-btn:disabled {
-  opacity: .6;
-  cursor: not-allowed;
-  transform: none;
-}
-body.theme-intelixa .seo-optimize-btn {
-  border-color: #ff9800;
-  color: #ffb74d;
-  background: rgba(255,152,0,.07);
-}
-body.theme-intelixa .seo-optimize-btn:hover {
-  background: rgba(255,152,0,.15);
-}
 
 /* ========================================================
    RESPONSIVE MOBILE — max-width: 768px
@@ -2928,11 +2870,6 @@ body.theme-intelixa .seo-optimize-btn:hover {
   .result-footer { flex-wrap: wrap; gap: 8px; }
   .copy-btn      { min-width: unset; flex: 1; min-height: 44px; }
 
-  /* ── 9. SEO PANEL ────────────────────────────────────── */
-  .seo-panel       { max-width: 100%; }
-  .seo-panel-inner { padding: 16px; }
-  .seo-grid        { grid-template-columns: 1fr; }
-  .seo-optimize-btn { width: 100%; justify-content: center; box-sizing: border-box; min-height: 44px; }
 
   /* ── 10. DASHBOARD ───────────────────────────────────── */
   .dash-hero    { max-width: 100%; margin-bottom: 20px; }

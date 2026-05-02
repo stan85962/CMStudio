@@ -225,7 +225,6 @@ async function generateIdea() {
     saveToHistory(ideaLine, postContent, 'IDÉE');
     updateStats();
     loadRecentDashboard();
-    renderSEOPanel(postContent, selectedBrand);
     checkPostGenLength(postContent, selectedPlatform);
 
   } catch(err) {
@@ -291,9 +290,6 @@ async function generate() {
     }
     updateStats();
     loadRecentDashboard();
-    // SEO analysis
-    const textForSEO = abMode ? document.getElementById('abTextA').textContent : document.getElementById('resultContent').textContent;
-    renderSEOPanel(textForSEO, selectedBrand);
     // Validation longueur post-génération
     checkPostGenLength(textForSEO, selectedPlatform);
   } catch(err) {
@@ -1010,114 +1006,6 @@ async function regenerate() {
   const theme = document.getElementById('theme').value.trim();
   if(!theme) return;
   await generate();
-}
-
-// ===== SEO/AEO ANALYZER =====
-const SEO_KEYWORDS = {
-  intelixa: ['IA','automatisation','TPE','formation','CPF','Excel','productivité','digitalisation','performance','PME','entrepreneur','comptabilité','RH','dirigeant'],
-};
-
-const AEO_INDICATORS = ['comment','pourquoi','quand','quel','quelle','combien','qui','est-ce que','faut-il','doit-on','peut-on','vaut-il mieux'];
-
-function analyzeSEOAEO(text, brand) {
-  if(!text || text.length < 20) return null;
-  const lower = text.toLowerCase();
-  const words = lower.split(/\s+/);
-  const keywords = SEO_KEYWORDS[brand] || [];
-
-  // SEO score — word-boundary matching, seuil 50%, bonus densité
-  const foundKw = keywords.filter(k => {
-    const escaped = k.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return new RegExp(`(^|\\s|[.,!?;:«»"'])${escaped}(\\s|[.,!?;:«»"']|$)`, 'i').test(lower);
-  });
-  const base = Math.min(100, Math.round((foundKw.length / Math.max(keywords.length * 0.5, 1)) * 100));
-  const density = words.length > 0 ? (foundKw.length / words.length) : 0;
-  const kwScore = Math.min(100, base + (density > 0.03 ? 10 : 0));
-
-  // AEO score — scoring gradué : questions + indicateurs + position
-  const hasQuestion = lower.includes('?');
-  const foundIndicators = AEO_INDICATORS.filter(i => lower.includes(i));
-  const questionAtBoundary = /^[^.!?]*\?/.test(text) || /\?\s*$/.test(text.trim());
-  let aeoScore = 0;
-  if(hasQuestion) aeoScore += 40;
-  aeoScore += Math.min(40, foundIndicators.length * 15);
-  if(questionAtBoundary) aeoScore += 20;
-  aeoScore = Math.min(100, aeoScore);
-
-  // Lisibilité — longueur phrases + pénalité mots complexes + bonus structure
-  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 5);
-  const avgLen = sentences.length ? words.length / sentences.length : 999;
-  let readScore = avgLen <= 12 ? 100 : avgLen <= 20 ? 70 : avgLen <= 30 ? 40 : 20;
-  const complexWords = words.filter(w => w.replace(/[^a-zA-ZÀ-ÿ]/g,'').length > 10).length;
-  const complexRatio = words.length > 0 ? complexWords / words.length : 0;
-  if(complexRatio > 0.15) readScore = Math.max(10, readScore - 20);
-  else if(complexRatio > 0.08) readScore = Math.max(10, readScore - 10);
-  if(/\n|•|^\s*[-*]\s/m.test(text)) readScore = Math.min(100, readScore + 10);
-
-  // Longueur — plancher à 10 si >3x le max
-  const len = text.length;
-  const idealLengths = {
-    linkedin: [1500, 3000], instagram: [800, 2200], gmb: [250, 1500],
-    facebook: [400, 1200], tiktok: [100, 500], pinterest: [200, 500],
-    spotify: [200, 800], brevo: [500, 2000]
-  };
-  const [min, max] = idealLengths[selectedPlatform] || [200, 1500];
-  let lenScore;
-  if(len < min) {
-    lenScore = Math.round((len / min) * 80);
-  } else if(len > max) {
-    const overshoot = (len - max) / max;
-    lenScore = Math.max(overshoot > 2 ? 10 : 20, Math.round(100 - overshoot * 60));
-  } else {
-    lenScore = 100;
-  }
-
-  return {
-    seo: kwScore, aeo: aeoScore, readability: readScore, length: lenScore,
-    foundKeywords: foundKw.slice(0, 5),
-    aeoIndicators: foundIndicators.slice(0, 3),
-    charCount: len, ideal: `${min}–${max}`
-  };
-}
-
-function renderSEOPanel(text, brand) {
-  const box = document.getElementById('seoPanel');
-  if(!box) return;
-  const data = analyzeSEOAEO(text, brand);
-  if(!data) { box.style.display='none'; return; }
-  box.style.display='block';
-
-  const scoreColor = s => s >= 70 ? '#4caf50' : s >= 40 ? '#ff9800' : '#f44336';
-  const scoreLabel = s => s >= 70 ? '🟢' : s >= 40 ? '🟡' : '🔴';
-  const bar = (s, color) => `<div style="height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:4px;">
-    <div style="height:100%;width:${s}%;background:${color};border-radius:3px;transition:width .6s ease;"></div></div>`;
-
-  box.innerHTML = `
-    <div class="seo-panel-inner">
-      <div class="seo-title">📊 Analyse SEO / AEO</div>
-      <div class="seo-grid">
-        <div class="seo-item">
-          <div class="seo-item-label">${scoreLabel(data.seo)} SEO — Mots-clés</div>
-          ${bar(data.seo, scoreColor(data.seo))}
-          <div class="seo-item-sub">${data.foundKeywords.length ? data.foundKeywords.join(', ') : 'Aucun détecté'}</div>
-        </div>
-        <div class="seo-item">
-          <div class="seo-item-label">${scoreLabel(data.aeo)} AEO — Question/Intention</div>
-          ${bar(data.aeo, scoreColor(data.aeo))}
-          <div class="seo-item-sub">${data.aeoIndicators && data.aeoIndicators.length ? data.aeoIndicators.join(', ') : (data.aeo >= 50 ? 'Intent AEO présent' : 'Ajouter une question')}</div>
-        </div>
-        <div class="seo-item">
-          <div class="seo-item-label">${scoreLabel(data.readability)} Lisibilité</div>
-          ${bar(data.readability, scoreColor(data.readability))}
-          <div class="seo-item-sub">Phrases courtes = meilleur score</div>
-        </div>
-        <div class="seo-item">
-          <div class="seo-item-label">${scoreLabel(data.length)} Longueur — ${data.charCount} car.</div>
-          ${bar(data.length, scoreColor(data.length))}
-          <div class="seo-item-sub">Idéal : ${data.ideal} caractères</div>
-        </div>
-      </div>
-    </div>`;
 }
 
 // ===== POST-GENERATION VALIDATION =====

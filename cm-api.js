@@ -91,11 +91,9 @@ const _IDEAL_LENGTHS = {
   spotify:[200,800], brevo:[500,2000], youtube:[500,3000]
 };
 
-function buildSEOConstraints(brandKey, platform) {
-  const kw = (typeof SEO_KEYWORDS !== 'undefined' && SEO_KEYWORDS[brandKey])
-    ? SEO_KEYWORDS[brandKey].slice(0, 6).join(', ') : '';
+function _lengthConstraint(platform) {
   const [min, max] = _IDEAL_LENGTHS[platform] || [200, 1500];
-  return `\nCONTRAINTES SEO/AEO :${kw ? ` mots-clés à intégrer : ${kw} |` : ''} longueur ${min}–${max} car. | inclure une question | phrases ≤20 mots.`;
+  return ` Longueur idéale : ${min}–${max} caractères.`;
 }
 
 // ===== ADN CONTEXT =====
@@ -133,7 +131,7 @@ async function callClaude(brand, theme, variant) {
   }
 
   const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
-  const seoInject = buildSEOConstraints(selectedBrand, selectedPlatform);
+  const seoInject = _lengthConstraint(selectedPlatform);
   const adnContext = await buildADNContext(selectedBrand);
 
   // Starred posts injection
@@ -208,7 +206,7 @@ async function callClaudeVision(brand, images, platform, context) {
   const token = getGithubToken();
   if (!token) throw new Error("Token GitHub manquant — colle ton token dans le champ 🔑 en haut de la page.");
 
-  const seoInject = buildSEOConstraints(selectedBrand, platform);
+  const seoInject = _lengthConstraint(platform);
   const adnContext = await buildADNContext(selectedBrand);
 
   const platLabel = (typeof PLATFORMS_META !== 'undefined' && PLATFORMS_META[platform])
@@ -290,7 +288,7 @@ async function generateIdea() {
     if(!apiCfg.token) throw new Error("Clé API manquante — ajoute ta clé OpenAI dans config.js.");
 
     const veilleInject = _veilleEnabled ? getVeillePrompt(selectedBrand) : '';
-    const seoInject = buildSEOConstraints(selectedBrand, selectedPlatform);
+    const seoInject = _lengthConstraint(selectedPlatform);
     const adnContext = await buildADNContext(selectedBrand);
 
     const ideaTheme =`Choisis toi-même l'idée la plus pertinente du moment pour ${brand.label} sur ${selectedPlatform}. Lance-toi directement dans le contenu, sans préciser le thème choisi au préalable.`;
@@ -340,7 +338,6 @@ async function generateIdea() {
     saveToHistory(ideaLine, postContent, 'IDÉE');
     updateStats();
     loadRecentDashboard();
-    renderSEOPanel(postContent, selectedBrand);
     checkPostGenLength(postContent, selectedPlatform);
 
   } catch(err) {
@@ -406,10 +403,6 @@ async function generate() {
     }
     updateStats();
     loadRecentDashboard();
-    // SEO analysis
-    const textForSEO = abMode ? document.getElementById('abTextA').textContent : document.getElementById('resultContent').textContent;
-    renderSEOPanel(textForSEO, selectedBrand);
-    // Validation longueur post-génération
     checkPostGenLength(textForSEO, selectedPlatform);
   } catch(err) {
     document.getElementById('errorMsg').innerHTML = `<div class="error-msg">❌ ${err.message}</div>`;
@@ -425,61 +418,3 @@ async function generate() {
   btn.textContent = selectedBrand==='intelixa' ? '[ GENERER ]' : '✨ Générer';
 }
 
-// ===== OPTIMISER (relance ciblée sur critères faibles) =====
-async function optimizeContent(failedScores) {
-  const resultEl = document.getElementById('resultContent');
-  const currentText = resultEl?.textContent?.trim();
-  if(!currentText || currentText === '—') return;
-
-  const apiCfg = _getAPIConfig();
-  if(!apiCfg.token) { alert('Clé API manquante — vérifie config.js'); return; }
-
-  const btn = document.querySelector('.seo-optimize-btn');
-  if(btn) { btn.disabled = true; btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:tplSpin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Optimisation…'; }
-
-  const brand = BRAND_CONTEXT[selectedBrand];
-  const fixes = [];
-
-  if(failedScores.includes('seo')) {
-    const kw = (typeof SEO_KEYWORDS !== 'undefined' && SEO_KEYWORDS[selectedBrand])
-      ? SEO_KEYWORDS[selectedBrand].slice(0,5).join(', ') : '';
-    if(kw) fixes.push(`- SEO : intègre naturellement ces mots-clés : ${kw}`);
-  }
-  if(failedScores.includes('aeo')) {
-    fixes.push(`- AEO : ajoute une question ou tournure interrogative (comment, pourquoi, est-ce que…)`);
-  }
-  if(failedScores.includes('readability')) {
-    fixes.push(`- Lisibilité : raccourcis les phrases (max 20 mots chacune)`);
-  }
-  if(failedScores.includes('length')) {
-    const [min, max] = _IDEAL_LENGTHS[selectedPlatform] || [200, 1500];
-    fixes.push(`- Longueur : ajuste pour atteindre ${min}–${max} caractères`);
-  }
-  if(!fixes.length) return;
-
-  const fixPrompt = `Réécris ce post en améliorant uniquement ces points, sans changer le fond :\n${fixes.join('\n')}\n\nPost original :\n${currentText}`;
-
-  try {
-    const resp = await fetch(apiCfg.endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiCfg.token}` },
-      body: JSON.stringify({
-        model: 'gpt-4o', max_tokens: 1000,
-        messages: [
-          { role: 'system', content: brand.systemPrompt ? `${brand.systemPrompt} Retourne uniquement le post réécrit, sans commentaire.${_STYLE_RULES}` : `Tu es un expert CM pour ${brand.label}. Retourne uniquement le post réécrit, sans commentaire.${_STYLE_RULES}` },
-          { role: 'user', content: fixPrompt }
-        ]
-      })
-    });
-    const data = await resp.json();
-    if(!resp.ok || !data.choices) throw new Error(data?.error?.message || `HTTP ${resp.status}`);
-    const result = _cleanOutput(data.choices[0].message.content.trim());
-    resultEl.textContent = result;
-    saveToHistory(document.getElementById('theme')?.value || 'Optimisé', result, 'OPT');
-    renderSEOPanel(result, selectedBrand);
-    checkPostGenLength(result, selectedPlatform);
-  } catch(err) {
-    document.getElementById('errorMsg').innerHTML = `<div class="error-msg">❌ ${err.message}</div>`;
-    if(btn) { btn.disabled = false; btn.textContent = '⚡ Optimiser'; }
-  }
-}
