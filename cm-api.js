@@ -1,12 +1,20 @@
 // ===== RÈGLES DE STYLE GLOBALES =====
-const _STYLE_RULES = ` Règles de style impératives : n'utilise jamais d'astérisques (*, **), jamais d'émojis, jamais de tirets em (—) ni de tirets en milieu de phrase pour lister des idées (utilise des points ou des retours à la ligne à la place), vouvoie toujours le lecteur, n'utilise jamais "je" à la première personne.`;
+const _STYLE_RULES = ` Règles de style IMPÉRATIVES — à respecter absolument :
+PONCTUATION : N'utilise jamais de tirets (-, –, —) pour remplacer une virgule, deux-points ou toute autre ponctuation. N'utilise jamais de tirets en début de ligne comme puces. Si tu veux lister, utilise des retours à la ligne simples ou des points. Les seuls guillemets autorisés sont les guillemets droits doubles : " et " (jamais « », jamais les guillemets courbes " " ou ' '). Pas d'astérisques (* ou **). Pas de hashtags sauf si explicitement demandé.
+STYLE : Écris comme un humain, pas comme une IA. Interdits absolus : "Il est important de", "Il convient de noter", "N'hésitez pas à", "Dans ce contexte", "En tant que", "Il est essentiel", "révolutionnaire", "innovant", "cutting-edge", "Dans le monde actuel", "En conclusion", "En résumé". Pas de listes numérotées (1. 2. 3.). Pas de puces (•). Phrases courtes, directes, concrètes. Varie la longueur des phrases. Pas de tournures creuses ou de langue de bois.
+VOIX : Tutoiement sauf si le ton de la marque impose le vouvoiement. Jamais "je" à la première personne sauf si le prompt le demande explicitement.`;
 
 function _cleanOutput(text) {
   return text
-    .replace(/\*\*/g, '')   // retire les **gras**
-    .replace(/\*/g, '')      // retire les *italique*
-    .replace(/^—\s*/gm, '')  // retire les tirets em en début de ligne
-    .replace(/\s—\s/g, ' ') // retire les tirets em inline
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/^[-–—]\s*/gm, '')       // tirets en début de ligne
+    .replace(/\s[-–—]\s/g, ', ')      // tirets inline → virgule
+    .replace(/[""]/g, '"')            // guillemets courbes → droits
+    .replace(/['']/g, "'")            // apostrophes courbes → droites
+    .replace(/«\s*/g, '"').replace(/\s*»/g, '"') // guillemets français → droits
+    .replace(/^\d+\.\s+/gm, '')       // listes numérotées
+    .replace(/^•\s*/gm, '')           // puces
     .trim();
 }
 
