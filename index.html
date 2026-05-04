@@ -20,6 +20,7 @@
     <button class="nav-tab" onclick="switchPage('studio',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg> Studio</button>
     <button class="nav-tab" onclick="switchPage('historique',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Historique</button>
     <button class="nav-tab" onclick="switchPage('notes',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg> Notes</button>
+    <button class="nav-tab" id="navTabADN" onclick="switchPage('adn',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/><path d="M10 9c-.747-1.997-1.466-3.995-2.807-5.993"/><path d="m17 2-2.5 2.5"/><path d="m19 4-7.5 7.5"/><path d="m21 6-1.5 1.5"/><path d="m3 14 1.5-1.5"/><path d="m5 16 7.5-7.5"/><path d="m7 18 2.5-2.5"/><path d="M2 9c6.667 6 13.333 0 20 6"/></svg> ADN</button>
     <button class="nav-tab" onclick="switchPage('calendrier',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg> Calendrier</button>
   </div>
   <button id="darkToggleBtn" class="dark-toggle-btn" onclick="toggleDark()" title="Mode sombre"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
@@ -270,17 +271,17 @@
   </div>
 </div>
 
-<script src="config.js?v=1"></script>
-<script src="cm-icons.js?v=2"></script>
-<script src="cm-state.js?v=3"></script>
-<script src="cm-api.js?v=3"></script>
-<script src="cm-historique.js?v=2"></script>
-<script src="cm-notes.js?v=2"></script>
-<script src="cm-calendrier.js?v=2"></script>
-<script src="cm-dashboard.js?v=2"></script>
-<script src="cm-studio.js?v=7"></script>
-<script src="cm-help.js?v=2"></script>
-<script src="cm-init.js?v=3"></script>
+<script src="config.js?v=2"></script>
+<script src="cm-icons.js?v=3"></script>
+<script src="cm-state.js?v=4"></script>
+<script src="cm-api.js?v=4"></script>
+<script src="cm-historique.js?v=3"></script>
+<script src="cm-notes.js?v=3"></script>
+<script src="cm-calendrier.js?v=3"></script>
+<script src="cm-dashboard.js?v=3"></script>
+<script src="cm-studio.js?v=8"></script>
+<script src="cm-help.js?v=3"></script>
+<script src="cm-init.js?v=4"></script>
 
 <div id="histModal" style="display:none;position:fixed;inset:0;z-index:2000;align-items:center;justify-content:center;"></div>
 

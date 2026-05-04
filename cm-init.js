@@ -148,21 +148,7 @@ function _initADN() {
     if (firstPage) firstPage.parentNode.insertBefore(page, firstPage);
     else document.body.appendChild(page);
   }
-  // Injecter l'onglet nav entre Notes et Calendrier
-  if (!document.getElementById('navTabADN')) {
-    const navTabs = document.querySelector('.nav-tabs');
-    if (navTabs) {
-      const calTab = [...navTabs.querySelectorAll('.nav-tab')]
-        .find(t => (t.getAttribute('onclick') || '').includes("'calendrier'"));
-      const tab = document.createElement('button');
-      tab.id = 'navTabADN';
-      tab.className = 'nav-tab';
-      tab.setAttribute('onclick', "switchPage('adn',this)");
-      tab.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c.6.5 1.2 1 2.5 1C7 13 7 11 9.5 11s2.5 2 5 2 2.5-2 5-2"/><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5s2.5 2 5 2 2.5-2 5-2"/><path d="M2 18c.6.5 1.2 1 2.5 1C7 19 7 17 9.5 17s2.5 2 5 2 2.5-2 5-2"/></svg> ADN`;
-      if (calTab) navTabs.insertBefore(tab, calTab);
-      else navTabs.appendChild(tab);
-    }
-  }
+  // L'onglet ADN est maintenant dans le HTML directement (navTabADN)
 }
 
 function _adnCompletionHtml(filled, total) {
