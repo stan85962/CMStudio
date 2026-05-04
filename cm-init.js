@@ -46,8 +46,10 @@ function checkConnectivity() {
   const generateBtn = document.getElementById('generateBtn');
   const ideaBtn     = document.getElementById('ideaBtn');
   const isOnline    = navigator.onLine;
-  // Priorité : config.js → localStorage (fallback)
+  // Priorité : OpenAI → GitHub → localStorage
   const hasToken    = !!(
+    (typeof CONFIG !== 'undefined' && CONFIG.OPENAI_TOKEN ? CONFIG.OPENAI_TOKEN : '') ||
+    localStorage.getItem('cm_openai_token') ||
     (typeof CONFIG !== 'undefined' && CONFIG.GITHUB_TOKEN ? CONFIG.GITHUB_TOKEN : '') ||
     localStorage.getItem('cm_github_token') ||
     ''
