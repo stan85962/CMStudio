@@ -12,11 +12,20 @@ function _cleanOutput(text) {
 
 // ===== API =====
 function getOpenAIToken() {
-  return (
+  const t = (
     (typeof CONFIG !== 'undefined' && CONFIG.OPENAI_TOKEN ? CONFIG.OPENAI_TOKEN : '') ||
     localStorage.getItem('cm_openai_token') ||
     ''
   ).trim();
+  if (t) return t;
+  // Clé OpenAI sauvegardée avant le fix dans cm_github_token
+  const gh = (localStorage.getItem('cm_github_token') || '').trim();
+  if (gh.startsWith('sk-')) {
+    localStorage.setItem('cm_openai_token', gh);
+    localStorage.removeItem('cm_github_token');
+    return gh;
+  }
+  return '';
 }
 
 function getGithubToken() {
